@@ -1,0 +1,87 @@
+﻿.rz-panel-menu .rz-navigation-menu .rz-navigation-menu .rz-navigation-menu .rz-navigation-item-wrapper {
+    background-color: purple !important;
+}
+
+.rz-panel-menu .rz-navigation-menu .rz-navigation-menu .rz-navigation-menu .rz-navigation-menu .rz-navigation-item-wrapper {
+    background-color: pink !important;
+}
+
+ul.rz-profile-menu {
+    padding: 0;
+    background: var(--rz-background, transparent);
+}
+
+ul.rz-navigation-menu > .ep-label {
+    color: var(--text-neutral-subtle);
+    font-size: var(--size-xs);
+    font-weight: var(--weight-medium);
+    line-height: 150%;
+}
+
+ul.rz-navigation-menu > hr {
+    margin: var(--spacing-200) 0;
+}
+
+
+ul.rz-profile-menu .rz-navigation-menu {
+    padding: 0;
+}
+
+ul.rz-profile-menu .item-text {
+    display: flex;
+    gap: var(--spacing-100);
+    align-items: center;
+    padding: var(--rz-padding, 0);
+    border-radius: var(--rz-radius, 0);
+}
+
+ul.rz-profile-menu .rz-navigation-item-link::before {
+    border-radius: var(--rz-radius, 0);
+}
+
+ul.rz-profile-menu .rz-navigation-item-icon-children {
+    display: none !important;
+}
+
+.rz-menu:not(.rz-profile-menu) {
+    background-color: transparent !important;
+}
+
+    .rz-menu:not(.rz-profile-menu) i.rzi {
+        display: none;
+    }
+
+.notranslate rzi rz-navigation-item-icon-children {
+    display: none;
+}
+
+.rz-menu:not(.rz-profile-menu) .rz-navigation-menu {
+    bottom: 80px;
+    right: 0px !important;
+    padding: var(--spacing-400, 16px) !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--spacing-400, 16px) !important;
+    border-radius: var(--radius-base, 8px) !important;
+    border: var(--border-width-base, 1px) solid var(--border-neutral-divider, rgba(48, 84, 133, 0.20)) !important;
+    background: var(--background-neutral-subtle, #FFF) !important;
+    min-width: 256px !important;
+}
+
+.rz-navigation-item-icon-children {
+    display: none;
+}
+
+.rz-menu:not(.rz-profile-menu) .rz-navigation-menu .rz-navigation-item-wrapper .rz-navigation-item-link {
+    display: flex !important;
+    padding: var(--spacing-200, 8px) !important;
+    align-items: flex-start !important;
+    gap: var(--spacing-200, 8px) !important;
+    align-self: stretch !important;
+}
+
+@media (max-width: 768px) {
+    .rz-menu:not(.rz-profile-menu) .rz-navigation-menu {
+        bottom: 70px !important;
+    }
+}

@@ -1,0 +1,14 @@
+﻿
+.rz-button:not(.rz-state-disabled):not(:active):focus-visible {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    /* gap: .25rem; */
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1 !important;
+    border-radius: 62rem !important;
+    border: none !important;
+    transition: .2s none !important;
+}

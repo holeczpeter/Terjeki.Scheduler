@@ -1,0 +1,8 @@
+﻿.rz-notification {
+    position: fixed !important;
+    inset-block-end: 20px !important;
+    inset-inline-start: 50% !important;
+    transform: translateX(-50%) !important;
+    inset-block-start: auto !important;
+    inset-inline-end: auto !important;
+}
