@@ -1,0 +1,43 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Terjeki.Scheduler.Core
+@using Terjeki.Scheduler.Web.Services
+@inherits LayoutComponentBase
+@inject TerjekiAuthenticationStateProvider AuthProvider
+<HeadContent>
+    <RadzenTheme Theme="material" />
+</HeadContent>
+<RadzenComponents />
+
+<div class="page">
+    @if (IsAuthenticated)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
+   
+    <main>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+@code{
+    private bool IsAuthenticated { get; set; } = false;
+    protected override async Task OnInitializedAsync()
+    {
+        IsAuthenticated = await GetAuthState();
+        AuthProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+
+    private async Task<bool> GetAuthState()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        return authState.User.Identity?.IsAuthenticated == true;
+    }
+
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        IsAuthenticated = await GetAuthState();
+    }
+}

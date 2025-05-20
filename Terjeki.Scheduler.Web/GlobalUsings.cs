@@ -1,0 +1,10 @@
+﻿global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Radzen;
+global using Terjeki.Scheduler.Web;
+global using Terjeki.Scheduler.Application;
+global using System.Reflection;
+global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel;
+global using Terjeki.Scheduler.Core.Enums;
+global using Terjeki.Scheduler.Core;

@@ -1,0 +1,122 @@
+﻿@using MediatR
+@using System.Security.Claims
+@using Terjeki.Scheduler.Core
+@using Terjeki.Scheduler.Web.Services
+@inject IViewService ViewService
+@inject IMediator Mediator
+@inject TerjekiAuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">TerjekiTours</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+<div class="@(NavMenuCssClass + " nav-scrollable nav-bg " + (ViewService.ViewType == ViewTypes.Desktop ? "show" : ""))" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <div class="nav-item-container">
+                    <RadzenIcon Icon="calendar_month" />
+                    <span> Naptár</span>
+                </div>
+
+            </NavLink>
+        </div>
+        @if (UserRole != "Driver")
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="users">
+                    <div class="nav-item-container">
+                        <RadzenIcon Icon="person" />
+                        <span> Felhasználók</span>
+                    </div>
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="drivers">
+                    <div class="nav-item-container">
+                        <RadzenIcon Icon="person" />
+                        <span> Sofőrok</span>
+                    </div>
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="buses">
+                    <div class="nav-item-container">
+                        <RadzenIcon Icon="airport_shuttle" />
+                        <span> Buszok</span>
+                    </div>
+
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="services">
+                    <div class="nav-item-container">
+                        <RadzenIcon Icon="build" />
+                        <span> Szervíz</span>
+                    </div>
+
+                </NavLink>
+            </div>
+        }
+     
+       
+
+        <a href="/" id="header-logo">
+            <img src="images/terjeki-busz-logo.svg" alt="ePostaláda" aria-label="ePostaláda" />
+        </a>
+        <div class="user-box">
+            <div class="user-info">
+                <img src="images/img_avatar.png" alt="Avatar" class="avatar">
+                @if (SelectedUser != null)
+                {
+                    <span>@SelectedUser</span>
+                    <span>@UserRole</span>
+                }
+
+            </div>
+
+            <RadzenButton Icon="logout" Click="@(() => Logout())" ButtonStyle="ButtonStyle.Primary" class="rz-border-radius-10 rz-shadow-10" />
+        </div>
+    </nav>
+
+</div>
+
+@code {
+    private string UserRole;
+    private string SelectedUser;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            SelectedUser = user.Identity.Name;
+            UserRole = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "Ismeretlen";
+        }
+        ViewService.OnViewChange += OnViewChangedHandler;
+        StateHasChanged();
+    }
+   
+    private void OnViewChangedHandler(ViewTypes view)
+    {
+        StateHasChanged();
+    }
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+    private void Logout()
+    {
+        AuthProvider.MarkUserAsLoggedOut();
+        Navigation.NavigateTo("/login", true);
+    }
+}

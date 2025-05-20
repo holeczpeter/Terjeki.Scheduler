@@ -1,0 +1,129 @@
+.main[b-h81jvowp6u] {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.date-header[b-h81jvowp6u] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.fixed-column[b-h81jvowp6u] {
+    position: sticky;
+    left: 0;
+    background-color: white; /* A háttér színének megadása, hogy kitakarja a görgetést */
+    z-index: 10; /* Biztosítja, hogy a busz neve mindig a többi oszlop felett jelenjen meg */
+    border-right: 2px solid #ddd; /* Elválasztás a többi oszloptól */
+}
+
+table[b-h81jvowp6u] {
+    border-collapse: collapse;
+    width:100%;
+}
+
+td[b-h81jvowp6u], th[b-h81jvowp6u] {
+    border: 1px solid #ccc;
+}
+tbody[b-h81jvowp6u], td[b-h81jvowp6u], tfoot[b-h81jvowp6u], th[b-h81jvowp6u], thead[b-h81jvowp6u], tr[b-h81jvowp6u] {
+    border-color: inherit;
+    border-style: solid;
+    border-width: 1px;
+}
+    .scrollable-table[b-h81jvowp6u] {
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
+}
+
+
+table[b-h81jvowp6u] {
+    table-layout: fixed; 
+}
+.weekend[b-h81jvowp6u] {
+    background-color: #CFD8DC;
+}
+.view-selection[b-h81jvowp6u] {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+}
+.week-navigation[b-h81jvowp6u] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+    .week-navigation span[b-h81jvowp6u] {
+        color: var(--gm3-sys-color-on-surface);
+        font: 400 22px / 28px "Google Sans", Roboto, Arial, sans-serif;
+        letter-spacing: 0;
+        white-space: nowrap;
+    }
+.view-container[b-h81jvowp6u] {
+    display: flex;
+    gap: 10px;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+ 
+}
+.event-object[b-h81jvowp6u] {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.sticky-cell[b-h81jvowp6u] {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: white;
+}
+
+.sticky-header[b-h81jvowp6u] {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: white;
+}
+
+.tooltiptext[b-h81jvowp6u] {
+
+    position: absolute;
+    top: 100%; /* vagy top: -100% ha fölé szeretnéd */
+    left: 0;
+    z-index: 1000;
+    background-color: #333;
+    color: white;
+    padding: 6px;
+    border-radius: 6px;
+    white-space: nowrap;
+    display: none;
+}
+
+
+
+.tooltiptext[b-h81jvowp6u]::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+
+div:hover > .tooltiptext[b-h81jvowp6u] {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+.calendar-type-view[b-h81jvowp6u] {
+    display: flex;
+    gap: 10px;
+}
+@media screen and (max-width: 1000px) {
+    .view-container[b-h81jvowp6u] {
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+    }
+}

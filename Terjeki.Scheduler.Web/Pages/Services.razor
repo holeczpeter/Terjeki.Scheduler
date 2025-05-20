@@ -1,0 +1,188 @@
+﻿@page "/services"
+@using MediatR
+@using Microsoft.AspNetCore.Authorization
+@using Terjeki.Scheduler.Core
+@using Terjeki.Scheduler.Web.Components.Buses
+@using Terjeki.Scheduler.Web.Components.Services
+@using Terjeki.Scheduler.Web.Services
+@inject HttpClient Http
+@inject IMediator Mediator
+@inject NavigationManager Navigation
+@attribute [Authorize(Roles = "Admin")]
+<PageTitle>Szervíz események</PageTitle>
+<div class="floating-button">
+    <RadzenButton Click=@(args => OnCreate())
+                  Icon="add"
+                  ButtonStyle="ButtonStyle.Primary"
+                  Size="ButtonSize.Large" class="rz-border-radius-10 rz-shadow-10 " />
+</div>
+<div class="title">
+    <h1>Szervíz események</h1>
+  
+</div>
+
+@if (services != null && services.Any())
+{
+    <RadzenDataGrid AllowFiltering="true" Responsive="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true"
+    PageSize="10" AllowSorting="true" 
+    Data="@services" TItem="EventModel">
+        <Columns>
+            <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    @(services.IndexOf(data) + 1)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                <Template Context="data">
+
+                    <div style=@GetColor(data)></div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="EventModel?.Bus?.Brand" Title="Név">
+
+                <Template Context="service">
+
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.Brand</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="EventModel?.Bus?.LicensePlateNumber" Title="Rendszám">
+                <Template Context="service">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.LicensePlateNumber</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="EventModel?.Bus?.CurrentMileage" Title="Km óra állás">
+                <Template Context="service">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.CurrentMileage</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(EventModel.StartDate)" Title="Kezdő dátum">
+                <Template Context="service">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service.StartDate.ToString("yyyy.MM.dd")</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(EventModel.EndDate)" Title="Vég dátum">
+                <Template Context="service">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service.EndDate.ToString("yyyy.MM.dd")</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+          
+            <RadzenDataGridColumn Property="@nameof(EventModel.ServiceType)" Title="Szervíz" >
+                <Template Context="service">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.ServiceType.GetDescription()</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Context="service"
+            Filterable="false" Sortable="false"
+            TextAlign="TextAlign.Right"
+            Width="200px"
+            Frozen="true"
+            FrozenPosition="FrozenColumnPosition.Right">
+                <Template Context="service">
+                    <RadzenButton Icon="edit"
+                    ButtonStyle="ButtonStyle.Light"
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                    Click="@(() => OnEdit(service))" @onclick:stopPropagation="true" />
+                    <RadzenButton Icon="delete"
+                    ButtonStyle="ButtonStyle.Light"
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Medium"
+                    Shade="Shade.Lighter" class="rz-my-1 rz-ms-1"
+                    Click="@(() => OnDelete(service.Id))" @onclick:stopPropagation="true" />
+                </Template>
+
+            </RadzenDataGridColumn>
+
+
+        </Columns>
+    </RadzenDataGrid>
+}
+else
+{
+    <p>Buszok betöltése folyamatban...</p>
+}
+
+@code {
+    private IList<EventModel> services = new List<EventModel>();
+    RadzenDataGrid<EventModel> busesGrid;
+    [Inject] DialogService DialogService { get; set; } = default!;
+    protected override async Task OnInitializedAsync()
+    {
+       
+        await Refresh();
+    }
+    private async Task Refresh()
+    {
+        services = new List<EventModel>();
+
+        var query = new GetServiceEventsQuery();
+        services = (List<EventModel>)await Mediator.Send(query);
+        StateHasChanged();
+    }
+    string GetColor(EventModel data)
+    { 
+        var color = data.ServiceType switch
+        {
+            ServiceTypes.Other => "orange",
+            ServiceTypes.Inspection => "blue",
+            ServiceTypes.OilChange => "red",
+            _ => "gray"
+        };
+        return $" width: 5px;height: 25px;background-color: {color};";
+    }
+    void RowRender(RowRenderEventArgs<EventModel> args)
+    {    
+    }
+    void CellRender(DataGridCellRenderEventArgs<EventModel> args)
+    {
+        var color = args.Data.ServiceType switch
+        {
+            ServiceTypes.Other => "orange",
+            ServiceTypes.Inspection => "blue",
+            ServiceTypes.OilChange => "red",
+            _ => "transparent"
+        };
+        args.Attributes.Add("style", $"background-color: {color};");
+    }
+    private async Task OnCreate()
+    {
+        var result = await DialogService.OpenAsync<CreateServiceDialog>($"Szervíz időpont felvitele");
+        if (result != null) await Refresh();
+
+    }
+    private async Task OnEdit(EventModel eventModel)
+    {
+        var parameters = new Dictionary<string, object>() { { "Selected", eventModel } };
+        var result = await DialogService.OpenAsync<UpdateServiceDialog>($"{eventModel.Bus.Brand} szervíz módosítása", parameters);
+        if (result != null) await Refresh();
+    }
+    private async Task OnDelete(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteEventCommand(id), new CancellationToken());
+        if (result) await Refresh();
+    }
+}

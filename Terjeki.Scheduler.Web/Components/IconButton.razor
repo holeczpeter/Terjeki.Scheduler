@@ -1,0 +1,16 @@
+﻿<button id="@Id" class="ep-icon-button" @onclick="OnClick" disabled="@Disabled" aria-label="@AriaLabel" tabindex="TabIndex">
+    <div class="ep-icon-button-container">
+        <i class="@Icon" style="color:@(Disabled ? "gray" : @Color); font-size:@(!string.IsNullOrWhiteSpace(IconSize)?@IconSize:"12px")" />
+    </div>
+</button>
+
+@code {
+    [Parameter] public string Id { get; set; } = $"iconbutton-{Guid.NewGuid()}";
+    [Parameter] public string Color { get; set; } = "transparent";
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public String? IconSize { get; set; }
+    [Parameter] public String? AriaLabel { get; set; }
+    [Parameter] public int? TabIndex { get; set; }
+}

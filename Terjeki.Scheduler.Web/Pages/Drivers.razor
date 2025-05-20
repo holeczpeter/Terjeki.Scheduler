@@ -1,0 +1,119 @@
+﻿@page "/drivers"
+@using MediatR
+@using Microsoft.AspNetCore.Authorization
+@using Terjeki.Scheduler.Core
+@using Terjeki.Scheduler.Web.Components.Drivers
+@using Terjeki.Scheduler.Web.Services
+@inject HttpClient Http
+@inject IMediator Mediator
+@inject DialogService DialogService
+@inject NavigationManager Navigation
+@attribute [Authorize(Roles = "Admin")]
+<PageTitle>Sofőrök</PageTitle>
+<div class="floating-button">
+    <RadzenButton Click=@(args => OnCreate())
+                  Icon="add"
+                  ButtonStyle="ButtonStyle.Primary"
+                  Size="ButtonSize.Large" class="rz-border-radius-10 rz-shadow-10 " />
+</div>
+<div class="title">
+    <h1>Sofőrök</h1>
+ 
+</div>
+
+@if (drivers != null && drivers.Any())
+{
+    <RadzenDataGrid  AllowFiltering="true" Responsive="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"
+    AllowPaging="true" PageSize="10" AllowSorting="true"
+    Data="@drivers" TItem="DriverModel">
+        <Columns>
+            <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    @(drivers.IndexOf(data) + 1)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="DriverModel.Name" Title="Név">
+                <Template Context="driver">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@driver.Name</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="DriverModel.Bus" Title="Busz">
+                <Template Context="driver">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@driver.Bus</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Context="driver"
+            Filterable="false" Sortable="false"
+            TextAlign="TextAlign.Right"
+            Width="200px"
+            Frozen="true"
+            FrozenPosition="FrozenColumnPosition.Right">
+                <Template Context="bus">
+
+                    <RadzenButton Icon="edit" 
+                    ButtonStyle="ButtonStyle.Light" 
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" 
+                    Click="@(() => OnEdit(bus))" @onclick:stopPropagation="true" />
+                    <RadzenButton Icon="delete"
+                    ButtonStyle="ButtonStyle.Light"
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Medium"
+                    Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" 
+                    Click="@(() => OnDelete(bus.Id))" @onclick:stopPropagation="true" />
+                </Template>
+
+            </RadzenDataGridColumn>
+
+        </Columns>
+    </RadzenDataGrid>
+}
+else
+{
+    <p>Sofőrök betöltése folyamatban...</p>
+}
+
+
+
+@code {
+    private IList<DriverModel> drivers = new List<DriverModel>();
+ 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+    private async Task Refresh()
+    { 
+        drivers = new List<DriverModel>();
+        var query = new GetDriversQuery();
+        drivers = (List<DriverModel>)await Mediator.Send(query);
+        StateHasChanged();
+    }
+    private async Task OnCreate()
+    {
+        var result = await DialogService.OpenAsync<CreateDriverDialog>($"Sofőr felvitele");
+        if (result != null) await Refresh();
+
+    }
+    private async Task OnEdit(DriverModel driver)
+    {
+        var parameters = new Dictionary<string, object>() { { "Selected", driver } };
+        var result = await DialogService.OpenAsync<UpdateDriverDialog>($"{driver.Name} adatainak módosítása", parameters);
+        if (result != null) await Refresh();
+    }
+    private async Task OnDelete(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteDriverCommand(id), new CancellationToken());
+        if (result) await Refresh();
+    }
+}
+

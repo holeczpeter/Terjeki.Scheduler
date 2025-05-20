@@ -1,0 +1,67 @@
+﻿@page "/login"
+@using MediatR
+@using Terjeki.Scheduler.Core
+@using Terjeki.Scheduler.Web.Services
+@inject TerjekiAuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
+@inject IMediator Mediator
+<RadzenStack Gap="1.5rem">
+    <EditForm EditContext="@editContext">
+        <DataAnnotationsValidator />
+        <div class="content">
+            <a href="/" id="header-logo">
+                <img src="images/terjeki-busz-logo.svg" />
+            </a>
+            <span>Üdvözöljük a Terjéki Naptár programban</span>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> E-mail </RadzenText>
+                <RadzenTextBox @bind-Value=@form.Email Style="width: 100%;min-width:300px" />
+                <ValidationMessage For="@(() => form.Email)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Jelszó </RadzenText>
+                <RadzenPassword Value=@form.Password aria-label="enter password" Style="width: 100%;min-width:300px" />
+                <ValidationMessage For="@(() => form.Password)" />
+            </div>
+            <RadzenButton Text="Bejelentkezés" Click="@DoLogin" Disabled="!isFormValid" Style="min-width:300px" />
+        </div>
+       
+    </EditForm>
+</RadzenStack>
+
+@code {
+  
+    private LoginForm form = new();
+
+    private EditContext editContext = new(new LoginForm());
+
+    private bool isFormValid = false;
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    private ValidationMessageStore messageStore;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        editContext = new EditContext(form);
+        messageStore = new ValidationMessageStore(editContext);
+        editContext.OnFieldChanged += ValidateForm;
+
+        await base.OnInitializedAsync();
+    }
+    private void ValidateForm(object? sender, FieldChangedEventArgs e)
+    {
+        isFormValid = editContext.Validate();
+        StateHasChanged();
+    }
+    private async Task DoLogin()
+    {
+        var users = new List<UserModel>();
+        var query = new GetUsersQuery();
+        users = (List<UserModel>) await Mediator.Send(query);
+        var selectedUser = users.Where(x => x.Email == form.Email).FirstOrDefault();
+        AuthProvider.MarkUserAsAuthenticated(selectedUser);
+        Navigation.NavigateTo("/");
+    }
+}

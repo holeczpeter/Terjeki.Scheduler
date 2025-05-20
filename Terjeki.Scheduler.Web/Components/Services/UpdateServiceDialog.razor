@@ -1,0 +1,206 @@
+﻿@using MediatR
+@using Terjeki.Scheduler.Core
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject IMediator Mediator
+
+<RadzenStack Gap="1.5rem">
+    <EditForm EditContext="@editContext">
+        <DataAnnotationsValidator />
+        <div class="content">
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Szervíz kiválasztása </RadzenText>
+                <RadzenDropDown Data="@serviceTypes"
+                                @bind-Value="@form.Type"
+                                TValue="ServiceTypes"
+                                TextProperty="Name"
+                                ValueProperty="Type"
+                                AllowClear="true"
+                                AllowFiltering="true"
+                                Style="width: 100%;"
+                                Name="DropDownCustomObjects" />
+
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Busz kiválasztása </RadzenText>
+                <RadzenDropDown Data=@buses
+                                TValue="BusModel" @bind-Value=@form.Bus AllowClear="true" AllowFiltering="true" Style="width: 100%;"
+                                Name="DropDownCustomObjects" />
+
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Km óra állás </RadzenText>
+                <RadzenNumeric @bind-Value=@form.Bus.CurrentMileage InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" Style="width: 100%;" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Leírás </RadzenText>
+                <RadzenTextArea @bind-Value=@form.Description Cols="30" Rows="3" aria-label="TextArea with 3 rows and 30 columns" Style="width: 100%;" />
+                <ValidationMessage For="@(() => form.Description)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Kezdő dátum </RadzenText>
+                <RadzenDatePicker @bind-Value=@form.Start Name="RadzenDatePickerBindValue" ShowCalendarWeek DateFormat="yyyy.MM.dd" Style="width: 100%;" />
+                <ValidationMessage For="@(() => form.Start)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Befejezés dátuma </RadzenText>
+                <RadzenDatePicker @bind-Value=@form.End Name="RadzenDatePickerBindValue" ShowCalendarWeek DateFormat="yyyy.MM.dd" Style="width: 100%;" />
+                <ValidationMessage For="@(() => form.End)" />
+            </div>
+        </div>
+        <div class="flex-button">
+
+            <TButton Label="Mégsem"
+                     Type="@TButton.TypeEnum.Outline"
+                     Size="@TButton.SizeEnum.Medium"
+                     OnClick="() => Close()">
+            </TButton>
+            <TButton Label="Mentés"
+                     Type="@TButton.TypeEnum.Primary"
+                     Size="@TButton.SizeEnum.Medium"
+                     OnClick="()=> OnSave()">
+            </TButton>
+
+        </div>
+    </EditForm>
+</RadzenStack>
+
+@code {
+
+    private UpdateServiceForm form = new();
+
+    private EditContext editContext = new(new UpdateServiceForm());
+
+    private bool isFormValid = false;
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    private ValidationMessageStore messageStore;
+
+    private List<BusModel> buses;
+    private List<EventModel> events;
+    private List<ServiceModel> serviceTypes;
+    [Parameter]
+    public EventModel Selected { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allEvents = await Mediator.Send(new GetEventsQuery());
+        events = allEvents.ToList();
+        var allBuses = await Mediator.Send(new GetBusesQuery());
+        buses = allBuses.ToList();
+
+        var allBus = await Mediator.Send(new GetBusesQuery());
+
+        var allServiceTypes = await Mediator.Send(new GetServiceTypesQuery());
+        serviceTypes = allServiceTypes.ToList();
+        form = new UpdateServiceForm()
+        {
+                Id = Selected.Id,
+                Bus = Selected.Bus,
+                Description = Selected.Description,
+                Start = Selected.StartDate,
+                End = Selected.EndDate,
+                Type = Selected.ServiceType
+        };
+        editContext = new EditContext(form);
+        messageStore = new ValidationMessageStore(editContext);
+        editContext.OnFieldChanged += ValidateForm;
+        form.PropertyChanged += OnFieldChanged;
+
+        await base.OnInitializedAsync();
+    }
+
+    private void OnFieldChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        editContext.NotifyFieldChanged(new FieldIdentifier(form, nameof(UpdateServiceForm.Type)));
+    }
+
+    private void ValidateForm(object? sender, FieldChangedEventArgs e)
+    {
+        messageStore.Clear();
+
+        if (form.Start != default && form.End != default)
+        {
+            if (form.Start > form.End)
+            {
+                messageStore.Add(new FieldIdentifier(form, nameof(form.Start)), "A kezdő dátum nem lehet nagyobb, mint a befejezés dátum.");
+                messageStore.Add(new FieldIdentifier(form, nameof(form.End)), "A befejezés dátuma nem lehet kisebb, mint a kezdés.");
+            }
+
+            if (form.Bus != null)
+            {
+                var overlapping = events.Any(ev =>
+                    ev.Bus != null &&
+                    ev.Bus.Id == form.Bus.Id &&
+                    (
+                        (form.Start >= ev.StartDate && form.Start < ev.EndDate) ||
+                        (form.End > ev.StartDate && form.End <= ev.EndDate) ||
+                        (form.Start <= ev.StartDate && form.End >= ev.EndDate)
+                    )
+                );
+
+                if (overlapping)
+                {
+                    var currentOverlap = events.Where(ev => ev.Bus != null && ev.Bus.Id == form.Bus.Id &&
+                    (
+                        (form.Start >= ev.StartDate && form.Start < ev.EndDate) ||
+                        (form.End > ev.StartDate && form.End <= ev.EndDate) ||
+                        (form.Start <= ev.StartDate && form.End >= ev.EndDate)
+                    )).FirstOrDefault();
+                    messageStore.Add(new FieldIdentifier(form, nameof(form.Start)), $"Ütközés más eseménnyel: {currentOverlap.Description} - {currentOverlap.StartDate.ToString("yyyy.MM.dd")} - {currentOverlap.EndDate.ToString("yyyy.MM.dd")} ");
+                    messageStore.Add(new FieldIdentifier(form, nameof(form.End)), $"Ütközés más eseménnyel: {currentOverlap.Description} - {currentOverlap.StartDate.ToString("yyyy.MM.dd")} - {currentOverlap.EndDate.ToString("yyyy.MM.dd")} ");
+                }
+            }
+        }
+
+
+
+        editContext.NotifyValidationStateChanged();
+        isFormValid = editContext.Validate();
+        StateHasChanged();
+    }
+
+
+    public async Task OnSave()
+    {
+        var request = new UpdateEventCommand()
+            {
+                Id = form.Id,
+                Bus = form.Bus,
+                StartDate = form.Start,
+                EndDate = form.End,
+                Type = EventTypes.Service,
+                ServiceType = form.Type,
+                Description = form.Description,
+            };
+        var result = await Mediator.Send(request, _cancellationTokenSource.Token);
+        if (result == null)
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Sikertelen mentés",
+                    Duration = 2000
+                });
+            DialogService.Close(result);
+            DialogService.CloseSide(result);
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = $"Sikeres módosítás",
+                    Duration = 2000
+                });
+            DialogService.Close(result);
+            DialogService.CloseSide(result);
+        }
+    }
+    private void Close()
+    {
+        DialogService.Close(null);
+    }
+
+}

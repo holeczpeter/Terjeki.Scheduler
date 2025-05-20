@@ -1,0 +1,15 @@
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.csproj.AssemblyReference.cache
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.AssemblyInfoInputs.cache
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.AssemblyInfo.cs
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.csproj.CoreCompileInputs.cache
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\bin\Debug\net8.0\Terjeki.Scheduler.Application.deps.json
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\bin\Debug\net8.0\Terjeki.Scheduler.Application.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\bin\Debug\net8.0\Terjeki.Scheduler.Application.pdb
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\bin\Debug\net8.0\Terjeki.Scheduler.Core.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\bin\Debug\net8.0\Terjeki.Scheduler.Core.pdb
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki..223B786D.Up2Date
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\refint\Terjeki.Scheduler.Application.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.pdb
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\ref\Terjeki.Scheduler.Application.dll

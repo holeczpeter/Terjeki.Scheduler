@@ -1,0 +1,83 @@
+﻿@using System.Text
+<button id="@Id" class="@GetClass()" @onclick="async () => await OnClick.InvokeAsync()" disabled="@Disabled" type="@GetButtonType()" aria-label="@AriaLabel">
+    @if (!string.IsNullOrWhiteSpace(Icon))
+    {
+        <i class="@Icon"/>
+    }
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <span>@Label</span>
+    }
+</button>
+
+@code {
+    [Parameter] public string Id { get; set; } = $"button-{Guid.NewGuid()}";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string Class { get; set; }
+    [Parameter] public TypeEnum Type { get; set; } = TypeEnum.Primary;
+    [Parameter] public ColorEnum Color { get; set; } = ColorEnum.Main;
+    [Parameter] public SizeEnum Size { get; set; } = SizeEnum.Medium;
+    [Parameter] public IconPositionEnum IconPosition { get; set; } = IconPositionEnum.Left;
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public ButtonTypeEnum ButtonType { get; set; } = ButtonTypeEnum.Button;
+    [Parameter] public String AriaLabel { get; set; }
+
+    public enum TypeEnum { Primary, Outline, Subtle, SubtleQuiet }
+    public enum ButtonTypeEnum { Submit, Button, Reset }
+    public enum ColorEnum { Main, Red, Black, Gray }
+    public enum SizeEnum { XSmall, Small, Medium, Large }
+    public enum IconPositionEnum { Left, Right }
+
+    private string GetButtonType() => $"{char.ToLower(ButtonType.ToString()[0])}{ButtonType.ToString()[1..]}";
+
+    private string GetClass()
+    {
+        StringBuilder sb = new("t-button");
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            sb.Append(" ");
+            sb.Append(Class);
+        }
+
+        sb.Append(" ");
+        sb.Append(Type switch
+        {
+            TypeEnum.Primary => "primary",
+            TypeEnum.Outline => "outline",
+            TypeEnum.Subtle => "subtle",
+            TypeEnum.SubtleQuiet => "subtle-quiet",
+            _ => "primary"
+        });
+
+        sb.Append(" ");
+        sb.Append(Color switch
+        {
+            ColorEnum.Main => "main",
+            ColorEnum.Red => "red",
+            ColorEnum.Black => "black",
+            ColorEnum.Gray => "gray",
+            _ => "main"
+        });
+
+        sb.Append(" ");
+        sb.Append(Size switch
+        {
+            SizeEnum.XSmall => "xsmall",
+            SizeEnum.Small => "small",
+            SizeEnum.Medium => "medium",
+            SizeEnum.Large => "large",
+            _ => "medium"
+        });
+
+        if (string.IsNullOrWhiteSpace(Label))
+            sb.Append(" icon-only");
+
+
+        if (IconPosition is IconPositionEnum.Right)
+            sb.Append(" right-icon");
+
+        return sb.ToString();
+    }
+}

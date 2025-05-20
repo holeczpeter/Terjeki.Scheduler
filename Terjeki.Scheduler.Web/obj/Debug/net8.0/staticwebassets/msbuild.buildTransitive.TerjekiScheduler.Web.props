@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\TerjekiScheduler.Web.props" />
+</Project>

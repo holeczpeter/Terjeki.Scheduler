@@ -1,0 +1,15 @@
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\bin\Debug\net8.0\Terjeki.Application.deps.json
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\bin\Debug\net8.0\Terjeki.Application.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\bin\Debug\net8.0\Terjeki.Application.pdb
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\bin\Debug\net8.0\Terjeki.Core.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\bin\Debug\net8.0\Terjeki.Core.pdb
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\Terjeki.Application.csproj.AssemblyReference.cache
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\Terjeki.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\Terjeki.Application.AssemblyInfoInputs.cache
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\Terjeki.Application.AssemblyInfo.cs
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\Terjeki.Application.csproj.CoreCompileInputs.cache
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\Terjeki..65EE4861.Up2Date
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\Terjeki.Application.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\refint\Terjeki.Application.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\Terjeki.Application.pdb
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Application\obj\Debug\net8.0\ref\Terjeki.Application.dll

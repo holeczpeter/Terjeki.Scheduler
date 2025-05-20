@@ -1,0 +1,135 @@
+﻿@page "/buses"
+@using MediatR
+@using Microsoft.AspNetCore.Authorization
+@using Terjeki.Scheduler.Core
+@using Terjeki.Scheduler.Web.Components.Buses
+@using Terjeki.Scheduler.Web.Services
+@inject HttpClient Http
+@inject IMediator Mediator
+@inject NavigationManager Navigation
+@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
+<PageTitle>Buszok</PageTitle>
+<div class="floating-button">
+    <RadzenButton Click="@(() => OnCreate())"
+                  Icon="add"
+                  ButtonStyle="ButtonStyle.Primary"
+                  Size="ButtonSize.Large"
+                  class="rz-border-radius-10 rz-shadow-10" />
+</div>
+
+<div class="title">
+    <h1>Buszok</h1>
+   
+</div>
+
+@if (buses != null && buses.Any())
+{ 
+    <RadzenDataGrid  AllowFiltering="true" Responsive="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" PageSize="10" AllowSorting="true"
+
+    Data="@buses" TItem="BusModel">
+        <Columns>
+            <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    @(buses.IndexOf(data) + 1)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="BusModel.Name" Title="Név">
+                <Template Context="bus">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@bus.Brand</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(BusModel.Capacity)" Title="Férőhely" />
+            <RadzenDataGridColumn Property="@nameof(BusModel.LicensePlateNumber)" Title="Rendszám"/>
+            <RadzenDataGridColumn Property="@nameof(BusModel.Description)" Title="Leírás" />
+            <RadzenDataGridColumn Property="@nameof(BusModel.CurrentMileage)" Title="Km óra állás" />
+            <RadzenDataGridColumn Property="BusModel?.Driver?.Name" Title="Sofőr">
+                <Template Context="bus">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenStack Gap="0">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@bus?.Driver?.Name</RadzenText>
+                        </RadzenStack>
+                    </RadzenStack>
+                </Template>
+                </RadzenDataGridColumn>
+            <RadzenDataGridColumn Context="bus" 
+                Filterable="false" Sortable="false"
+                TextAlign="TextAlign.Right"
+                Width="200px"
+                Frozen="true" 
+                FrozenPosition="FrozenColumnPosition.Right">
+                <Template Context="bus">
+                     <RadzenButton Icon="timeline" 
+                        ButtonStyle="ButtonStyle.Light" 
+                        Variant="Variant.Flat" 
+                        Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" 
+                        Click="@(() => OnTimeLine(bus))" @onclick:stopPropagation="true" />
+                 
+                    <RadzenButton Icon="edit" 
+                    ButtonStyle="ButtonStyle.Light" 
+                    Variant="Variant.Flat" 
+                    Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" 
+                    Click="@(() => OnEdit(bus))" @onclick:stopPropagation="true" />
+                    <RadzenButton Icon="delete" 
+                    ButtonStyle="ButtonStyle.Light" 
+                    Variant="Variant.Flat" 
+                    Size="ButtonSize.Medium" 
+                    Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" 
+                    Click="@(() => OnDelete(bus.Id))" @onclick:stopPropagation="true" />
+                </Template>
+            </RadzenDataGridColumn>
+
+
+        </Columns>
+    </RadzenDataGrid>
+}
+else
+{
+    <p>Buszok betöltése folyamatban...</p>
+}
+
+@code {
+    private IList<BusModel> buses = new List<BusModel>();
+    RadzenDataGrid<BusModel> busesGrid;
+    [Inject] DialogService DialogService { get; set; } = default!;
+    protected override async Task OnInitializedAsync()
+    {
+       
+        await Refresh();
+    }
+    private async Task Refresh()
+    {
+        buses = new List<BusModel>();
+
+        var query = new GetBusesQuery();
+        buses = (List<BusModel>)await Mediator.Send(query);
+        StateHasChanged();
+    }
+    private async Task OnCreate()
+    {
+        var result = await DialogService.OpenAsync<CreateBusDialog>($"Busz felvitele");
+        if (result != null) await Refresh();
+
+    }
+    private async Task OnTimeLine(BusModel bus)
+    {
+        var parameters = new Dictionary<string, object>() { { "Selected", bus } };
+        var result = await DialogService.OpenAsync<BusHistoryDialog>($"{bus.Brand} szervíz történet", parameters);
+        if (result != null) await Refresh();
+    }
+    private async Task OnEdit(BusModel bus)
+    {
+        var parameters = new Dictionary<string, object>() { { "Selected", bus } };
+        var result = await DialogService.OpenAsync<UpdateBusDialog>($"{bus.Brand} adatainak módosítása", parameters);
+        if (result != null) await Refresh();
+    }
+    private async Task OnDelete(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteBusCommand(id), new CancellationToken());
+        if (result) await Refresh();
+    }
+}

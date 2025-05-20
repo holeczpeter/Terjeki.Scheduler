@@ -1,0 +1,58 @@
+﻿@using Terjeki.Scheduler.Core
+@inject DialogService DialogService
+<RadzenStack Gap="1.5rem">
+<div class="content">
+    <RadzenTimeline>
+        <Items>
+            <RadzenTimelineItem PointStyle="PointStyle.Primary">
+                <LabelContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">212.122 km</RadzenText>
+                </LabelContent>
+                <ChildContent>
+                    Olajcsere
+                </ChildContent>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem>
+                <LabelContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">236.122 km</RadzenText>
+                </LabelContent>
+                <ChildContent>
+                    Fékbetét csere
+                </ChildContent>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem>
+                <LabelContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">252.003 km</RadzenText>
+                </LabelContent>
+                <ChildContent>
+                    Szervíz
+                </ChildContent>
+            </RadzenTimelineItem>
+            <RadzenTimelineItem>
+                <LabelContent>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">255.122 km</RadzenText>
+                </LabelContent>
+                <ChildContent>
+                    Olajcsere
+                </ChildContent>
+            </RadzenTimelineItem>
+        </Items>
+    </RadzenTimeline>
+</div>
+</RadzenStack>
+<div class="flex-button">
+    <TButton Label="Bezár"
+             Type="@TButton.TypeEnum.Primary"
+             Size="@TButton.SizeEnum.Medium"
+             OnClick="()=> Close()">
+    </TButton>
+
+</div>
+@code {
+    [Parameter]
+    public BusModel Selected { get; set; } = default!;
+    private void Close()
+    {
+        DialogService.Close(null);
+    }
+}

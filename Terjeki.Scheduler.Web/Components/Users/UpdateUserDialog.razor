@@ -1,0 +1,150 @@
+﻿@using MediatR
+@using Terjeki.Scheduler.Core
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject IMediator Mediator
+
+<RadzenStack Gap="1.5rem">
+    <EditForm EditContext="@editContext">
+        <DataAnnotationsValidator />
+        <div class="content">
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Név </RadzenText>
+                <RadzenTextBox @bind-Value=@form.Name Style="width: 100%" />
+                <ValidationMessage For="@(() => form.Name)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> E-mail </RadzenText>
+                <RadzenTextBox @bind-Value=@form.Email Style="width: 100%" />
+                <ValidationMessage For="@(() => form.Email)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Jogosultság kiválasztása </RadzenText>
+                <RadzenDropDown Data=@roles
+                                TValue="RoleModel" @bind-Value=@form.Role AllowClear="true" AllowFiltering="true" Style="width: 100%;"
+                                Name="DropDownCustomObjects" />
+            </div>
+        </div>
+        <div class="flex-button">
+
+            <TButton Label="Mégsem"
+                     Type="@TButton.TypeEnum.Outline"
+                     Size="@TButton.SizeEnum.Medium"
+                     OnClick="() => Close()">
+            </TButton>
+            <TButton Label="Mentés"
+                     Type="@TButton.TypeEnum.Primary"
+                     Size="@TButton.SizeEnum.Medium"
+                     OnClick="()=> OnSave()">
+            </TButton>
+
+        </div>
+    </EditForm>
+</RadzenStack>
+
+@code {
+    private UpdateUserForm form = new();
+
+    private EditContext editContext = new(new UpdateUserForm());
+
+    private bool isFormValid = false;
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    private ValidationMessageStore messageStore;
+
+    private List<RoleModel> roles;
+    private List<UserModel> users;
+    [Parameter]
+    public UserModel Selected { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        form = new UpdateUserForm()
+            {
+                Id = Selected.Id,
+                Name = Selected.Name,
+                Email = Selected.Email,
+                Role = Selected.Role,
+            };
+        var allRoles = await Mediator.Send(new GetRolesQuery());
+        roles = allRoles.ToList();
+        var allUser = await Mediator.Send(new GetUsersQuery());
+        users = allUser.Where(x=>x.Id != Selected.Id).ToList();
+
+        editContext = new EditContext(form);
+        messageStore = new ValidationMessageStore(editContext);
+        editContext.OnFieldChanged += ValidateForm;
+        form.PropertyChanged += OnFieldChanged;
+        await base.OnInitializedAsync();
+    }
+
+    private void OnFieldChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        editContext.NotifyFieldChanged(new FieldIdentifier(form, nameof(UpdateUserForm.Name)));
+    }
+
+    private void ValidateForm(object? sender, FieldChangedEventArgs e)
+    {
+        if (e.FieldIdentifier.FieldName == nameof(UpdateUserForm.Name))
+        {
+            ValidateName();
+        }
+
+        isFormValid = editContext.Validate();
+        StateHasChanged();
+    }
+
+    private void ValidateName()
+    {
+        messageStore.Clear(new FieldIdentifier(form, nameof(UpdateUserForm.Name)));
+
+        if (users.Any(n => n.Name.Equals(form.Name, StringComparison.OrdinalIgnoreCase) || n.Email.Equals(form.Email, StringComparison.OrdinalIgnoreCase)))
+        {
+            messageStore.Add(new FieldIdentifier(form, nameof(UpdateUserForm.Name)), $"A '{form.Name}' nevű felhasználó már létezik");
+        }
+
+        editContext.NotifyValidationStateChanged();
+    }
+    public async Task OnSave()
+    {
+        if (!string.IsNullOrEmpty(form.Name))
+        {
+            var request = new UpdateUserCommand()
+                {
+                    Id = form.Id,
+                    Name = form.Name,
+                    Email = form.Email,
+                    Role = form.Role,
+                };
+            var result = await Mediator.Send(request, _cancellationTokenSource.Token);
+            if (result == null)
+            {
+                NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Sikertelen mentés",
+                        Duration = 2000
+                    });
+                DialogService.Close(result);
+                DialogService.CloseSide(result);
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = $"Sikeres mentés",
+                        Duration = 2000
+                    });
+                DialogService.Close(result);
+                DialogService.CloseSide(result);
+            }
+
+        }
+    }
+    private void Close()
+    {
+        DialogService.Close(null);
+    }
+}

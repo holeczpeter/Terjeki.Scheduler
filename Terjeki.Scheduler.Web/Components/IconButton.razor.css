@@ -1,0 +1,28 @@
+﻿.ep-icon-button {
+    width: 32px;
+    height: 32px;
+    padding: 16px;
+    background: var(--transparent-black-subtle, rgba(0, 0, 0, 0.05));
+    border-radius: 1000px;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    border: none;
+    cursor: pointer;
+}
+
+.disabled {
+    background: var(--back-disabled-color);
+    cursor: pointer;
+}
+
+.ep-icon-button-container {
+    width: 32px;
+    height: 32px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.ep-icon-button-button i {
+}

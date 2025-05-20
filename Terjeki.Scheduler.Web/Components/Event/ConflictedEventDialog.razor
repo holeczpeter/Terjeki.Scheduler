@@ -1,0 +1,48 @@
+﻿@using Terjeki.Scheduler.Core
+@using Terjeki.Scheduler.Core.Enums
+@inject DialogService DialogService
+<RadzenStack Gap="1.5rem">
+     <div class="content">
+        <div>
+            <span>@DraggableItem.Bus - @DraggableItem.StartDate.ToString("yyyy.MM.dd") -  @DraggableItem.EndDate.ToString("yyyy.MM.dd")</span>
+            <span>@DraggableItem.Description</span>
+         </div>
+        <div>
+            Az adott intervallumban már van egy esemény 
+            <span>@ConflictedItem.Bus - @ConflictedItem.StartDate.ToString("yyyy.MM.dd") -  @ConflictedItem.EndDate.ToString("yyyy.MM.dd")</span>
+            <span>@DraggableItem.Description</span>
+        </div>
+    </div>
+    <div class="flex-button">
+
+        <TButton Label="Mégsem"
+        Type="@TButton.TypeEnum.Outline"
+        Size="@TButton.SizeEnum.Medium"
+        OnClick="() => Close()">
+        </TButton>
+        
+       
+        <TButton Label="Mentés"
+        Type="@TButton.TypeEnum.Primary"
+        Size="@TButton.SizeEnum.Medium"
+        OnClick="()=> OnSave()">
+        </TButton>
+    </div>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public EventModel DraggableItem { get; set; }
+
+    [Parameter]
+    public EventModel ConflictedItem { get; set; }
+    public async Task Close()
+    {
+        DialogService.Close(ConflictedResolveTypes.None);
+    }
+   
+    public async Task OnSave()
+    {
+        DialogService.Close(ConflictedResolveTypes.Save);
+    }
+}

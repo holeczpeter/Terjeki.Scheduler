@@ -1,0 +1,232 @@
+﻿@using MediatR
+@using Terjeki.Scheduler.Core
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject IMediator Mediator
+
+<RadzenStack Gap="1.5rem">
+    <EditForm EditContext="@editContext">
+        <DataAnnotationsValidator />
+        <div class="content">
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Férőhelyek száma </RadzenText>
+                <RadzenDropDown Data=@capacities
+                Change="@(args => ChangeCapacity(args))"
+                TValue="CapacityModel" @bind-Value=@form.Capacity AllowClear="true" AllowFiltering="true" Style="width: 100%;"
+                Name="DropDownCapacities" />
+
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Busz kiválasztása </RadzenText>
+                <RadzenDropDown Data=@buses
+                TValue="BusModel" @bind-Value=@form.Bus AllowClear="true" AllowFiltering="true" Style="width: 100%;"
+                Name="DropDownCustomObjects" />
+
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Sofőr(ök) kiválasztása </RadzenText>
+                <RadzenDropDown Data="@drivers"
+                @bind-Value="@form.Drivers"
+                TextProperty="Name"
+                Multiple="true"
+                AllowClear="true"
+                AllowFiltering="true"
+                Style="width: 100%;"
+                Name="DriversDropDown" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Leírás </RadzenText>
+                <RadzenTextArea @bind-Value=@form.Description Cols="30" Rows="3" aria-label="TextArea with 3 rows and 30 columns" Style="width: 100%;" />
+                <ValidationMessage For="@(() => form.Description)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Kezdő dátum </RadzenText>
+                <RadzenDatePicker @bind-Value=@form.Start Name="RadzenDatePickerBindValue" ShowCalendarWeek DateFormat="yyyy.MM.dd"  Style="width: 100%;" />
+                <ValidationMessage For="@(() => form.Start)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Befejezés dátuma </RadzenText>
+                <RadzenDatePicker @bind-Value=@form.End Name="RadzenDatePickerBindValue" ShowCalendarWeek DateFormat="yyyy.MM.dd" Style="width: 100%;" />
+                <ValidationMessage For="@(() => form.End)" />
+            </div>
+        </div>
+        <div class="flex-button">
+
+            <TButton Label="Mégsem"
+            Type="@TButton.TypeEnum.Outline"
+            Size="@TButton.SizeEnum.Medium"
+            OnClick="() => Close()">
+            </TButton>
+            <TButton Label="Mentés"
+            Type="@TButton.TypeEnum.Primary"
+            Size="@TButton.SizeEnum.Medium"
+            OnClick="()=> OnSave()">
+            </TButton>
+
+        </div>
+    </EditForm>
+</RadzenStack>
+
+@code {
+    private CreateEventForm form = new();
+
+    private EditContext editContext = new(new CreateEventForm());
+
+    private bool isFormValid = false;
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    private ValidationMessageStore messageStore;
+
+    private List<CapacityModel> capacities;
+
+    private List<BusModel> buses;
+
+    private List<DriverModel> drivers;
+
+    private List<EventModel> events;
+    [Parameter]
+    public DateTime? CurrentDate { get; set; }
+    [Parameter]
+    public EventGroupModel EventGroupModel { get; set; }
+    [Parameter]
+    public DriverEventModel CurrentDriverEventModel { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var allCapacities = await Mediator.Send(new GetCapacities());
+        capacities = allCapacities.ToList();
+
+        var allEvents = await Mediator.Send(new GetEventsQuery());
+        events = allEvents.ToList();
+
+        var allBuses = await Mediator.Send(new GetBusesQuery());
+        buses = allBuses.ToList();
+
+        var allBus = await Mediator.Send(new GetBusesQuery());
+
+        var allDrivers = await Mediator.Send(new GetDriversQuery());
+        drivers = allDrivers.ToList();
+        if (CurrentDate != null && CurrentDriverEventModel != null)
+        {
+            var drivers = new List<DriverModel> { CurrentDriverEventModel.Driver };
+            form = new CreateEventForm()
+                {
+                    Drivers = drivers,
+                    Start = CurrentDate.Value,
+                    End = CurrentDate.Value,
+                };
+        }
+        if (CurrentDate != null && EventGroupModel != null)
+        { 
+            form = new CreateEventForm()
+                {
+                    Bus = EventGroupModel.Bus,
+                    Capacity = EventGroupModel.Capacity,
+                    Start = CurrentDate.Value,
+                    End = CurrentDate.Value,
+                };
+        }
+        editContext = new EditContext(form);
+        messageStore = new ValidationMessageStore(editContext);
+        editContext.OnFieldChanged += ValidateForm;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task ChangeCapacity(object change )
+    {
+        if (Int32.TryParse(change?.ToString(), out int currentCapacity))
+        {
+            buses = buses.Where(x => x.Capacity.Capacity == currentCapacity).ToList();
+        }
+    }
+
+    private void ValidateForm(object? sender, FieldChangedEventArgs e)
+    {
+        messageStore.Clear();
+
+        if (form.Start != default && form.End != default)
+        {
+            if (form.Start > form.End)
+            {
+                messageStore.Add(new FieldIdentifier(form, nameof(form.Start)), "A kezdő dátum nem lehet nagyobb, mint a befejezés dátum.");
+                messageStore.Add(new FieldIdentifier(form, nameof(form.End)), "A befejezés dátuma nem lehet kisebb, mint a kezdés.");
+            }
+
+            if (form.Bus != null)
+            {
+                var overlapping = events.Any(ev =>
+                    ev.Bus != null &&
+                    ev.Bus.Id == form.Bus.Id &&
+                    (
+                        (form.Start >= ev.StartDate && form.Start < ev.EndDate) ||
+                        (form.End > ev.StartDate && form.End <= ev.EndDate) ||
+                        (form.Start <= ev.StartDate && form.End >= ev.EndDate)
+                    )
+                );
+
+                if (overlapping)
+                {
+                    var currentOverlap = events.Where(ev => ev.Bus != null &&  ev.Bus.Id == form.Bus.Id &&
+                    (
+                        (form.Start >= ev.StartDate && form.Start < ev.EndDate) ||
+                        (form.End > ev.StartDate && form.End <= ev.EndDate) ||
+                        (form.Start <= ev.StartDate && form.End >= ev.EndDate)
+                    )).FirstOrDefault();
+                    messageStore.Add(new FieldIdentifier(form, nameof(form.Start)), $"Ütközés más eseménnyel: {currentOverlap.Description} - {currentOverlap.StartDate.ToString("yyyy.MM.dd")} - {currentOverlap.EndDate.ToString("yyyy.MM.dd")} ");
+                    messageStore.Add(new FieldIdentifier(form, nameof(form.End)), $"Ütközés más eseménnyel: {currentOverlap.Description} - {currentOverlap.StartDate.ToString("yyyy.MM.dd")} - {currentOverlap.EndDate.ToString("yyyy.MM.dd")} ");
+                }
+            }
+        }
+
+
+
+        editContext.NotifyValidationStateChanged();
+        isFormValid = editContext.Validate();
+        StateHasChanged();
+    }
+
+
+    public async Task OnSave()
+    {
+        var request = new CreateEventCommand()
+            {
+                Capacity = form.Capacity,
+                Bus = form.Bus,
+                Drivers = form.Drivers,
+                Description = form.Description,
+                StartDate = form.Start,
+                EndDate = form.End,
+                Type = EventTypes.Event,
+                Status = form.Bus != null ? EventStatuses.Accepted : EventStatuses.Plan
+               
+
+            };
+        var result = await Mediator.Send(request, _cancellationTokenSource.Token);
+        if (result == null)
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Sikertelen mentés",
+                    Duration = 2000
+                });
+            DialogService.Close(result);
+            DialogService.CloseSide(result);
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = $"Sikeres rögzítés",
+                    Duration = 2000
+                });
+            DialogService.Close(result);
+            DialogService.CloseSide(result);
+        }
+    }
+    private void Close()
+    {
+        DialogService.Close(null);
+    }
+}

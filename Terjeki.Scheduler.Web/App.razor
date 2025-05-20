@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Terjeki.Scheduler.Core.Enums
+@using Terjeki.Scheduler.Web.Pages
+@using Terjeki.Scheduler.Web.Services
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject IViewService ViewService
+<RadzenTheme Theme="material" />
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized Context="context">
+                    @if (!context.User.Identity?.IsAuthenticated ?? true)
+                    {
+                        <Login />
+                    }
+                    else
+                    {
+                        <p>Nincs jogosultság az oldalhoz.</p>
+                    }
+                </NotAuthorized>
+                <Authorizing>
+                    <p>Betöltés...</p>
+                </Authorizing>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Nem található az oldal.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+@code{
+    
+    private DotNetObjectReference<App> objRef;
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("onScreenResize", objRef);
+        await SetLayoutBasedOnScreenSize();
+
+    }
+
+    [JSInvokable]
+    public async Task SetLayoutBasedOnScreenSize()
+    {
+        int width = await JS.InvokeAsync<int>("getScreenWidth");
+        var prevView = ViewService.ViewType;
+        var actView = width > 1000 ? ViewTypes.Desktop : ViewTypes.Mobile;
+
+        if (prevView != actView)
+        {
+            ViewService.ViewType = actView;
+            
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+}

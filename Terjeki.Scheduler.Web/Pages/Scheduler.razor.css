@@ -1,0 +1,129 @@
+﻿.main {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.date-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.fixed-column {
+    position: sticky;
+    left: 0;
+    background-color: white; /* A háttér színének megadása, hogy kitakarja a görgetést */
+    z-index: 10; /* Biztosítja, hogy a busz neve mindig a többi oszlop felett jelenjen meg */
+    border-right: 2px solid #ddd; /* Elválasztás a többi oszloptól */
+}
+
+table {
+    border-collapse: collapse;
+    width:100%;
+}
+
+td, th {
+    border: 1px solid #ccc;
+}
+tbody, td, tfoot, th, thead, tr {
+    border-color: inherit;
+    border-style: solid;
+    border-width: 1px;
+}
+    .scrollable-table {
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
+}
+
+
+table {
+    table-layout: fixed; 
+}
+.weekend {
+    background-color: #CFD8DC;
+}
+.view-selection {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+}
+.week-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+    .week-navigation span {
+        color: var(--gm3-sys-color-on-surface);
+        font: 400 22px / 28px "Google Sans", Roboto, Arial, sans-serif;
+        letter-spacing: 0;
+        white-space: nowrap;
+    }
+.view-container {
+    display: flex;
+    gap: 10px;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+ 
+}
+.event-object {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.sticky-cell {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: white;
+}
+
+.sticky-header {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: white;
+}
+
+.tooltiptext {
+
+    position: absolute;
+    top: 100%; /* vagy top: -100% ha fölé szeretnéd */
+    left: 0;
+    z-index: 1000;
+    background-color: #333;
+    color: white;
+    padding: 6px;
+    border-radius: 6px;
+    white-space: nowrap;
+    display: none;
+}
+
+
+
+.tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+
+div:hover > .tooltiptext {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+.calendar-type-view {
+    display: flex;
+    gap: 10px;
+}
+@media screen and (max-width: 1000px) {
+    .view-container {
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+    }
+}
