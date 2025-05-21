@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Terjeki.Scheduler.Web.props" />
-</Project>
