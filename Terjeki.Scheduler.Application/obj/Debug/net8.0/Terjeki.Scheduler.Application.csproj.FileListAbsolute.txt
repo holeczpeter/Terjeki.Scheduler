@@ -13,3 +13,4 @@ C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\
 C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\refint\Terjeki.Scheduler.Application.dll
 C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.pdb
 C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\ref\Terjeki.Scheduler.Application.dll
+C:\Users\holec\source\repos\TerjekiTerv\Terjeki.Scheduler.Application\obj\Debug\net8.0\Terjeki.Scheduler.Application.sourcelink.json

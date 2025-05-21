@@ -434,6 +434,7 @@
         buses = (List<BusModel>)await Mediator.Send(query);
         await LoadEventsForPeriod(DateTime.Today);
         ViewService.OnViewChange += OnViewChangedHandler;
+        StateHasChanged();
     }
     private void OnViewChangedHandler(ViewTypes view)
     {
@@ -692,6 +693,7 @@
     }
     private async Task OnDrop(DragEventArgs e, DateTime targetDate, EventGroupModel eventGroup)
     {
+        if (!IsAdmin) return;
         if (draggedItem == null) return;
 
         // Másolat készítése az eredeti eseményről
@@ -772,8 +774,9 @@
     }
     private async Task OnDrop(DragEventArgs e, DateTime targetDate, DriverEventModel eventGroup)
     {
-        if (draggedItem == null || eventGroup?.Driver == null)
-            return;
+        if (!IsAdmin) return;
+        if (draggedItem == null || eventGroup?.Driver == null) return;
+           
 
         // Másolatot készítünk a meglévő Driver listáról
         var updatedDrivers = draggedItem.Drivers
@@ -844,25 +847,25 @@
         var width = 195 * GetColSpan(ev);
         var color = (ev.Type, ev.Status) switch
         {
-            (EventTypes.Event, EventStatuses.Plan) => "orange",
-            (EventTypes.Event, EventStatuses.Accepted) => "lightgreen",
-            (EventTypes.Event, EventStatuses.Canceled) => "lightcoral",
+            (EventTypes.Event, EventStatuses.Plan) => "#ffa000",
+            (EventTypes.Event, EventStatuses.Accepted) => "#66bb6a",
+            (EventTypes.Event, EventStatuses.Canceled) => "#26a69a",
             var t when t.Item1 == EventTypes.Service &&
                         (t.Item2 == EventStatuses.Plan || t.Item2 == EventStatuses.Accepted || t.Item2 == EventStatuses.Canceled)
-                => "red",
+                => "#f4511e",
 
-            _ => "lightblue"
+            _ => "#2196f3"
         };
         var border = (ev.Type, ev.Status) switch
         {
-            (EventTypes.Event, EventStatuses.Plan) => "orange",
-            (EventTypes.Event, EventStatuses.Accepted) => "green",
-            (EventTypes.Event, EventStatuses.Canceled) => "coral",
+            (EventTypes.Event, EventStatuses.Plan) => "#e65100",
+            (EventTypes.Event, EventStatuses.Accepted) => "#1b5e20",
+            (EventTypes.Event, EventStatuses.Canceled) => "#004d40",
             var t when t.Item1 == EventTypes.Service &&
                         (t.Item2 == EventStatuses.Plan || t.Item2 == EventStatuses.Accepted || t.Item2 == EventStatuses.Canceled)
-                => "red",
+                => "#bf360c",
 
-            _ => "blue"
+            _ => "#0d47a1"
         };
         return $@"
                 position: absolute;
