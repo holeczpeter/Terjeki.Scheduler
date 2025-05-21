@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Terjeki.Scheduler.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3537199d3953582d6098263d786ff35f6f138982")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+62e6c87052dc87d8578987ea24cc7e0be7dfcd03")]
 [assembly: System.Reflection.AssemblyProductAttribute("Terjeki.Scheduler.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Terjeki.Scheduler.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

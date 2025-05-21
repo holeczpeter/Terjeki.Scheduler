@@ -1,0 +1,25 @@
+# .NET build output
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS cache
+.vs/
+.vscode/
+
+# Rider
+.idea/
+
+# Publish output
+publish/
+wwwroot/dist/
+
+# Logs
+*.log
+
+# Git-ignored files
+*.db
+*.sqlite
