@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Terjeki.Scheduler.Application
 {
@@ -200,7 +202,7 @@ namespace Terjeki.Scheduler.Application
             { 
                 Id = x.Driver.Id,
                 Name = x.Driver.Name,
-                Bus = x
+                Bus = new BusItemModel()  { Id = x.Id, Brand = x.Brand, LicensePlateNumber = x.LicensePlateNumber }
             
 
             }).ToList();
@@ -454,6 +456,10 @@ namespace Terjeki.Scheduler.Application
         }
         public async Task<BusModel> CreateBus(CreateBusCommand model, CancellationToken cancellationToken)
         {
+            var currentDriver = Drivers
+               .Where(d => d.Id == model.DriverId)
+               .FirstOrDefault();
+
             var bus = new BusModel()
             {
                 Id = Guid.NewGuid(),
@@ -461,7 +467,7 @@ namespace Terjeki.Scheduler.Application
                 Description = model.Description,
                 LicensePlateNumber = model.LicensePlateNumber,
                 Brand = model.Name,
-                Driver = model.Driver,
+                Driver = currentDriver,
             };
             Buses.Add(bus);
             return Buses.Where(x => x.Id == bus.Id).FirstOrDefault();
@@ -470,11 +476,13 @@ namespace Terjeki.Scheduler.Application
 
         public async Task<DriverModel> CreateDriver(CreateDriverCommand model, CancellationToken cancellationToken)
         {
+            var currentBus = await GetBus(model.BusId.Value,cancellationToken);
+
             var driver = new DriverModel()
             {
                 Id = Guid.NewGuid(),
                 Name = model.Driver.Name,
-                Bus = model.Bus,
+                Bus = new BusItemModel() { Id = currentBus.Id, Brand = currentBus.Brand, LicensePlateNumber = currentBus.LicensePlateNumber } 
             };
             Drivers.Add(driver);
             var currentDriver = Drivers.Where(x => x.Id == driver.Id).FirstOrDefault();
@@ -617,6 +625,10 @@ namespace Terjeki.Scheduler.Application
         public async Task<BusModel> UpdateBus(UpdateBusCommand model, CancellationToken cancellationToken)
         {
             var current = Buses.Where(x => x.Id == model.Id).FirstOrDefault();
+            var currentDriver =  Drivers
+               .Where(d => d.Id == model.DriverId)
+               .FirstOrDefault();
+           
             if (current != null)
             {
 
@@ -624,7 +636,7 @@ namespace Terjeki.Scheduler.Application
                 current.Description = model.Description;
                 current.LicensePlateNumber = model.LicensePlateNumber;
                 current.Brand = model.Name;
-                current.Driver = model.Driver;
+                current.Driver = currentDriver;
             }
             return current;
         }
@@ -632,10 +644,10 @@ namespace Terjeki.Scheduler.Application
         public async Task<DriverModel> UpdateDriver(UpdateDriverCommand model, CancellationToken cancellationToken)
         {
             var current = Drivers.Where(x => x.Id == model.Id).FirstOrDefault();
-            var currentBusModel = Buses.Where(x => x.Id == model.Bus.Id).FirstOrDefault();
+            var currentBusModel = Buses.Where(x => x.Id == model.BusId).FirstOrDefault();
             if (current != null && currentBusModel != null)
             {
-                current.Bus = currentBusModel;
+                current.Bus = new BusItemModel() { Id = currentBusModel.Id, LicensePlateNumber = currentBusModel.LicensePlateNumber, Brand = currentBusModel.Brand };
                 currentBusModel.Driver = current;
             }
 

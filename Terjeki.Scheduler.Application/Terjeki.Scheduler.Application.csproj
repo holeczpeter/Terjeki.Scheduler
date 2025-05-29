@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Terjeki.Scheduler.Core\Terjeki.Scheduler.Core.csproj" />
+    <ProjectReference Include="..\Terjeki.Scheduler.Infrastucure\Terjeki.Scheduler.Infrastucure.csproj" />
   </ItemGroup>
 
 </Project>

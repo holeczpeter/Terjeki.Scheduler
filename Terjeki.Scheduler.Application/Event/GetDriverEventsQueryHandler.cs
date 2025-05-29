@@ -1,4 +1,4 @@
-﻿namespace Terjeki.Scheduler.Application.Event
+﻿namespace Terjeki.Scheduler.Application
 {
     public class GetDriverEventsQueryHandler : IRequestHandler<GetDriverEventsQueryByInterval, IEnumerable<DriverEventModel>>
     {

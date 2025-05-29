@@ -1,15 +1,26 @@
-﻿namespace Terjeki.Scheduler.Application.Driver
+﻿namespace Terjeki.Scheduler.Application
 {
     public class GetDriverQueryHandler : IRequestHandler<GetDriverQuery, DriverModel>
     {
-        private readonly IMockDatabase _mockDatabase;
-        public GetDriverQueryHandler(IMockDatabase mockDatabase)
+        private readonly AppDbContext _dbContext;
+
+        public GetDriverQueryHandler(AppDbContext dbContext)
         {
-            _mockDatabase = mockDatabase;
+            _dbContext = dbContext;
         }
+
+       
         public async Task<DriverModel> Handle(GetDriverQuery request, CancellationToken cancellationToken)
         {
-            return await _mockDatabase.GetDriver(request.Id, cancellationToken);
+            return await this._dbContext.Drivers
+                 .Where(x => x.Id == request.Id)
+                 .Select(x => new DriverModel
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     Bus = x.Bus != null ?
+                            new BusItemModel() { Id = x.Bus.Id, Brand = x.Bus.Brand, LicensePlateNumber = x.Bus.LicensePlateNumber } : null
+                 }).FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

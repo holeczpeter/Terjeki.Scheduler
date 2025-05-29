@@ -1,15 +1,24 @@
-﻿namespace Terjeki.Scheduler.Application.Holiday
+﻿namespace Terjeki.Scheduler.Application
 {
     internal class GetHolidayTypesQueryHandler : IRequestHandler<GetHolidayTypesQuery, IEnumerable<HolidayModel>>
     {
-        private readonly IMockDatabase _mockDatabase;
-        public GetHolidayTypesQueryHandler(IMockDatabase mockDatabase)
+       
+        public GetHolidayTypesQueryHandler()
         {
-            _mockDatabase = mockDatabase;
+          
         }
         public async Task<IEnumerable<HolidayModel>> Handle(GetHolidayTypesQuery request, CancellationToken cancellationToken)
         {
-            return await _mockDatabase.GetHolidayTypes(cancellationToken);
+            return Enum.GetValues(typeof(HolidayTypes))
+                .Cast<HolidayTypes>()
+                .Where(x => x != HolidayTypes.None)
+                .Select(service => new HolidayModel
+                {
+
+                    Name = service.GetDescription(),
+                    Type = service
+                })
+                .ToList();
         }
     }
 }

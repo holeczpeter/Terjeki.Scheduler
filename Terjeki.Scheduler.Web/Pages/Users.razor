@@ -1,12 +1,10 @@
 ﻿@page "/users"
-@using MediatR
 @using Microsoft.AspNetCore.Authorization
 @using Terjeki.Scheduler.Core
 @using Terjeki.Scheduler.Web.Components.Drivers
 @using Terjeki.Scheduler.Web.Components.Users
 @using Terjeki.Scheduler.Web.Services
-@inject HttpClient Http
-@inject IMediator Mediator
+
 @inject DialogService DialogService
 @inject NavigationManager Navigation
 @attribute [Authorize(Roles = "Admin")]
@@ -93,38 +91,6 @@ else
 
 
 @code {
-    private IList<UserModel> users = new List<UserModel>();
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        
-        await Refresh();
-    }
-    private async Task Refresh()
-    {
-        users = new List<UserModel>();
-
-        var query = new GetUsersQuery();
-        users = (List<UserModel>)await Mediator.Send(query);
-        StateHasChanged();
-    }
-    private async Task OnCreate()
-    {
-        var result = await DialogService.OpenAsync<CreateUserDialog>($"Felhasználó felvitele");
-        if (result != null) await Refresh();
-
-    }
-    private async Task OnEdit(UserModel user)
-    {
-        var parameters = new Dictionary<string, object>() { { "Selected", user } };
-        var result = await DialogService.OpenAsync<UpdateUserDialog>($"{user.Name} adatainak módosítása", parameters);
-        if (result != null) await Refresh();
-    }
-    private async Task OnDelete(Guid id)
-    {
-        var result = await Mediator.Send(new DeleteUserCommand(id), new CancellationToken());
-        if (result) await Refresh();
-    }
+    
 }
 

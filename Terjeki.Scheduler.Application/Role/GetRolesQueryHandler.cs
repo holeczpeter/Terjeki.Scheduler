@@ -1,15 +1,41 @@
-﻿namespace Terjeki.Scheduler.Application.Role
+﻿namespace Terjeki.Scheduler.Application
 {
     internal class GetRolesQueryHandler : IRequestHandler<GetRolesQuery, IEnumerable<RoleModel>>
     {
-        private readonly IMockDatabase _mockDatabase;
-        public GetRolesQueryHandler(IMockDatabase mockDatabase)
+        public RoleModel AdminRole = new RoleModel
         {
-            _mockDatabase = mockDatabase;
+            Id = Guid.NewGuid(),
+            Name = "Adminisztrátor",
+            Type = RoleTypes.Admin
+        };
+
+        public RoleModel DriverRole = new RoleModel
+        {
+            Id = Guid.NewGuid(),
+            Name = "Sofőr",
+            Type = RoleTypes.Driver
+        };
+
+        public RoleModel ServiceRole = new RoleModel
+        {
+            Id = Guid.NewGuid(),
+            Name = "Szerelő",
+            Type = RoleTypes.Service
+        };
+        public GetRolesQueryHandler()
+        {
+            
         }
         public async Task<IEnumerable<RoleModel>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
         {
-            return await _mockDatabase.GetRoles(cancellationToken);
+            var roles = new List<RoleModel>
+                    {
+                        AdminRole,
+                        DriverRole,
+                        ServiceRole
+                    };
+
+            return roles;
         }
     }
 }

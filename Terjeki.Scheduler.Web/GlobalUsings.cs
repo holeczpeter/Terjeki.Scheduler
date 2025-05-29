@@ -8,3 +8,8 @@ global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel;
 global using Terjeki.Scheduler.Core.Enums;
 global using Terjeki.Scheduler.Core;
+global using Microsoft.AspNetCore.Components;
+global using Radzen.Blazor;
+global using Terjeki.Scheduler.Web.Components.Buses;
+global using Terjeki.Scheduler.Web.Services;
+global using System.Net.Http.Json;

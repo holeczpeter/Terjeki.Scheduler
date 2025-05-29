@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace Terjeki.Scheduler.Application.Event
+﻿namespace Terjeki.Scheduler.Application
 {
     public class GetEventsQueryByIntervalHandler : IRequestHandler<GetEventsQueryByInterval, IEnumerable<EventModel>>
     {

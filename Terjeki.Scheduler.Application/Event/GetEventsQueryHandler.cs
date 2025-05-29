@@ -1,4 +1,4 @@
-﻿namespace Terjeki.Scheduler.Application.Event
+﻿namespace Terjeki.Scheduler.Application
 {
     public class GetEventsQueryHandler : IRequestHandler<GetEventsQuery, IEnumerable<EventModel>>
     {

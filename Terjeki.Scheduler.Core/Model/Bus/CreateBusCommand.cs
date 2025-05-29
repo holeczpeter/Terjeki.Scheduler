@@ -13,7 +13,7 @@
         [Required]
         public CapacityModel Capacity { get; set; }
 
-        public DriverModel Driver { get; set; }
+        public Guid? DriverId { get; set; } = new();
 
         public int CurrentMileage { get; set; }
     }

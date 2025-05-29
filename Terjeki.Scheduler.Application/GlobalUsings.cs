@@ -5,3 +5,6 @@ global using Microsoft.Extensions.DependencyInjection;
 global using System.Net;
 global using System.Reflection;
 global using MediatR;
+global using Terjeki.Scheduler.Infrastucure;
+global using Microsoft.EntityFrameworkCore;
+global using Terjeki.Scheduler.Core.Entities;

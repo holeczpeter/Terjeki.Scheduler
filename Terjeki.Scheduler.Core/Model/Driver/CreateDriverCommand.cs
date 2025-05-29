@@ -6,7 +6,7 @@
         [Required]
         public DriverModel Driver { get; set; }
        
-        public BusModel Bus { get; set; }
+        public Guid? BusId { get; set; }
 
     }
 }
