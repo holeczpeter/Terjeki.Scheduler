@@ -1,10 +1,9 @@
 ﻿@page "/login"
-@using MediatR
 @using Terjeki.Scheduler.Core
 @using Terjeki.Scheduler.Web.Services
 @inject TerjekiAuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
-@inject IMediator Mediator
+
 <RadzenStack Gap="1.5rem">
     <EditForm EditContext="@editContext">
         <DataAnnotationsValidator />
@@ -30,7 +29,7 @@
 </RadzenStack>
 
 @code {
-  
+    [Inject] IUserService UserService { get; set; }
     private LoginForm form = new();
 
     private EditContext editContext = new(new LoginForm());
@@ -57,9 +56,8 @@
     }
     private async Task DoLogin()
     {
-        var users = new List<UserModel>();
-        var query = new GetUsersQuery();
-        users = (List<UserModel>) await Mediator.Send(query);
+        var allUser = await UserService.GetAllAsync();
+        var users = allUser.ToList();
         var selectedUser = users.Where(x => x.Email == form.Email).FirstOrDefault();
         AuthProvider.MarkUserAsAuthenticated(selectedUser);
         Navigation.NavigateTo("/");

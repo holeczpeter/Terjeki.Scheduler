@@ -1,4 +1,4 @@
-﻿namespace Terjeki.Scheduler.Application.User
+﻿namespace Terjeki.Scheduler.Application
 {
 
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserModel>

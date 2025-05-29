@@ -5,7 +5,6 @@
 @using Terjeki.Scheduler.Web.Components.Drivers
 @using Terjeki.Scheduler.Web.Services
 @inject HttpClient Http
-@inject IMediator Mediator
 @inject DialogService DialogService
 @inject NavigationManager Navigation
 @attribute [Authorize(Roles = "Admin")]
@@ -84,36 +83,6 @@ else
 
 
 @code {
-    private IList<DriverModel> drivers = new List<DriverModel>();
- 
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Refresh();
-    }
-    private async Task Refresh()
-    { 
-        drivers = new List<DriverModel>();
-        var query = new GetDriversQuery();
-        drivers = (List<DriverModel>)await Mediator.Send(query);
-        StateHasChanged();
-    }
-    private async Task OnCreate()
-    {
-        var result = await DialogService.OpenAsync<CreateDriverDialog>($"Sofőr felvitele");
-        if (result != null) await Refresh();
-
-    }
-    private async Task OnEdit(DriverModel driver)
-    {
-        var parameters = new Dictionary<string, object>() { { "Selected", driver } };
-        var result = await DialogService.OpenAsync<UpdateDriverDialog>($"{driver.Name} adatainak módosítása", parameters);
-        if (result != null) await Refresh();
-    }
-    private async Task OnDelete(Guid id)
-    {
-        var result = await Mediator.Send(new DeleteDriverCommand(id), new CancellationToken());
-        if (result) await Refresh();
-    }
+    
 }
 

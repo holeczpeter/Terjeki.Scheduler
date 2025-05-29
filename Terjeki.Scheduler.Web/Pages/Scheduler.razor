@@ -1,6 +1,5 @@
 ﻿@page "/"
 @using System.Globalization
-@using MediatR
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using System.Security.Claims
@@ -11,7 +10,6 @@
 @using Terjeki.Scheduler.Web.Components.Holiday
 @using Terjeki.Scheduler.Web.Components.Services
 @using Terjeki.Scheduler.Web.Services
-@inject IMediator Mediator
 @inject IViewService ViewService
 @inject DialogService DialogService
 @inject TooltipService tooltipService
@@ -326,6 +324,10 @@
 
 
 @code {
+    [Inject] IServiceService ServiceService { get; set; }
+    [Inject] IBusService BusService { get; set; }
+    [Inject] IHolidayService HolidayService { get; set; }
+    [Inject] IEventService EventService { get; set; }
     public RenderFragment<TooltipService> ToolTipContent => (service) => @<div class='custom-tooltip'>
         @if(MouseOverEvent.Type == EventTypes.Holiday)
     {
@@ -375,7 +377,7 @@
 
 
     </div>
-        ;
+    ;
     public RenderFragment<TooltipService> ServiceToolTipContent => (service) => @<div class='custom-tooltip'>
         <div><strong>Busz:</strong> @MouseOverEvent.Bus.LicensePlateNumber</div>
         <div><strong>Indulás:</strong> @MouseOverEvent.StartDate.ToString("yyyy.MM.dd")</div>
@@ -431,7 +433,7 @@
         buses = new List<BusModel>();
 
         var query = new GetBusesQuery();
-        buses = (List<BusModel>)await Mediator.Send(query);
+        buses = (List<BusModel>)await BusService.GetAll();
         await LoadEventsForPeriod(DateTime.Today);
         ViewService.OnViewChange += OnViewChangedHandler;
         StateHasChanged();
@@ -495,7 +497,7 @@
         if (isBus)
         {
             this.rowHeight = 20;
-            var eventGroupList = await Mediator.Send(new GetEventGroupQueryByInterval(currentPeriodStartDate, currentPeriodEndDate));
+            var eventGroupList = await EventService.GetGrouped(currentPeriodStartDate, currentPeriodEndDate);
             eventGroups = eventGroupList.ToList();
             foreach (var group in eventGroups)
             {
@@ -546,7 +548,7 @@
         else
         {
             this.rowHeight = 20;
-            var ev = (List<DriverEventModel>)await Mediator.Send(new GetDriverEventsQueryByInterval(currentPeriodStartDate, currentPeriodEndDate));
+            var ev = (List<DriverEventModel>)await EventService.GetDriverEvents(currentPeriodStartDate, currentPeriodEndDate);
             driverEvents = ev.ToList();
             foreach (var group in driverEvents)
             {
@@ -624,7 +626,7 @@
     {
         if (eventModel.Bus == null) return new List<EventModel>();
         return eventGroup.Events
-         .Where(currentCell => currentCell.Bus != null && currentCell.Drivers.Any(d => eventModel.Drivers.Any(ed => ed.Id == d.Id))  && currentCell.Id != eventModel.Id &&
+         .Where(currentCell => currentCell.Bus != null && currentCell.Drivers.Any(d => eventModel.Drivers.Any(ed => ed.Id == d.Id)) && currentCell.Id != eventModel.Id &&
              (currentCell.EndDate >= eventModel.StartDate &&
               currentCell.EndDate <= eventModel.EndDate)
              ||
@@ -745,28 +747,28 @@
                     return;
 
                 case ConflictedResolveTypes.Save:
-                    
+
                     break;
                 default:
                     return;
             }
         }
         var saveRequest = new UpdateEventCommand
-                        {
-                            Id = updatedEvent.Id,
-                            Drivers = updatedEvent.Drivers,
-                            Capacity = updatedEvent.Capacity,
-                            Description = updatedEvent.Description,
-                            Bus = updatedEvent.Bus,
-                            StartDate = updatedEvent.StartDate,
-                            EndDate = updatedEvent.EndDate,
-                            Type = updatedEvent.Type,
-                            Status = updatedEvent.Status
-                        };
+            {
+                Id = updatedEvent.Id,
+                Drivers = updatedEvent.Drivers,
+                Capacity = updatedEvent.Capacity,
+                Description = updatedEvent.Description,
+                Bus = updatedEvent.Bus,
+                StartDate = updatedEvent.StartDate,
+                EndDate = updatedEvent.EndDate,
+                Type = updatedEvent.Type,
+                Status = updatedEvent.Status
+            };
 
-                    await Mediator.Send(saveRequest, new CancellationToken());
-                    await LoadEventsForPeriod(currentPeriodStartDate); // vagy StateHasChanged()
-                    await InvokeAsync(StateHasChanged);
+        await EventService.Update(saveRequest);
+        await LoadEventsForPeriod(currentPeriodStartDate); // vagy StateHasChanged()
+        await InvokeAsync(StateHasChanged);
 
 
 
@@ -776,7 +778,7 @@
     {
         if (!IsAdmin) return;
         if (draggedItem == null || eventGroup?.Driver == null) return;
-           
+
 
         // Másolatot készítünk a meglévő Driver listáról
         var updatedDrivers = draggedItem.Drivers
@@ -803,7 +805,7 @@
                 EndDate = targetDate.AddDays((draggedItem.EndDate - draggedItem.StartDate).Days)
             };
 
-        
+
         // Ha nincs konfliktus, vagy felhasználó elfogadta, akkor végrehajtás
         var request = new UpdateEventCommand
             {
@@ -818,13 +820,13 @@
                 Status = updatedEvent.Status
             };
 
-        await Mediator.Send(request, new CancellationToken());
+        await EventService.Update(request);
         await LoadEventsForPeriod(currentPeriodStartDate); // vagy StateHasChanged()
         await InvokeAsync(StateHasChanged);
 
 
     }
-   
+
     private string GetDivStyle()
     {
         return $@"position: relative; height:{rowHeight}px";
@@ -1000,15 +1002,15 @@
         var result = false;
         if (eventModel.Type == EventTypes.Event)
         {
-            result = await Mediator.Send(new DeleteEventCommand(eventModel.Id), new CancellationToken());
+            result = await EventService.Delete(new DeleteEventCommand(eventModel.Id));
         }
         else if (eventModel.Type == EventTypes.Service)
         {
-            result = await Mediator.Send(new DeleteEventCommand(eventModel.Id), new CancellationToken());
+            result = await EventService.Delete(new DeleteEventCommand(eventModel.Id));
         }
         else if (eventModel.Type == EventTypes.Holiday)
         {
-            result = await Mediator.Send(new DeleteHolidayCommand(eventModel.Id), new CancellationToken());
+            result = await  HolidayService.DeleteAsync(new DeleteHolidayCommand(eventModel.Id));
         }
         if (result) await LoadEventsForPeriod(DateTime.Today);
 

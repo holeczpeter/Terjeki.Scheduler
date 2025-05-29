@@ -4,7 +4,7 @@
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public BusModel Bus { get; set; }
+        public BusItemModel Bus { get; set; }
 
         public override bool Equals(object o)
         {

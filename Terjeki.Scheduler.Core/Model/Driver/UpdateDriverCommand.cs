@@ -6,6 +6,6 @@ namespace Terjeki.Scheduler.Core
     {
         public Guid Id { get; set; }
 
-        public BusModel Bus { get; set; }
+        public Guid? BusId { get; set; }
     }
 }

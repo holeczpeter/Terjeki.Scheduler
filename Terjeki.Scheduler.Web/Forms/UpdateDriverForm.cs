@@ -34,10 +34,10 @@ namespace Terjeki.Scheduler.Web.Components.Drivers
                 }
             }
         }
-        private BusModel _bus;
+        private BusItemModel _bus;
 
         
-        public BusModel Bus
+        public BusItemModel Bus
         {
             get => _bus;
             set

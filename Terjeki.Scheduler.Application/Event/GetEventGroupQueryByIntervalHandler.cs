@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Terjeki.Scheduler.Application.Event
+﻿namespace Terjeki.Scheduler.Application
 {
     public class GetEventGroupQueryByIntervalHandler : IRequestHandler<GetEventGroupQueryByInterval, IEnumerable<EventGroupModel>>
     {

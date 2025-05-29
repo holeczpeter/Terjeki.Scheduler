@@ -5,7 +5,6 @@
 @using Terjeki.Scheduler.Web.Components.Buses
 @using Terjeki.Scheduler.Web.Services
 @inject HttpClient Http
-@inject IMediator Mediator
 @inject NavigationManager Navigation
 @attribute [Authorize]
 @attribute [Authorize(Roles = "Admin")]
@@ -93,43 +92,5 @@ else
 }
 
 @code {
-    private IList<BusModel> buses = new List<BusModel>();
-    RadzenDataGrid<BusModel> busesGrid;
-    [Inject] DialogService DialogService { get; set; } = default!;
-    protected override async Task OnInitializedAsync()
-    {
-       
-        await Refresh();
-    }
-    private async Task Refresh()
-    {
-        buses = new List<BusModel>();
-
-        var query = new GetBusesQuery();
-        buses = (List<BusModel>)await Mediator.Send(query);
-        StateHasChanged();
-    }
-    private async Task OnCreate()
-    {
-        var result = await DialogService.OpenAsync<CreateBusDialog>($"Busz felvitele");
-        if (result != null) await Refresh();
-
-    }
-    private async Task OnTimeLine(BusModel bus)
-    {
-        var parameters = new Dictionary<string, object>() { { "Selected", bus } };
-        var result = await DialogService.OpenAsync<BusHistoryDialog>($"{bus.Brand} szervíz történet", parameters);
-        if (result != null) await Refresh();
-    }
-    private async Task OnEdit(BusModel bus)
-    {
-        var parameters = new Dictionary<string, object>() { { "Selected", bus } };
-        var result = await DialogService.OpenAsync<UpdateBusDialog>($"{bus.Brand} adatainak módosítása", parameters);
-        if (result != null) await Refresh();
-    }
-    private async Task OnDelete(Guid id)
-    {
-        var result = await Mediator.Send(new DeleteBusCommand(id), new CancellationToken());
-        if (result) await Refresh();
-    }
+   
 }

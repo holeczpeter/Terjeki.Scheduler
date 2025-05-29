@@ -1,4 +1,4 @@
-﻿namespace Terjeki.Scheduler.Application.User
+﻿namespace Terjeki.Scheduler.Application
 {
     internal class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, IEnumerable<UserModel>>
     {
