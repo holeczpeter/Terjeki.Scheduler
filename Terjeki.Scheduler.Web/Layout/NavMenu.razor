@@ -3,8 +3,9 @@
 @using Terjeki.Scheduler.Core
 @using Terjeki.Scheduler.Web.Services
 @inject IViewService ViewService
-@inject IMediator Mediator
-@inject TerjekiAuthenticationStateProvider AuthProvider
+
+@inject IAuthService AuthService             
+@inject JwtAuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -88,6 +89,9 @@
 @code {
     private string UserRole;
     private string SelectedUser;
+    private bool collapseNavMenu = true;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
@@ -98,25 +102,23 @@
             SelectedUser = user.Identity.Name;
             UserRole = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "Ismeretlen";
         }
-        ViewService.OnViewChange += OnViewChangedHandler;
-        StateHasChanged();
-    }
-   
-    private void OnViewChangedHandler(ViewTypes view)
-    {
-        StateHasChanged();
-    }
-    private bool collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+        ViewService.OnViewChange += OnViewChangedHandler;
+    }
+
+    private void OnViewChangedHandler(ViewTypes view)
+        => StateHasChanged();
 
     private void ToggleNavMenu()
+        => collapseNavMenu = !collapseNavMenu;
+
+    private async Task Logout()
     {
-        collapseNavMenu = !collapseNavMenu;
-    }
-    private void Logout()
-    {
-        AuthProvider.MarkUserAsLoggedOut();
-        Navigation.NavigateTo("/login", true);
+        // 1) Token törlése localStorage-ból
+        await AuthService.LogoutAsync();
+        // 2) AuthenticationStateProvider értesítése
+        AuthProvider.NotifyUserLogout();
+        // 3) Átirányítás a login oldalra (force reload)
+        Navigation.NavigateTo("/login", forceLoad: true);
     }
 }

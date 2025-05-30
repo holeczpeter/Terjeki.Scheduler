@@ -1,6 +1,6 @@
 ﻿namespace Terjeki.Scheduler.Api.Controllers
 {
-    
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class CapacityController : ControllerBase

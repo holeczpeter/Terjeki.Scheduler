@@ -1,20 +1,22 @@
 ﻿
-
 namespace Terjeki.Scheduler.Infrastucure
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
+        
         public DbSet<Event> Events { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Bus> Buses { get; set; }
         public DbSet<Capacity> Capacities { get; set; }
-
         public DbSet<DriverEvent> DriverEvents { get; set; }
+        public DbSet<AllowedEmail> AllowedEmails { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(
+                typeof(AppDbContext).Assembly);
 
         }
         public override int SaveChanges()

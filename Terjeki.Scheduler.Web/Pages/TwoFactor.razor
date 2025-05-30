@@ -1,0 +1,31 @@
+﻿@inject IAuthService Auth
+@inject NavigationManager Nav
+<EditForm Model="_dto" OnValidSubmit="Handle2Fa">
+    <DataAnnotationsValidator />
+    <InputText @bind-Value="_dto.Code" placeholder="2FA Code" />
+    <InputCheckbox @bind-Value="_dto.RememberClient" /> Remember this device
+    <button type="submit">Verify</button>
+</EditForm>
+@if (_error is not null)
+{
+    <div class="text-danger">@_error</div>
+
+}
+
+@code {
+    LoginWith2FaDto _dto = new();
+    string? _error;
+
+    async Task Handle2Fa()
+    {
+        try
+        {
+            await Auth.LoginWith2FaAsync(_dto);
+            Nav.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+}

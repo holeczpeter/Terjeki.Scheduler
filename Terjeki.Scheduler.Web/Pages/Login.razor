@@ -1,65 +1,80 @@
-﻿@page "/login"
+﻿@layout EmptyLayout
+@page "/login"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Authorization
 @using Terjeki.Scheduler.Core
 @using Terjeki.Scheduler.Web.Services
-@inject TerjekiAuthenticationStateProvider AuthProvider
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 
 <RadzenStack Gap="1.5rem">
-    <EditForm EditContext="@editContext">
+    <EditForm Model="form" OnValidSubmit="DoLogin">
         <DataAnnotationsValidator />
+        <ValidationSummary />
+
         <div class="content">
-            <a href="/" id="header-logo">
-                <img src="images/terjeki-busz-logo.svg" />
-            </a>
+            <a href="/" id="header-logo"><img src="images/terjeki-busz-logo.svg" /></a>
             <span>Üdvözöljük a Terjéki Naptár programban</span>
+
             <div class="form-input">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> E-mail </RadzenText>
-                <RadzenTextBox @bind-Value=@form.Email Style="width: 100%;min-width:300px" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">E-mail</RadzenText>
+                <RadzenTextBox @bind-Value="form.Email"
+                Style="width:100%;min-width:300px" />
                 <ValidationMessage For="@(() => form.Email)" />
             </div>
+
             <div class="form-input">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Jelszó </RadzenText>
-                <RadzenPassword Value=@form.Password aria-label="enter password" Style="width: 100%;min-width:300px" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Jelszó</RadzenText>
+                <RadzenPassword @bind-Value="form.Password"
+                Style="width:100%;min-width:300px" />
                 <ValidationMessage For="@(() => form.Password)" />
             </div>
-            <RadzenButton Text="Bejelentkezés" Click="@DoLogin" Disabled="!isFormValid" Style="min-width:300px" />
+
+            <RadzenButton Text="Bejelentkezés"
+            ButtonStyle="ButtonStyle.Primary"
+            Type="ButtonType.Submit"
+            Style="min-width:300px" />
         </div>
-       
     </EditForm>
+
+    <div class="text-center mt-4">
+        <span>Még nincs fiókod?</span>
+        <RadzenButton Text="Regisztráció"
+                      ButtonStyle="ButtonStyle.Primary"
+        Click="() => NavigateRegister()" />
+    </div>
+
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="text-danger mt-2">@error</div>
+    }
 </RadzenStack>
 
 @code {
-    [Inject] IUserService UserService { get; set; }
     private LoginForm form = new();
-
-    private EditContext editContext = new(new LoginForm());
-
-    private bool isFormValid = false;
-
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
-
-    private ValidationMessageStore messageStore;
-
-    protected override async Task OnInitializedAsync()
+    private string? error;
+    void NavigateRegister()
     {
-        
-        editContext = new EditContext(form);
-        messageStore = new ValidationMessageStore(editContext);
-        editContext.OnFieldChanged += ValidateForm;
-
-        await base.OnInitializedAsync();
-    }
-    private void ValidateForm(object? sender, FieldChangedEventArgs e)
-    {
-        isFormValid = editContext.Validate();
-        StateHasChanged();
+        Navigation.NavigateTo("/register");
     }
     private async Task DoLogin()
     {
-        var allUser = await UserService.GetAllAsync();
-        var users = allUser.ToList();
-        var selectedUser = users.Where(x => x.Email == form.Email).FirstOrDefault();
-        AuthProvider.MarkUserAsAuthenticated(selectedUser);
-        Navigation.NavigateTo("/");
+        error = null;
+        try
+        {
+            var jwtProv = (JwtAuthenticationStateProvider)AuthProvider;
+            await AuthService.LoginAsync(new LoginDto(form.Email, form.Password));
+            var token = await AuthService.GetTokenAsync();
+            if (!string.IsNullOrEmpty(token))
+                jwtProv.NotifyUserAuthentication(token);
+            Navigation.NavigateTo("/");
+        }
+        catch (HttpRequestException ex)
+        {
+            error = ex.Message;
+        }
     }
+
 }

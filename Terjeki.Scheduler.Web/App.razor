@@ -6,22 +6,21 @@
 @inject NavigationManager Navigation
 @inject IViewService ViewService
 <RadzenTheme Theme="material" />
+
+
+<RadzenTheme Theme="material" />
+
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized Context="context">
-                    @if (!context.User.Identity?.IsAuthenticated ?? true)
-                    {
-                        <Login />
-                    }
-                    else
-                    {
-                        <p>Nincs jogosultság az oldalhoz.</p>
-                    }
+            <AuthorizeRouteView RouteData="@routeData"
+                                DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    @* Ha a route anonymous oldal (login/register), akkor csak routeview-oljuk újra, de EmptyLayout-tel: *@
+                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(EmptyLayout)" />
                 </NotAuthorized>
                 <Authorizing>
-                    <p>Betöltés...</p>
+                    <p>Betöltés…</p>
                 </Authorizing>
             </AuthorizeRouteView>
         </Found>
@@ -32,34 +31,28 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
-@code{
-    
-    private DotNetObjectReference<App> objRef;
+
+@code {
+    private DotNetObjectReference<App>? objRef;
     protected override async Task OnInitializedAsync()
     {
         objRef = DotNetObjectReference.Create(this);
         await JS.InvokeVoidAsync("onScreenResize", objRef);
         await SetLayoutBasedOnScreenSize();
-
     }
 
     [JSInvokable]
     public async Task SetLayoutBasedOnScreenSize()
     {
         int width = await JS.InvokeAsync<int>("getScreenWidth");
-        var prevView = ViewService.ViewType;
-        var actView = width > 1000 ? ViewTypes.Desktop : ViewTypes.Mobile;
-
-        if (prevView != actView)
+        var prev = ViewService.ViewType;
+        var @new = width > 1000 ? ViewTypes.Desktop : ViewTypes.Mobile;
+        if (prev != @new)
         {
-            ViewService.ViewType = actView;
-            
+            ViewService.ViewType = @new;
             StateHasChanged();
         }
     }
 
-    public void Dispose()
-    {
-        objRef?.Dispose();
-    }
+    public void Dispose() => objRef?.Dispose();
 }

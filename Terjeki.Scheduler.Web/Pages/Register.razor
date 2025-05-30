@@ -1,0 +1,92 @@
+﻿@layout EmptyLayout
+@page "/register"
+
+@using System.ComponentModel.DataAnnotations
+@using Terjeki.Scheduler.Web.Forms
+@using Terjeki.Scheduler.Web.Services
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+
+
+<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+ 
+    <div class="content">
+        <a href="/" id="header-logo"><img src="images/terjeki-busz-logo.svg" /></a>
+        <span>Üdvözöljük a Terjéki Naptár programban</span>
+
+        <div class="form-input">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Teljes név</RadzenText>
+            <RadzenTextBox @bind-Value="registerModel.FullName"
+                           Style="width:100%;min-width:300px" />
+            <ValidationMessage For="@(() => registerModel.FullName)" />
+        </div>
+        <div class="form-input">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">E-mail</RadzenText>
+            <RadzenTextBox @bind-Value="registerModel.Email"
+                           Style="width:100%;min-width:300px" />
+            <ValidationMessage For="@(() => registerModel.Email)" />
+        </div>
+        <div class="form-input">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Jelszó</RadzenText>
+            <RadzenPassword @bind-Value="registerModel.Password"
+                            Style="width:100%;min-width:300px" />
+            <ValidationMessage For="@(() => registerModel.Password)" />
+        </div>
+        <div class="form-input">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Jelszó ismét</RadzenText>
+            <RadzenPassword @bind-Value="registerModel.ConfirmPassword"
+                            Style="width:100%;min-width:300px" />
+            <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
+        </div>
+        <RadzenButton Text="Regisztráció"
+                      ButtonStyle="ButtonStyle.Primary"
+                      Type="ButtonType.Submit"
+                      Style="min-width:300px" />
+    </div>
+    
+
+
+    
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert @alertClass mt-3">@message</div>
+}
+
+@code {
+    private RegisterForm registerModel = new();
+    private string message = "";
+    private string alertClass = "alert-info";
+
+    private async Task HandleRegister()
+    {
+        if (registerModel.Password != registerModel.ConfirmPassword)
+        {
+            message = "A jelszavak nem egyeznek.";
+            alertClass = "alert-danger";
+            return;
+        }
+
+        try
+        {
+            var result = await Auth.RegisterAsync(new RegisterDto(
+                registerModel.FullName,
+                registerModel.Email,
+                registerModel.Password
+            ));
+            message = result;
+            alertClass = "alert-success";
+            // Nav.NavigateTo("/login");
+        }
+        catch (HttpRequestException ex)
+        {
+            message = ex.Message;
+            alertClass = "alert-danger";
+        }
+    }
+
+  
+}

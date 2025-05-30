@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @using Terjeki.Scheduler.Core
 @using Terjeki.Scheduler.Core.Enums
 @using Terjeki.Scheduler.Web.Components
@@ -10,320 +11,322 @@
 @using Terjeki.Scheduler.Web.Components.Holiday
 @using Terjeki.Scheduler.Web.Components.Services
 @using Terjeki.Scheduler.Web.Services
+@inject NavigationManager Navigation
 @inject IViewService ViewService
 @inject DialogService DialogService
 @inject TooltipService tooltipService
-@inject TerjekiAuthenticationStateProvider AuthProvider
+@inject AuthenticationStateProvider AuthProvider
 @attribute [Authorize]
 <PageTitle>Naptár</PageTitle>
+
 @if (IsAdmin)
-{
-    <div class="floating-button">
-        <RadzenMenu Responsive="false" class="menu-right">
-            <RadzenMenuItem>
-                <Template>
-                    <TButton Label="Új hozzáadása"
-                             Icon="add"
-                             Type="@TButton.TypeEnum.Primary"
-                             Size="@TButton.SizeEnum.Medium" />
-                </Template>
-                <ChildContent>
-                    <RadzenMenuItem Click=@(args => OnCreate())>
+        {
+            <div class="floating-button">
+                <RadzenMenu Responsive="false" class="menu-right">
+                    <RadzenMenuItem>
                         <Template>
-                            <div>
-                                <i class="ri-folder-add-line"></i>
-                                <span>Külföldi út hozzáadása</span>
-                            </div>
+                            <TButton Label="Új hozzáadása"
+                            Icon="add"
+                            Type="@TButton.TypeEnum.Primary"
+                            Size="@TButton.SizeEnum.Medium" />
                         </Template>
+                        <ChildContent>
+                            <RadzenMenuItem Click=@(args => OnCreate())>
+                                <Template>
+                                    <div>
+                                        <i class="ri-folder-add-line"></i>
+                                        <span>Külföldi út hozzáadása</span>
+                                    </div>
+                                </Template>
+                            </RadzenMenuItem>
+                            <RadzenMenuItem Click=@(args => OnCreate())>
+                                <Template>
+                                    <div>
+                                        <i class="ri-folder-add-line"></i>
+                                        <span>Dolgozói járat rögzítése</span>
+                                    </div>
+                                </Template>
+                            </RadzenMenuItem>
+                            <RadzenMenuItem Click=@(args => OnCreateHoliday())>
+                                <Template>
+                                    <div>
+                                        <i class="ri-folder-add-line"></i>
+                                        <span>Szabadság rögzítése</span>
+                                    </div>
+                                </Template>
+                            </RadzenMenuItem>
+                            <RadzenMenuItem Click=@(args => OnCreateService())>
+                                <Template>
+                                    <div>
+                                        <i class="ri-folder-add-line"></i>
+                                        <span>Szervíz rögzítése</span>
+                                    </div>
+                                </Template>
+                            </RadzenMenuItem>
+                        </ChildContent>
                     </RadzenMenuItem>
-                    <RadzenMenuItem Click=@(args => OnCreate())>
-                        <Template>
-                            <div>
-                                <i class="ri-folder-add-line"></i>
-                                <span>Dolgozói járat rögzítése</span>
-                            </div>
-                        </Template>
-                    </RadzenMenuItem>
-                    <RadzenMenuItem Click=@(args => OnCreateHoliday())>
-                        <Template>
-                            <div>
-                                <i class="ri-folder-add-line"></i>
-                                <span>Szabadság rögzítése</span>
-                            </div>
-                        </Template>
-                    </RadzenMenuItem>
-                    <RadzenMenuItem Click=@(args => OnCreateService())>
-                        <Template>
-                            <div>
-                                <i class="ri-folder-add-line"></i>
-                                <span>Szervíz rögzítése</span>
-                            </div>
-                        </Template>
-                    </RadzenMenuItem>
-                </ChildContent>
-            </RadzenMenuItem>
-        </RadzenMenu>
+                </RadzenMenu>
 
-    </div>
-}
-
+            </div>
+        }
 <section class="main">
-    <div class="title">
-        <h1>Naptár</h1>
-    </div>
-    <div class="view-container">
-        <div class="view-selection">
-            <TButton Label="Heti nézet"
-                     Type="@TButton.TypeEnum.Primary"
-                     Size="@TButton.SizeEnum.Medium"
-                     Disabled="@(currentPeriodView == CalendarPeriodViews.Week)"
-                     OnClick="@(() => SetViewMode(CalendarPeriodViews.Week))">
-            </TButton>
-            <TButton Label="Havi nézet"
-                     Type="@TButton.TypeEnum.Primary"
-                     Size="@TButton.SizeEnum.Medium"
-                     Disabled="@(currentPeriodView == CalendarPeriodViews.Month)"
-                     OnClick="@(() => SetViewMode(CalendarPeriodViews.Month))">
-            </TButton>
-        </div>
+            <div class="title">
+                <h1>Naptár</h1>
+            </div>
+            <div class="view-container">
+                <div class="view-selection">
+                    <TButton Label="Heti nézet"
+                    Type="@TButton.TypeEnum.Primary"
+                    Size="@TButton.SizeEnum.Medium"
+                    Disabled="@(currentPeriodView == CalendarPeriodViews.Week)"
+                    OnClick="@(() => SetViewMode(CalendarPeriodViews.Week))">
+                    </TButton>
+                    <TButton Label="Havi nézet"
+                    Type="@TButton.TypeEnum.Primary"
+                    Size="@TButton.SizeEnum.Medium"
+                    Disabled="@(currentPeriodView == CalendarPeriodViews.Month)"
+                    OnClick="@(() => SetViewMode(CalendarPeriodViews.Month))">
+                    </TButton>
+                </div>
 
-        <div class="week-navigation">
-            <RadzenButton Icon="navigate_before" Click="@(() => ChangePeriod(-1))" ButtonStyle="ButtonStyle.Primary" class="rz-border-radius-10 rz-shadow-10" />
-            <RadzenButton Icon="navigate_next" Click="@(() => ChangePeriod(1))" ButtonStyle="ButtonStyle.Primary" class="rz-border-radius-10 rz-shadow-10" />
-            <span>@currentPeriodLabel</span>
-        </div>
+                <div class="week-navigation">
+                    <RadzenButton Icon="navigate_before" Click="@(() => ChangePeriod(-1))" ButtonStyle="ButtonStyle.Primary" class="rz-border-radius-10 rz-shadow-10" />
+                    <RadzenButton Icon="navigate_next" Click="@(() => ChangePeriod(1))" ButtonStyle="ButtonStyle.Primary" class="rz-border-radius-10 rz-shadow-10" />
+                    <span>@currentPeriodLabel</span>
+                </div>
 
-    </div>
-    <div class="calendar-type-view">
-        <TButton Label="Busz nézet"
-                 Type="@TButton.TypeEnum.Primary"
-                 Size="@TButton.SizeEnum.Medium"
-                 Disabled="@isBus"
-                 OnClick="@ChangeViewType">
-        </TButton>
-        <TButton Label="Sofőr nézet"
-                 Type="@TButton.TypeEnum.Primary"
-                 Size="@TButton.SizeEnum.Medium"
-                 Disabled="@(!isBus)"
-                 OnClick="@ChangeViewType">
-        </TButton>
+            </div>
+            <div class="calendar-type-view">
+                <TButton Label="Busz nézet"
+                Type="@TButton.TypeEnum.Primary"
+                Size="@TButton.SizeEnum.Medium"
+                Disabled="@isBus"
+                OnClick="@ChangeViewType">
+                </TButton>
+                <TButton Label="Sofőr nézet"
+                Type="@TButton.TypeEnum.Primary"
+                Size="@TButton.SizeEnum.Medium"
+                Disabled="@(!isBus)"
+                OnClick="@ChangeViewType">
+                </TButton>
 
-    </div>
-    <div class="responsive-table-wrapper">
+            </div>
+            <div class="responsive-table-wrapper">
 
-        <table style="border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th style="position:sticky;left:0;z-index:2;background:white;">
+                <table style="border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="position:sticky;left:0;z-index:2;background:white;">
 
-                    </th>
-                    @foreach (var day in viewDays)
-                    {
-                        <th style="width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
-                            <div class="date-header">
-                                <span class="mobile-dayname-header">@day.ShortDayName</span>
-                                <span class="mobile-day-header">@day.Date.Day</span>
-                            </div>
-                        </th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @if (isBus)
-                {
-                    @foreach (var eventGroup in eventGroups)
-                    {
-                        <tr style="@GetRowStyle(eventGroup.Bus)">
-                            <td style="position:sticky;left:0;z-index:2;background:white;">
-                                <div class="event-object">
-                                    <span>Férőhely: @eventGroup?.Capacity?.Capacity</span>
-                                    @if (eventGroup.Bus != null)
-                                    {
-                                        <span>@eventGroup?.Bus?.LicensePlateNumber</span>
-                                    }
-                                </div>
-                            </td>
-                            @{
-                                int dayIndex = 0;
-                                while (dayIndex < viewDays.Count)
-                                {
-                                    var currentDate = viewDays[dayIndex].Date;
-                                    var eventsForDay = eventGroup.Events.Where(e => e.StartDate.Date == currentDate).ToList();
-
-                                    if (eventsForDay.Any())
-                                    {
-
-                                        var remainingDays = viewDays.Count - dayIndex;
-                                        <td style="padding:6px; border-radius:6px; z-index: -1;width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
-                                            <div style="@GetDivStyle()"
-                                                 ondragover="event.preventDefault()"
-                                                 @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
-                                                @foreach (var tuple in eventsForDay.Select((ev, index) => (ev, index)))
-                                                {
-                                                    var ev = tuple.ev;
-                                                    var index = tuple.index;
-                                                    var isPast = ev.StartDate.Date < viewStart;
-                                                    var isFuture = ev.EndDate.Date > viewEnd;
-                                                    if (GetDayIndex(ev.StartDate) == GetDayIndex(currentDate))
-                                                    {
-
-                                                        <div style="@GetEventStyle(ev,index)"
-                                                             id="event-@ev.Id"
-                                                             @ref="@(refMap[ev.Id])"
-                                                             @onmouseenter="@(() => ShowTooltip(ev))"
-                                                             @onmouseleave="HideTooltip"
-                                                             draggable="true"
-                                                             ondragstart="@(() => SetDragItem(ev))"
-                                                             onclick="@(() => OnUpdate(ev))"
-                                                             @onclick:stopPropagation="true">
-                                                            @if (isPast)
-                                                            {
-                                                                <RadzenIcon Icon="keyboard_double_arrow_left" />
-                                                            }
-                                                            @if (ev.Type == EventTypes.Event)
-                                                            {
-                                                                <div style="display:flex">
-                                                                    @ev.Description
-                                                                    @($"{ev.StartDate:yyyy.MM.dd}")
-                                                                    @($"{ev.EndDate:yyyy.MM.dd}")
-                                                                </div>
-
-                                                            }
-                                                            else if (ev.Type == EventTypes.Service)
-                                                            {
-                                                                <div style="display:flex">
-                                                                    @ev.ServiceType.GetDescription()
-                                                                    @($"{ev.StartDate:yyyy.MM.dd}")
-                                                                    @($"{ev.EndDate:yyyy.MM.dd}")
-                                                                </div>
-
-                                                            }
-                                                            @if (isFuture)
-                                                            {
-                                                                <RadzenIcon Icon="double_arrow" />
-                                                            }
-
-
-                                                        </div>
-                                                    }
-                                                }
-                                            </div>
-                                        </td>
-                                        dayIndex++;
-                                    }
-                                    else
-                                    {
-                                        <td ondragover="event.preventDefault()"
-                                            onclick="@(() => OnCreate(eventGroup, currentDate))"
-                                            @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
-                                        </td>
-                                        dayIndex++;
-                                    }
-                                }
+                            </th>
+                            @foreach (var day in viewDays)
+                            {
+                                <th style="width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
+                                    <div class="date-header">
+                                        <span class="mobile-dayname-header">@day.ShortDayName</span>
+                                        <span class="mobile-day-header">@day.Date.Day</span>
+                                    </div>
+                                </th>
                             }
                         </tr>
-                    }
-                }
-                else if (!isBus)
-                {
-                    @foreach (var eventGroup in driverEvents)
-                    {
-                        <tr style="@GetRowStyle(eventGroup.Driver)">
-                            <td style="position:sticky;left:0;z-index:2;background:white;">
-                                <div class="event-object">
-                                    <span> @eventGroup?.Driver?.Name</span>
-                                </div>
-                            </td>
-                            @{
-                                int dayIndex = 0;
-                                while (dayIndex < viewDays.Count)
-                                {
-                                    var currentDate = viewDays[dayIndex].Date;
-                                    var eventsForDay = eventGroup.Events.Where(e =>
-                                    e.StartDate.Date == currentDate).ToList();
+                    </thead>
+                    <tbody>
+                        @if (isBus)
+                        {
+                            @foreach (var eventGroup in eventGroups)
+                            {
+                                <tr style="@GetRowStyle(eventGroup.Bus)">
+                                    <td style="position:sticky;left:0;z-index:2;background:white;">
+                                        <div class="event-object">
+                                            <span>Férőhely: @eventGroup?.Capacity?.Capacity</span>
+                                            @if (eventGroup.Bus != null)
+                                            {
+                                                <span>@eventGroup?.Bus?.LicensePlateNumber</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    @{
+                                        int dayIndex = 0;
+                                        while (dayIndex < viewDays.Count)
+                                        {
+                                            var currentDate = viewDays[dayIndex].Date;
+                                            var eventsForDay = eventGroup.Events.Where(e => e.StartDate.Date == currentDate).ToList();
 
-                                    if (eventsForDay.Any())
-                                    {
+                                            if (eventsForDay.Any())
+                                            {
 
-                                        var remainingDays = viewDays.Count - dayIndex;
-                                        <td style="padding:6px; border-radius:6px; z-index: -1;width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
-                                            <div style="@GetDivStyle()"
-                                                 ondragover="event.preventDefault()"
-                                                 @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
-                                                @foreach (var tuple in eventsForDay.Select((ev, index) => (ev, index)))
-                                                {
-                                                    var ev = tuple.ev;
-                                                    var index = tuple.index;
-                                                    var isPast = ev.StartDate.Date < viewStart;
-                                                    var isFuture = ev.EndDate.Date > viewEnd;
-                                                    if (GetDayIndex(ev.StartDate) == GetDayIndex(currentDate))
-                                                    {
-
-                                                        <div style="@GetEventStyle(ev,index)"
-                                                             id="event-@ev.Id"
-                                                             @ref="@(refMap[ev.Id])"
-                                                             @onmouseenter="@(() => ShowTooltip(ev))"
-                                                             @onmouseleave="HideTooltip"
-                                                             draggable="true"
-                                                             ondragstart="@(() => SetDragItem(ev,eventGroup.Driver))"
-                                                             onclick="@(() => OnUpdate(ev))"
-                                                             @onclick:stopPropagation="true">
-                                                            @if (isPast)
+                                                var remainingDays = viewDays.Count - dayIndex;
+                                                <td style="padding:6px; border-radius:6px; z-index: -1;width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
+                                                    <div style="@GetDivStyle()"
+                                                    ondragover="event.preventDefault()"
+                                                    @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
+                                                        @foreach (var tuple in eventsForDay.Select((ev, index) => (ev, index)))
+                                                        {
+                                                            var ev = tuple.ev;
+                                                            var index = tuple.index;
+                                                            var isPast = ev.StartDate.Date < viewStart;
+                                                            var isFuture = ev.EndDate.Date > viewEnd;
+                                                            if (GetDayIndex(ev.StartDate) == GetDayIndex(currentDate))
                                                             {
-                                                                <RadzenIcon Icon="keyboard_double_arrow_left" />
-                                                            }
-                                                            @if (ev.Type == EventTypes.Event)
-                                                            {
-                                                                <div style="display:flex">
-                                                                    @ev.Bus.LicensePlateNumber
-                                                                    @ev.Description
-                                                                    @($"{ev.StartDate:yyyy.MM.dd}")
-                                                                    @($"{ev.EndDate:yyyy.MM.dd}")
+
+                                                                <div style="@GetEventStyle(ev,index)"
+                                                                id="event-@ev.Id"
+                                                                @ref="@(refMap[ev.Id])"
+                                                                @onmouseenter="@(() => ShowTooltip(ev))"
+                                                                @onmouseleave="HideTooltip"
+                                                                draggable="true"
+                                                                ondragstart="@(() => SetDragItem(ev))"
+                                                                onclick="@(() => OnUpdate(ev))"
+                                                                @onclick:stopPropagation="true">
+                                                                    @if (isPast)
+                                                                    {
+                                                                        <RadzenIcon Icon="keyboard_double_arrow_left" />
+                                                                    }
+                                                                    @if (ev.Type == EventTypes.Event)
+                                                                    {
+                                                                        <div style="display:flex">
+                                                                            @ev.Description
+                                                                            @($"{ev.StartDate:yyyy.MM.dd}")
+                                                                            @($"{ev.EndDate:yyyy.MM.dd}")
+                                                                        </div>
+
+                                                                    }
+                                                                    else if (ev.Type == EventTypes.Service)
+                                                                    {
+                                                                        <div style="display:flex">
+                                                                            @ev.ServiceType.GetDescription()
+                                                                            @($"{ev.StartDate:yyyy.MM.dd}")
+                                                                            @($"{ev.EndDate:yyyy.MM.dd}")
+                                                                        </div>
+
+                                                                    }
+                                                                    @if (isFuture)
+                                                                    {
+                                                                        <RadzenIcon Icon="double_arrow" />
+                                                                    }
+
+
                                                                 </div>
-
                                                             }
-                                                            else if (ev.Type == EventTypes.Holiday)
-                                                            {
-                                                                <div style="display:flex">
-                                                                    @ev.HolidayType.GetDescription()
-                                                                    @($" {ev.StartDate:yyyy.MM.dd}")
-                                                                    @($"{ev.EndDate:yyyy.MM.dd}")
-                                                                </div>
-                                                            }
-
-                                                            @if (isFuture)
-                                                            {
-                                                                <RadzenIcon Icon="double_arrow" />
-                                                            }
-
-                                                        </div>
-                                                    }
-                                                }
-                                            </div>
-                                        </td>
-                                        dayIndex++;
+                                                        }
+                                                    </div>
+                                                </td>
+                                                dayIndex++;
+                                            }
+                                            else
+                                            {
+                                                <td ondragover="event.preventDefault()"
+                                                onclick="@(() => OnCreate(eventGroup, currentDate))"
+                                                @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
+                                                </td>
+                                                dayIndex++;
+                                            }
+                                        }
                                     }
-                                    else
-                                    {
-                                        <td ondragover="event.preventDefault()"
-                                            onclick="@(() => OnCreate(eventGroup, currentDate))"
-                                            @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
-                                        </td>
-                                        dayIndex++;
-                                    }
-                                }
+                                </tr>
                             }
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
+                        }
+                        else if (!isBus)
+                        {
+                            @foreach (var eventGroup in driverEvents)
+                            {
+                                <tr style="@GetRowStyle(eventGroup.Driver)">
+                                    <td style="position:sticky;left:0;z-index:2;background:white;">
+                                        <div class="event-object">
+                                            <span> @eventGroup?.Driver?.Name</span>
+                                        </div>
+                                    </td>
+                                    @{
+                                        int dayIndex = 0;
+                                        while (dayIndex < viewDays.Count)
+                                        {
+                                            var currentDate = viewDays[dayIndex].Date;
+                                            var eventsForDay = eventGroup.Events.Where(e =>
+                                            e.StartDate.Date == currentDate).ToList();
 
-    </div>
-</section>
+                                            if (eventsForDay.Any())
+                                            {
+
+                                                var remainingDays = viewDays.Count - dayIndex;
+                                                <td style="padding:6px; border-radius:6px; z-index: -1;width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
+                                                    <div style="@GetDivStyle()"
+                                                    ondragover="event.preventDefault()"
+                                                    @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
+                                                        @foreach (var tuple in eventsForDay.Select((ev, index) => (ev, index)))
+                                                        {
+                                                            var ev = tuple.ev;
+                                                            var index = tuple.index;
+                                                            var isPast = ev.StartDate.Date < viewStart;
+                                                            var isFuture = ev.EndDate.Date > viewEnd;
+                                                            if (GetDayIndex(ev.StartDate) == GetDayIndex(currentDate))
+                                                            {
+
+                                                                <div style="@GetEventStyle(ev,index)"
+                                                                id="event-@ev.Id"
+                                                                @ref="@(refMap[ev.Id])"
+                                                                @onmouseenter="@(() => ShowTooltip(ev))"
+                                                                @onmouseleave="HideTooltip"
+                                                                draggable="true"
+                                                                ondragstart="@(() => SetDragItem(ev,eventGroup.Driver))"
+                                                                onclick="@(() => OnUpdate(ev))"
+                                                                @onclick:stopPropagation="true">
+                                                                    @if (isPast)
+                                                                    {
+                                                                        <RadzenIcon Icon="keyboard_double_arrow_left" />
+                                                                    }
+                                                                    @if (ev.Type == EventTypes.Event)
+                                                                    {
+                                                                        <div style="display:flex">
+                                                                            @ev.Bus.LicensePlateNumber
+                                                                            @ev.Description
+                                                                            @($"{ev.StartDate:yyyy.MM.dd}")
+                                                                            @($"{ev.EndDate:yyyy.MM.dd}")
+                                                                        </div>
+
+                                                                    }
+                                                                    else if (ev.Type == EventTypes.Holiday)
+                                                                    {
+                                                                        <div style="display:flex">
+                                                                            @ev.HolidayType.GetDescription()
+                                                                            @($" {ev.StartDate:yyyy.MM.dd}")
+                                                                            @($"{ev.EndDate:yyyy.MM.dd}")
+                                                                        </div>
+                                                                    }
+
+                                                                    @if (isFuture)
+                                                                    {
+                                                                        <RadzenIcon Icon="double_arrow" />
+                                                                    }
+
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </td>
+                                                dayIndex++;
+                                            }
+                                            else
+                                            {
+                                                <td ondragover="event.preventDefault()"
+                                                onclick="@(() => OnCreate(eventGroup, currentDate))"
+                                                @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
+                                                </td>
+                                                dayIndex++;
+                                            }
+                                        }
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
 
 
 @code {
+    [CascadingParameter] Task<AuthenticationState> authStateTask { get; set; }
     [Inject] IServiceService ServiceService { get; set; }
     [Inject] IBusService BusService { get; set; }
     [Inject] IHolidayService HolidayService { get; set; }
@@ -420,6 +423,15 @@
     DriverModel draggedDriver;
     private IList<BusModel> buses = new List<BusModel>();
     private bool IsAdmin = false;
+
+ 
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await authStateTask;
+        var user = authState.User;
+        IsAdmin = user.Identity?.IsAuthenticated == true
+                  && user.IsInRole("Admin");
+    }
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();

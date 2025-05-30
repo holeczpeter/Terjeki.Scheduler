@@ -10,7 +10,9 @@ namespace Terjeki.Scheduler.Infrastucure.Persistence.Configurations
 
             builder.Property(d => d.Name)
                    .IsRequired()
-                   .HasMaxLength(100); 
+                   .HasMaxLength(100);
+
+         
         }
     }
 }

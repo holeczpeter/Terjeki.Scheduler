@@ -22,9 +22,9 @@ namespace Terjeki.Scheduler.Infrastucure.Persistence.Configurations
                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(b => b.Driver)
-               .WithOne()
-               .HasForeignKey<Bus>(b => b.DriverId)
-               .OnDelete(DeleteBehavior.SetNull);
+                    .WithOne(d => d.Bus)
+                    .HasForeignKey<Bus>(b => b.DriverId)
+                    .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

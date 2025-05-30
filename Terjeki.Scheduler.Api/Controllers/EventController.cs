@@ -1,5 +1,6 @@
 ﻿namespace Terjeki.Scheduler.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class EventController : ControllerBase
