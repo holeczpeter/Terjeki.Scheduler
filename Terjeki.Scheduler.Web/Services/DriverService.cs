@@ -5,11 +5,13 @@ namespace Terjeki.Scheduler.Web.Services
     public class DriverService : IDriverService
     {
         private readonly HttpClient _httpClient;
-        public DriverService(IHttpClientFactory clientFactory)
-        {
-            _httpClient = clientFactory.CreateClient("ApiClient");
 
+        public DriverService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
         }
+
+       
         public async Task<DriverModel> Create(CreateDriverCommand command, CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.PostAsJsonAsync("api/driver/create", command, cancellationToken);

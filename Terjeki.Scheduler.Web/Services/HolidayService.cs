@@ -4,11 +4,12 @@
     {
         private readonly HttpClient _httpClient;
 
-        public HolidayService(IHttpClientFactory clientFactory)
+        public HolidayService(HttpClient httpClient)
         {
-            _httpClient = clientFactory.CreateClient("ApiClient");
+            _httpClient = httpClient;
         }
 
+       
         public async Task<EventModel> CreateAsync(CreateHolidayCommand command, CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.PostAsJsonAsync("api/holiday/create", command, cancellationToken);

@@ -4,9 +4,10 @@
     {
         private readonly HttpClient _httpClient;
 
-        public EventService(IHttpClientFactory clientFactory)
+        public EventService(HttpClient httpClient)
         {
-            _httpClient = clientFactory.CreateClient("ApiClient");
+            
+            _httpClient = httpClient;
         }
 
         public async Task<EventModel> Get(Guid id, CancellationToken cancellationToken = default)

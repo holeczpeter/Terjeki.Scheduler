@@ -6,10 +6,12 @@ namespace Terjeki.Scheduler.Web.Services
     {
         private readonly HttpClient _httpClient;
 
-        public CapacityService(IHttpClientFactory clientFactory)
+        public CapacityService(HttpClient httpClient)
         {
-            _httpClient = clientFactory.CreateClient("ApiClient");
+            _httpClient = httpClient;
         }
+
+       
         public async Task<IEnumerable<CapacityModel>> GetAll(CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetAsync($"api/capacity/getAll", cancellationToken);

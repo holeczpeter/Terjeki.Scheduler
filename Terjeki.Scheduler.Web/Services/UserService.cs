@@ -4,10 +4,12 @@
     {
         private readonly HttpClient _httpClient;
 
-        public UserService(IHttpClientFactory clientFactory)
+        public UserService(HttpClient httpClient)
         {
-            _httpClient = clientFactory.CreateClient("ApiClient");
+            _httpClient = httpClient;
         }
+
+        
 
         /// <summary>
         /// Létrehoz egy új felhasználót.

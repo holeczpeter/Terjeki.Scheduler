@@ -4,10 +4,12 @@
     {
         private readonly HttpClient _httpClient;
 
-        public ServiceService(IHttpClientFactory clientFactory)
+        public ServiceService(HttpClient httpClient)
         {
-            _httpClient = clientFactory.CreateClient("ApiClient");
+            _httpClient = httpClient;
         }
+
+        
         public async Task<IEnumerable<EventModel>> GetAll(CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetAsync($"api/service/GetAll", cancellationToken);

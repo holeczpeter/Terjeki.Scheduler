@@ -6,11 +6,12 @@ namespace Terjeki.Scheduler.Web.Services
     {
         private readonly HttpClient _httpClient;
 
-        public BusService(IHttpClientFactory clientFactory)
+        public BusService(HttpClient httpClient)
         {
-            _httpClient = clientFactory.CreateClient("ApiClient");
+            _httpClient = httpClient;
         }
 
+     
         public async Task<BusModel> Get(Guid id, CancellationToken cancellationToken = default)
         {
             var response = await _httpClient.GetAsync($"api/bus/get?id={id}", cancellationToken);
