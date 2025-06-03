@@ -1,0 +1,44 @@
+﻿namespace Terjeki.Scheduler.Application
+{
+    internal class UpdateAllowedEmailCommandHandler : IRequestHandler<UpdateAllowedEmailCommand, AllowedEmailModel>
+    {
+        private readonly AppDbContext _dbContext;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        public UpdateAllowedEmailCommandHandler(AppDbContext dbContext, RoleManager<IdentityRole<Guid>> roleManager)
+        {
+            _dbContext = dbContext;
+            _roleManager = roleManager;
+        }
+
+        
+       
+        public async Task<AllowedEmailModel> Handle(UpdateAllowedEmailCommand request, CancellationToken cancellationToken)
+        {
+            var currentAllowedEmail =  await _dbContext.AllowedEmails.Where(x => x.Id == request.Id).FirstOrDefaultAsync(cancellationToken);
+            currentAllowedEmail.Email = request.Email;
+            currentAllowedEmail.RoleName = request.Role.Name;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            var currentRole = await _roleManager.Roles
+                .Select(r => new RoleModel
+                {
+                    Id = r.Id,
+                    Name = r.Name!
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return await _dbContext.AllowedEmails.Where(x => x.Id == currentAllowedEmail.Id).Select(x => new AllowedEmailModel()
+            {
+                Id = x.Id,
+                Email = x.Email,
+                Role = new RoleModel
+                {
+                    Id = currentRole.Id,
+                    Name = currentRole.Name!
+                }
+            }).FirstOrDefaultAsync(cancellationToken);
+            
+        }
+    }
+}

@@ -6,10 +6,13 @@ namespace Terjeki.Scheduler.Web.Components.Holiday
     public partial class CreateHolidayDialog
     {
        
-        [Inject] IDriverService DriverService { get; set; }
-        [Inject] IEventService EventService { get; set; }
+        [Inject] 
+        IDriverService DriverService { get; set; }
+        [Inject] 
+        IEventService EventService { get; set; }
 
-        [Inject] IHolidayService HolidayService { get; set; }
+        [Inject] 
+        IHolidayService HolidayService { get; set; }
 
         private CreateHolidayForm form = new();
 
@@ -21,10 +24,12 @@ namespace Terjeki.Scheduler.Web.Components.Holiday
 
         private ValidationMessageStore messageStore;
 
-
         private List<HolidayModel> holidayTypes;
+
         private List<DriverModel> drivers;
+
         private List<EventModel> events;
+
         protected override async Task OnInitializedAsync()
         {
             var allEvents = await EventService.GetEvents(_cancellationTokenSource.Token);
@@ -58,8 +63,9 @@ namespace Terjeki.Scheduler.Web.Components.Holiday
                 if (form.Driver != null)
                 {
                     var overlapping = events.Any(ev =>
+                    
                         ev.Drivers != null &&
-                        ev.Drivers.Contains(form.Driver) &&
+                        ev.Drivers.Select(x=>x.Id).Contains(form.Driver.Id) &&
                         (
                             (form.Start >= ev.StartDate && form.Start < ev.EndDate) ||
                             (form.End > ev.StartDate && form.End <= ev.EndDate) ||
@@ -69,7 +75,7 @@ namespace Terjeki.Scheduler.Web.Components.Holiday
 
                     if (overlapping)
                     {
-                        var currentOverlap = events.Where(ev => ev.Drivers != null && ev.Drivers.Contains(form.Driver) &&
+                        var currentOverlap = events.Where(ev => ev.Drivers != null && ev.Drivers.Select(x => x.Id).Contains(form.Driver.Id) &&
                         (
                             (form.Start >= ev.StartDate && form.Start < ev.EndDate) ||
                             (form.End > ev.StartDate && form.End <= ev.EndDate) ||
@@ -93,8 +99,7 @@ namespace Terjeki.Scheduler.Web.Components.Holiday
         {
             var request = new CreateHolidayCommand()
             {
-
-                Driver = form.Driver,
+                DriverId = form.Driver.Id,
                 Description = form.Description,
                 StartDate = form.Start,
                 EndDate = form.End,

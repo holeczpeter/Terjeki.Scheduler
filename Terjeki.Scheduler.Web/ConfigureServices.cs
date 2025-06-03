@@ -6,9 +6,10 @@ namespace Terjeki.Scheduler.Web
     {
         public static IServiceCollection AddWebApplicationServices(this IServiceCollection services)
         {
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<IViewService, ViewService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAllowedEmailService, AllowedEmailService>();
             services.AddScoped<IDriverService, DriverService>();
             services.AddScoped<IBusService, BusService>();
             services.AddScoped<ICapacityService, CapacityService>();
@@ -17,6 +18,7 @@ namespace Terjeki.Scheduler.Web
             services.AddScoped<IEventService, EventService>();
             services.AddSingleton<TerjekiAuthenticationStateProvider>();
             services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<TerjekiAuthenticationStateProvider>());
+          
             services.AddAuthorizationCore();
             return services;
         }

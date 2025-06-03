@@ -1,6 +1,6 @@
 ﻿namespace Terjeki.Scheduler.Api.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class BusController : ControllerBase
@@ -26,10 +26,10 @@
             return await mediator.Send(request, cancellationToken);
         }
 
-        [HttpDelete]
-        public async Task Delete([FromBody] DeleteBusCommand request, CancellationToken cancellationToken)
+        [HttpDelete("{id}")]
+        public async Task Delete([FromRoute] Guid id, CancellationToken cancellationToken)
         {
-            await mediator.Send(request, cancellationToken);
+            await mediator.Send(new DeleteBusCommand(id), cancellationToken);
         }
 
         [HttpGet("get")]

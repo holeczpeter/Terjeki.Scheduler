@@ -4,7 +4,7 @@ namespace Terjeki.Scheduler.Web.Components.Users
 {
     public partial class UpdateUserDialog
     {
-        [Inject] IUserService UserService { get; set; }
+        [Inject] IAllowedEmailService UserService { get; set; }
         private UpdateUserForm form = new();
 
         private EditContext editContext = new(new UpdateUserForm());
@@ -16,9 +16,9 @@ namespace Terjeki.Scheduler.Web.Components.Users
         private ValidationMessageStore messageStore;
 
         private List<RoleModel> roles;
-        private List<UserModel> users;
+        private List<AllowedEmailModel> users;
         [Parameter]
-        public UserModel Selected { get; set; } = default!;
+        public AllowedEmailModel Selected { get; set; } = default!;
 
         protected override async Task OnInitializedAsync()
         {
@@ -72,7 +72,7 @@ namespace Terjeki.Scheduler.Web.Components.Users
         {
             if (!string.IsNullOrEmpty(form.Name))
             {
-                var request = new UpdateUserCommand()
+                var request = new UpdateAllowedEmailCommand()
                 {
                     Id = form.Id,
                     Name = form.Name,

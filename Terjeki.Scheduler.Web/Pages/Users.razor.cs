@@ -4,9 +4,9 @@ namespace Terjeki.Scheduler.Web.Pages
 {
     public partial class Users
     {
-        [Inject] IUserService UserService { get; set; }
+        [Inject] IAllowedEmailService UserService { get; set; }
 
-        private IList<UserModel> users = new List<UserModel>();
+        private IList<AllowedEmailModel> users = new List<AllowedEmailModel>();
 
         protected override async Task OnInitializedAsync()
         {
@@ -26,7 +26,7 @@ namespace Terjeki.Scheduler.Web.Pages
             if (result != null) await Refresh();
 
         }
-        private async Task OnEdit(UserModel user)
+        private async Task OnEdit(AllowedEmailModel user)
         {
             var parameters = new Dictionary<string, object>() { { "Selected", user } };
             var result = await DialogService.OpenAsync<UpdateUserDialog>($"{user.Name} adatainak módosítása", parameters);
@@ -34,7 +34,7 @@ namespace Terjeki.Scheduler.Web.Pages
         }
         private async Task OnDelete(Guid id)
         {
-            var result = await UserService.DeleteAsync(new DeleteUserCommand(id));
+            var result = await UserService.DeleteAsync(new DeleteAllowedEmailCommand(id));
             if (result) await Refresh();
         }
     }

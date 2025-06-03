@@ -3,10 +3,8 @@
     public class CreateDriverCommand : IRequest<DriverModel>
     {
 
-        [Required]
-        public DriverModel Driver { get; set; }
-       
         public Guid? BusId { get; set; }
-
+        public Guid? DriverUserId { get; set; }
+        public string? DriverName { get; set; }
     }
 }

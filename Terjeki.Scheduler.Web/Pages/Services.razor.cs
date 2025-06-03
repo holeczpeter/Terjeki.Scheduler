@@ -1,4 +1,5 @@
 ﻿
+using Terjeki.Scheduler.Web.Components;
 using Terjeki.Scheduler.Web.Components.Services;
 
 namespace Terjeki.Scheduler.Web.Pages
@@ -64,8 +65,13 @@ namespace Terjeki.Scheduler.Web.Pages
         }
         private async Task OnDelete(Guid id)
         {
-            var result = await EventService.Delete(new DeleteEventCommand(id), new CancellationToken()); 
-            if (result) await Refresh();
+            var parameters = new Dictionary<string, object>() { { "Text", $"Biztosan törlöd a szervíz eseményt?" } };
+            var confirm = await DialogService.OpenAsync<ConfirmDialog>($"Törlés megerősítése", parameters);
+            if (confirm)
+            {
+                var result = await EventService.Delete(new DeleteEventCommand(id), new CancellationToken());
+                if (result) await Refresh();
+            }
         }
     }
 }

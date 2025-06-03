@@ -1,0 +1,35 @@
+﻿@inject DialogService DialogService
+<RadzenStack Gap="1.5rem">
+    
+        <div class="content">
+            @Text
+        </div>
+        <div class="flex-button">
+
+
+            <TButton Label="Mégsem"
+                     Type="@TButton.TypeEnum.Outline"
+                     Size="@TButton.SizeEnum.Medium"
+                     OnClick="() => Cancel()">
+            </TButton>
+            <TButton Label="Igen"
+                     Type="@TButton.TypeEnum.Primary"
+                     Size="@TButton.SizeEnum.Medium"
+                     OnClick="()=> Ok()">
+            </TButton>
+
+        </div>
+   
+</RadzenStack>
+@code {
+    [Parameter]
+    public string Text { get; set; } = default!;
+    private void Ok()
+    {
+        DialogService.Close(true);
+    }
+    private void Cancel()
+    {
+        DialogService.Close(false);
+    }
+}

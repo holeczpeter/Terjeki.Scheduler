@@ -2,67 +2,59 @@
 
 namespace Terjeki.Scheduler.Web.Components.Drivers
 {
+
     public partial class UpdateDriverDialog
     {
-        [Inject] IBusService BusService { get; set; }
-        [Inject] IDriverService DriverService { get; set; }
+        [Inject] 
+        IBusService BusService { get; set; }
+        [Inject] 
+        IDriverService DriverService { get; set; }
+
+        [Parameter]
+        public Guid SelectedId { get; set; } = default!;
 
         private UpdateDriverForm form = new();
 
         private EditContext editContext = new(new UpdateDriverForm());
 
-        private bool isFormValid = false;
+        private List<BusItemModel> buses = new();
 
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-        private ValidationMessageStore messageStore;
-
-        private List<BusModel> buses;
-
-        [Parameter]
-        public DriverModel Selected { get; set; } = default!;
-
         protected override async Task OnInitializedAsync()
         {
-            var allBus = await BusService.GetAll(_cancellationTokenSource.Token);
-            buses = allBus.ToList();
+            var currentDriver = await DriverService.Get(SelectedId, _cancellationTokenSource.Token);
+            buses = (await BusService.GetAll(_cancellationTokenSource.Token)).Select(x=> new BusItemModel() 
+            {
+              Id = x.Id,
+              Brand = x.Brand,
+              CurrentMileage = x.CurrentMileage,
+              LicensePlateNumber = x.LicensePlateNumber
+            }).ToList();
 
             form = new UpdateDriverForm()
             {
-                Id = Selected.Id,
-                Name = Selected.Name,
-                Bus = Selected.Bus
+                Id = currentDriver.Id,
+                UserId = currentDriver.UserId,
+                DriverName = currentDriver.Name,
+                Bus = currentDriver.Bus
             };
 
-
             editContext = new EditContext(form);
-            messageStore = new ValidationMessageStore(editContext);
-            editContext.OnFieldChanged += ValidateForm;
-            form.PropertyChanged += OnFieldChanged;
+
             await base.OnInitializedAsync();
         }
 
-        private void OnFieldChanged(object? sender, PropertyChangedEventArgs e)
+        private async Task OnSave()
         {
-            editContext.NotifyFieldChanged(new FieldIdentifier(form, nameof(CreateDriverForm.Driver)));
-        }
-
-        private void ValidateForm(object? sender, FieldChangedEventArgs e)
-        {
-
-            isFormValid = editContext.Validate();
-            StateHasChanged();
-        }
-
-
-        public async Task OnSave()
-        {
-            if (isFormValid)
+            if (editContext.Validate())
             {
                 var request = new UpdateDriverCommand()
                 {
                     Id = form.Id,
                     BusId = form.Bus?.Id,
+                    DriverName = form.DriverName,
+                    UserId = form.UserId
                 };
                 var result = await DriverService.Update(request, _cancellationTokenSource.Token);
                 if (result == null)
@@ -73,8 +65,7 @@ namespace Terjeki.Scheduler.Web.Components.Drivers
                         Summary = "Sikertelen mentés",
                         Duration = 2000
                     });
-                    DialogService.Close(result);
-                    DialogService.CloseSide(result);
+                    DialogService.Close(null);
                 }
                 else
                 {
@@ -85,14 +76,14 @@ namespace Terjeki.Scheduler.Web.Components.Drivers
                         Duration = 2000
                     });
                     DialogService.Close(result);
-                    DialogService.CloseSide(result);
                 }
-
             }
         }
+
         private void Close()
         {
             DialogService.Close(null);
         }
     }
+
 }

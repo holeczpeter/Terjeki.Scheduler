@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Json;
-
-namespace Terjeki.Scheduler.Web.Services
+﻿namespace Terjeki.Scheduler.Web.Services
 {
     public class DriverService : IDriverService
     {
@@ -38,12 +36,7 @@ namespace Terjeki.Scheduler.Web.Services
         }
         public async Task<bool> Delete(DeleteDriverCommand command, CancellationToken cancellationToken = default)
         {
-            var request = new HttpRequestMessage(HttpMethod.Delete, "api/driver")
-            {
-                Content = JsonContent.Create(command)
-            };
-
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            var response = await _httpClient.DeleteAsync($"api/driver/{command.Id}", cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

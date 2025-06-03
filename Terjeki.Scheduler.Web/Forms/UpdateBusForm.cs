@@ -78,9 +78,9 @@ namespace Terjeki.Scheduler.Web.Components.Buses
                 }
             }
         }
-        private DriverModel _driver;
+        private DriverItemModel _driver;
 
-        public DriverModel Driver
+        public DriverItemModel Driver
         {
             get => _driver;
             set

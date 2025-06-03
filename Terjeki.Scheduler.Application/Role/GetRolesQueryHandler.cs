@@ -1,39 +1,23 @@
-﻿namespace Terjeki.Scheduler.Application
+﻿
+
+namespace Terjeki.Scheduler.Application
 {
     internal class GetRolesQueryHandler : IRequestHandler<GetRolesQuery, IEnumerable<RoleModel>>
     {
-        public RoleModel AdminRole = new RoleModel
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        public GetRolesQueryHandler(RoleManager<IdentityRole<Guid>> roleManager)
         {
-            Id = Guid.NewGuid(),
-            Name = "Adminisztrátor",
-            Type = RoleTypes.Admin
-        };
-
-        public RoleModel DriverRole = new RoleModel
-        {
-            Id = Guid.NewGuid(),
-            Name = "Sofőr",
-            Type = RoleTypes.Driver
-        };
-
-        public RoleModel ServiceRole = new RoleModel
-        {
-            Id = Guid.NewGuid(),
-            Name = "Szerelő",
-            Type = RoleTypes.Service
-        };
-        public GetRolesQueryHandler()
-        {
-            
+            _roleManager = roleManager;
         }
         public async Task<IEnumerable<RoleModel>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
         {
-            var roles = new List<RoleModel>
-                    {
-                        AdminRole,
-                        DriverRole,
-                        ServiceRole
-                    };
+            var roles = await _roleManager.Roles
+                .Select(r => new RoleModel
+                {
+                    Id = r.Id,
+                    Name = r.Name!
+                })
+                .ToListAsync(cancellationToken);
 
             return roles;
         }

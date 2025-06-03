@@ -72,6 +72,7 @@ namespace Terjeki.Scheduler.Web.Components.Services
                 if (form.Bus != null)
                 {
                     var overlapping = events.Any(ev =>
+                        ev.Id != Selected.Id &&
                         ev.Bus != null &&
                         ev.Bus.Id == form.Bus.Id &&
                         (
@@ -83,7 +84,7 @@ namespace Terjeki.Scheduler.Web.Components.Services
 
                     if (overlapping)
                     {
-                        var currentOverlap = events.Where(ev => ev.Bus != null && ev.Bus.Id == form.Bus.Id &&
+                        var currentOverlap = events.Where(ev => ev.Id != Selected.Id && ev.Bus != null && ev.Bus.Id == form.Bus.Id &&
                         (
                             (form.Start >= ev.StartDate && form.Start < ev.EndDate) ||
                             (form.End > ev.StartDate && form.End <= ev.EndDate) ||
@@ -105,17 +106,18 @@ namespace Terjeki.Scheduler.Web.Components.Services
 
         public async Task OnSave()
         {
-            var request = new UpdateEventCommand()
+            var request = new UpdateServiceCommand()
             {
                 Id = form.Id,
-                Bus = form.Bus,
+                BusId = form.Bus.Id,
+                CurrentMileage = form.Bus.CurrentMileage,
                 StartDate = form.Start,
                 EndDate = form.End,
                 Type = EventTypes.Service,
                 ServiceType = form.Type,
                 Description = form.Description,
             };
-            var result = await EventService.Update(request, _cancellationTokenSource.Token);
+            var result = await ServiceService.Update(request, _cancellationTokenSource.Token);
             
             if (result == null)
             {

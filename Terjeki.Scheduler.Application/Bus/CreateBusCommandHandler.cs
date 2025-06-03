@@ -25,6 +25,7 @@
                 Brand = request.Name,
                 Driver = driver,
                 CurrentMileage = request.CurrentMileage,
+                Type = "Busz"
             };
             await this._dbContext.Buses.AddAsync(bus, cancellationToken);
             await this._dbContext.SaveChangesAsync(cancellationToken);
@@ -43,7 +44,7 @@
                     Brand = x.Brand,
                     CurrentMileage = x.CurrentMileage,
                     Driver = x.Driver != null ?
-                             new DriverModel() { Id = x.Driver.Id, Name = x.Driver.Name }:
+                             new DriverItemModel() { Id = x.Driver.Id, Name = x.Driver.Name }:
                              null,
                 }).FirstOrDefaultAsync(cancellationToken);
 

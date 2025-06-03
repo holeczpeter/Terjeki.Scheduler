@@ -6,6 +6,7 @@ namespace Terjeki.Scheduler.Infrastucure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Capacity> builder)
         {
+            BaseEntityConfiguration.Configure(builder);
             builder.HasKey(d => d.Id);
 
            

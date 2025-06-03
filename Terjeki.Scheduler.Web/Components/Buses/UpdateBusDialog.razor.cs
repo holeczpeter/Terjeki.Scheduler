@@ -45,7 +45,7 @@ namespace Terjeki.Scheduler.Web.Components.Buses
                 LicensePlateNumber = Selected.LicensePlateNumber,
                 Description = Selected.Description,
                 Driver = Selected.Driver,
-                CurrentMileage = form.CurrentMileage,
+                CurrentMileage = Selected.CurrentMileage,
             };
 
            

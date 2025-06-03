@@ -6,6 +6,7 @@ namespace Terjeki.Scheduler.Infrastucure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Bus> builder)
         {
+            BaseEntityConfiguration.Configure(builder);
             builder.HasKey(b => b.Id);
             builder.Property(b => b.LicensePlateNumber).IsRequired().HasMaxLength(20);
             builder.Property(b => b.Brand).HasMaxLength(50);

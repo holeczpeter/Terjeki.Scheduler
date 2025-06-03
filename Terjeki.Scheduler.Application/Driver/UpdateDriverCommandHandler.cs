@@ -13,8 +13,10 @@
             var currentBus = await this._dbContext.Buses
               .Where(x => x.Id == request.BusId).FirstOrDefaultAsync(cancellationToken);
             var currentDriver = await this._dbContext.Drivers.Where(x=>x.Id == request.Id).FirstOrDefaultAsync(cancellationToken);
-
+            var currentUser = await _dbContext.Users.Where(x => x.Id == request.UserId).FirstOrDefaultAsync(cancellationToken);
             currentDriver.Bus = currentBus;
+            currentDriver.Name = request.UserId != null ? currentUser.FullName : request.DriverName;
+            currentDriver.UserId = request.UserId;  
 
             await this._dbContext.SaveChangesAsync(cancellationToken);
 
@@ -24,6 +26,7 @@
                 {
                     Id = x.Id,
                     Name = x.Name,
+                    UserId = x.UserId,
                     Bus = x.Bus != null ?
                             new BusItemModel() { Id = x.Bus.Id, Brand = x.Bus.Brand, LicensePlateNumber = x.Bus.LicensePlateNumber } : null
                 }).FirstOrDefaultAsync(cancellationToken);

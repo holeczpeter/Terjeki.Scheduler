@@ -1,18 +1,43 @@
-﻿
-@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
 
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <HeadContent>
     <RadzenTheme Theme="material" />
 </HeadContent>
 <RadzenComponents />
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    @if (IsAuthenticated)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
+   
     <main>
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+@code{
+    private bool IsAuthenticated { get; set; } = false;
+    protected override async Task OnInitializedAsync()
+    {
+
+        IsAuthenticated = await GetAuthState();
+        AuthenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+    private async Task<bool> GetAuthState()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        return authState.User.Identity?.IsAuthenticated == true;
+    }
+
+    private async void OnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        IsAuthenticated = await GetAuthState();
+    }
+    
+}

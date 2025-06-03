@@ -1,4 +1,6 @@
-﻿namespace Terjeki.Scheduler.Web.Pages
+﻿using Terjeki.Scheduler.Web.Components;
+
+namespace Terjeki.Scheduler.Web.Pages
 {
     public partial class Buses : IDisposable
     {
@@ -36,8 +38,13 @@
         }
         private async Task OnDelete(Guid id)
         {
-            var result = await BusService.Delete(new DeleteBusCommand(id), new CancellationToken());
-            if (result) await Refresh();
+            var parameters = new Dictionary<string, object>() { { "Text", $"Biztosan törlöd a kiválasztott buszt?" } };
+            var confirm = await DialogService.OpenAsync<ConfirmDialog>($"Törlés megerősítése", parameters);
+            if (confirm)
+            {
+                var result = await BusService.Delete(new DeleteBusCommand(id), new CancellationToken());
+                if (result) await Refresh();
+            }
         }
         public void Dispose()
         {

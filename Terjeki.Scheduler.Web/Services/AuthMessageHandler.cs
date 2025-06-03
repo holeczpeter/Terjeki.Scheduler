@@ -2,21 +2,22 @@
 
 namespace Terjeki.Scheduler.Web.Services
 {
-   
+
     public class AuthMessageHandler : DelegatingHandler
     {
-        private readonly JwtAuthenticationStateProvider _authState;
+        private readonly IServiceProvider _serviceProvider;
 
-        public AuthMessageHandler(JwtAuthenticationStateProvider authState)
+        public AuthMessageHandler(IServiceProvider serviceProvider)
         {
-            _authState = authState;
+            _serviceProvider = serviceProvider;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            var token = await _authState.GetTokenAsync();
+            var authStateProvider = _serviceProvider.GetRequiredService<JwtAuthenticationStateProvider>();
+            var token = await authStateProvider.GetTokenAsync();
             if (!string.IsNullOrEmpty(token))
             {
                 request.Headers.Authorization =

@@ -7,39 +7,73 @@
 <RadzenStack Gap="1.5rem">
     <EditForm EditContext="@editContext">
         <DataAnnotationsValidator />
+        <ValidationSummary />
+
         <div class="content">
             <div class="form-input">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Sofőr kiválasztása </RadzenText>
-                <RadzenDropDown Data="@users"
-                                @bind-Value="@form.Driver"
-                                TextProperty="Name"
-                                AllowClear="true"
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                    Sofőr típusa
+                </RadzenText>
+                <RadzenRadioButtonList @bind-Value="form.IsExistingUser" TValue="bool"
+                                       Data="Options"
+                                       TextProperty="Label" ValueProperty="Value"
+                                       Style="display:flex; gap:1rem;" />
+            </div>
+            @if (form.IsExistingUser)
+            {
+                <div class="form-input">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                        Felhasználó kiválasztása
+                    </RadzenText>
+                    <RadzenDropDown Data="@users"
+                                    TValue="UserModel" @bind-Value="selectedUser"
+                                    TextProperty="FullName"
+                                    AllowClear="false"
+                                    AllowFiltering="true"
+                                    Style="width: 100%;"
+                                    Placeholder="Válassz felhasználót"
+                                    Change="@(args => OnUserChanged(args))" />
+                    <ValidationMessage For="@(() => form.DriverUserId)" />
+                </div>
+            }
+            else
+            {
+               
+                <div class="form-input">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                        Sofőr neve
+                    </RadzenText>
+                    <RadzenTextBox @bind-Value="form.DriverName"
+                                  Style="width: 100%;"
+                                  Placeholder="Írd be a sofőr nevét" />
+                    <ValidationMessage For="@(() => form.DriverName)" />
+                </div>
+            }
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                    Busz kiválasztása
+                </RadzenText>
+                <RadzenDropDown Data="@buses"
+                                TValue="BusModel" @bind-Value="form.Bus"
+                                TextProperty="LicensePlateNumber"
+                                AllowClear="false"
                                 AllowFiltering="true"
                                 Style="width: 100%;"
-                                Name="DriversDropDown" />
-            </div>
-            <div class="form-input">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Busz kiválasztása </RadzenText>
-                <RadzenDropDown Data=@buses
-                                TValue="BusModel" @bind-Value=@form.Bus
-                                AllowClear="true"
-                                AllowFiltering="true" Style="width: 100%;"
-                                Name="DropDownCustomObjects" />
+                                Placeholder="Válassz buszt" />
+                <ValidationMessage For="@(() => form.Bus)" />
             </div>
         </div>
-        <div class="flex-button">
 
+        <div class="flex-button">
             <TButton Label="Mégsem"
                      Type="@TButton.TypeEnum.Outline"
                      Size="@TButton.SizeEnum.Medium"
-                     OnClick="() => Close()">
-            </TButton>
+                     OnClick="Close" />
+
             <TButton Label="Mentés"
                      Type="@TButton.TypeEnum.Primary"
                      Size="@TButton.SizeEnum.Medium"
-                     OnClick="()=> OnSave()">
-            </TButton>
-
+                     OnClick="OnSave" />
         </div>
     </EditForm>
 </RadzenStack>

@@ -2,10 +2,10 @@
 {
     public class CreateEventCommand : IRequest<EventModel>
     {
-        public CapacityModel Capacity { get; set; }
-        public BusModel Bus { get; set; }
+        public int Capacity { get; set; }
+        public Guid? BusId { get; set; }
 
-        public List<DriverModel> Drivers { get; set; }
+        public List<Guid> DriverIds { get; set; }
 
         public DateTime StartDate { get; set; }
 

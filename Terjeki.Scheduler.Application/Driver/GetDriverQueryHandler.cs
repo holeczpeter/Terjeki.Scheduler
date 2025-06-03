@@ -18,6 +18,7 @@
                  {
                      Id = x.Id,
                      Name = x.Name,
+                     UserId = x.UserId,
                      Bus = x.Bus != null ?
                             new BusItemModel() { Id = x.Bus.Id, Brand = x.Bus.Brand, LicensePlateNumber = x.Bus.LicensePlateNumber } : null
                  }).FirstOrDefaultAsync(cancellationToken);

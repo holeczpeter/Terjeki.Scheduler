@@ -6,7 +6,7 @@
 
         public BusModel Bus { get; set; }
 
-        public List<DriverModel> Drivers { get; set; }
+        public List<DriverItemModel> Drivers { get; set; }
 
         public override string ToString()
         {

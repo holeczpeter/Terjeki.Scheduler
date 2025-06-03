@@ -7,7 +7,6 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @attribute [Authorize]
-@attribute [Authorize(Roles = "Admin")]
 <PageTitle>Buszok</PageTitle>
 <div class="floating-button">
     <RadzenButton Click="@(() => OnCreate())"
@@ -22,74 +21,73 @@
    
 </div>
 
-@if (buses != null && buses.Any())
-{ 
-    <RadzenDataGrid  AllowFiltering="true" Responsive="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" PageSize="10" AllowSorting="true"
-
-    Data="@buses" TItem="BusModel">
-        <Columns>
-            <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
-                <Template Context="data">
-                    @(buses.IndexOf(data) + 1)
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="BusModel.Name" Title="Név">
-                <Template Context="bus">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@bus.Brand</RadzenText>
-                        </RadzenStack>
+<RadzenDataGrid AllowFiltering="true"
+                Responsive="true"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand"
+                AllowPaging="true" PageSize="10"
+                AllowSorting="true" Data="@buses"
+                TItem="BusModel">
+    <EmptyTemplate>
+        Nem található busz
+    </EmptyTemplate>
+    <Columns>
+        <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                @(buses.IndexOf(data) + 1)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="BusModel.Name" Title="Név">
+            <Template Context="bus">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@bus.Brand</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(BusModel.Capacity)" Title="Férőhely" />
-            <RadzenDataGridColumn Property="@nameof(BusModel.LicensePlateNumber)" Title="Rendszám"/>
-            <RadzenDataGridColumn Property="@nameof(BusModel.Description)" Title="Leírás" />
-            <RadzenDataGridColumn Property="@nameof(BusModel.CurrentMileage)" Title="Km óra állás" />
-            <RadzenDataGridColumn Property="BusModel?.Driver?.Name" Title="Sofőr">
-                <Template Context="bus">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@bus?.Driver?.Name</RadzenText>
-                        </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(BusModel.Capacity)" Title="Férőhely" />
+        <RadzenDataGridColumn Property="@nameof(BusModel.LicensePlateNumber)" Title="Rendszám" />
+        <RadzenDataGridColumn Property="@nameof(BusModel.Description)" Title="Leírás" />
+        <RadzenDataGridColumn Property="@nameof(BusModel.CurrentMileage)" Title="Km óra állás" />
+        <RadzenDataGridColumn Property="BusModel?.Driver?.Name" Title="Sofőr">
+            <Template Context="bus">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@bus?.Driver?.Name</RadzenText>
                     </RadzenStack>
-                </Template>
-                </RadzenDataGridColumn>
-            <RadzenDataGridColumn Context="bus" 
-                Filterable="false" Sortable="false"
-                TextAlign="TextAlign.Right"
-                Width="200px"
-                Frozen="true" 
-                FrozenPosition="FrozenColumnPosition.Right">
-                <Template Context="bus">
-                     <RadzenButton Icon="timeline" 
-                        ButtonStyle="ButtonStyle.Light" 
-                        Variant="Variant.Flat" 
-                        Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" 
-                        Click="@(() => OnTimeLine(bus))" @onclick:stopPropagation="true" />
-                 
-                    <RadzenButton Icon="edit" 
-                    ButtonStyle="ButtonStyle.Light" 
-                    Variant="Variant.Flat" 
-                    Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" 
-                    Click="@(() => OnEdit(bus))" @onclick:stopPropagation="true" />
-                    <RadzenButton Icon="delete" 
-                    ButtonStyle="ButtonStyle.Light" 
-                    Variant="Variant.Flat" 
-                    Size="ButtonSize.Medium" 
-                    Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" 
-                    Click="@(() => OnDelete(bus.Id))" @onclick:stopPropagation="true" />
-                </Template>
-            </RadzenDataGridColumn>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Context="bus"
+                              Filterable="false" Sortable="false"
+                              TextAlign="TextAlign.Right"
+                              Width="200px"
+                              Frozen="true"
+                              FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="bus">
+                <RadzenButton Icon="timeline"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                              Click="@(() => OnTimeLine(bus))" @onclick:stopPropagation="true" />
+
+                <RadzenButton Icon="edit"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                              Click="@(() => OnEdit(bus))" @onclick:stopPropagation="true" />
+                <RadzenButton Icon="delete"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Size="ButtonSize.Medium"
+                              Shade="Shade.Lighter" class="rz-my-1 rz-ms-1"
+                              Click="@(() => OnDelete(bus.Id))" @onclick:stopPropagation="true" />
+            </Template>
+        </RadzenDataGridColumn>
 
 
-        </Columns>
-    </RadzenDataGrid>
-}
-else
-{
-    <p>Buszok betöltése folyamatban...</p>
-}
+    </Columns>
+</RadzenDataGrid>
 
 @code {
    

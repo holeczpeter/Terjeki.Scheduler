@@ -4,7 +4,7 @@ namespace Terjeki.Scheduler.Web.Components.Users
 {
     public partial class CreateUserDialog
     {
-        [Inject] IUserService UserService { get; set; }
+        [Inject] IAllowedEmailService UserService { get; set; }
        
         private CreateUserForm form = new();
 
@@ -16,7 +16,7 @@ namespace Terjeki.Scheduler.Web.Components.Users
 
         private ValidationMessageStore messageStore;
 
-        private List<UserModel> users;
+        private List<AllowedEmailModel> users;
         private List<RoleModel> roles;
         protected override async Task OnInitializedAsync()
         {
@@ -65,7 +65,7 @@ namespace Terjeki.Scheduler.Web.Components.Users
         {
             if (!string.IsNullOrEmpty(form.Name))
             {
-                var request = new CreateUserCommand()
+                var request = new CreateAllowedEmailCommand()
                 {
 
                     Name = form.Name,

@@ -26,16 +26,16 @@
             return await mediator.Send(request, cancellationToken);
         }
 
-        [HttpDelete]
-        public async Task<bool> Delete([FromBody] DeleteHolidayCommand request, CancellationToken cancellationToken)
+        [HttpDelete("{id}")]
+        public async Task<bool> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
         {
-            return await mediator.Send(request, cancellationToken);
+            return await mediator.Send(new DeleteHolidayCommand(id), cancellationToken);
         }
 
         [HttpGet("get")]
-        public async Task<BusModel> Get([FromQuery] Guid id, CancellationToken cancellationToken)
+        public async Task<EventModel> Get([FromQuery] Guid id, CancellationToken cancellationToken)
         {
-            var query = new GetBusQuery(id);
+            var query = new GetEventQuery(id);
             return await mediator.Send(query, cancellationToken);
         }
 

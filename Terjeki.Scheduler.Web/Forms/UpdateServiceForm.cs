@@ -35,9 +35,9 @@ namespace Terjeki.Scheduler.Web.Components.Services
             }
         }
 
-        private BusModel _bus;
+        private BusItemModel _bus;
 
-        public BusModel Bus
+        public BusItemModel Bus
         {
             get => _bus;
             set

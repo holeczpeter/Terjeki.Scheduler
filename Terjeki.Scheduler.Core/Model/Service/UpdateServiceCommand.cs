@@ -1,6 +1,6 @@
 ﻿namespace Terjeki.Scheduler.Core
 {
-    public class UpdateUserCommand : CreateUserCommand, IRequest<UserModel>
+    public class UpdateServiceCommand : CreateServiceCommand, IRequest<EventModel>
     {
         public Guid Id { get; set; }
     }

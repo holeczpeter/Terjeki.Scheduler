@@ -6,9 +6,9 @@
         public int?  Index { get; set; }
         public CapacityModel Capacity { get; set; }
        
-        public BusModel Bus { get; set; }
+        public BusItemModel Bus { get; set; }
 
-        public List<DriverModel> Drivers { get; set; }
+        public List<DriverItemModel> Drivers { get; set; }
 
         public DateTime StartDate { get; set; }
 

@@ -6,7 +6,7 @@ namespace Terjeki.Scheduler.Infrastucure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<DriverEvent> builder)
         {
-            
+            BaseEntityConfiguration.Configure(builder);
             builder.HasKey(ed => new { ed.EventId, ed.DriverId });
 
            

@@ -12,8 +12,8 @@ using Terjeki.Scheduler.Infrastucure;
 namespace Terjeki.Scheduler.Infrastucure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250530093202_SeedRoles")]
-    partial class SeedRoles
+    [Migration("20250603111618_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -167,7 +167,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("Creator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -184,20 +185,25 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("LastModifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("RoleName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("EntityStatus");
 
                     b.ToTable("AllowedEmails");
                 });
@@ -291,7 +297,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("Creator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("CurrentMileage")
                         .HasColumnType("int");
@@ -311,7 +318,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("LastModifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("LicensePlateNumber")
                         .IsRequired()
@@ -319,8 +327,10 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -334,6 +344,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     b.HasIndex("DriverId")
                         .IsUnique()
                         .HasFilter("[DriverId] IS NOT NULL");
+
+                    b.HasIndex("EntityStatus");
 
                     b.ToTable("Buses");
                 });
@@ -349,7 +361,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("Creator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("EntityStatus")
                         .HasColumnType("int");
@@ -362,16 +375,21 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("LastModifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<int>("Seats")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EntityStatus");
 
                     b.ToTable("Capacities");
                 });
@@ -387,7 +405,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("Creator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("EntityStatus")
                         .HasColumnType("int");
@@ -397,7 +416,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("LastModifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -405,10 +425,21 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EntityStatus");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Drivers");
                 });
@@ -426,7 +457,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("Creator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("EntityStatus")
                         .HasColumnType("int");
@@ -439,15 +471,20 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("LastModifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("EventId", "DriverId");
 
                     b.HasIndex("DriverId");
+
+                    b.HasIndex("EntityStatus");
 
                     b.ToTable("DriverEvents");
                 });
@@ -466,12 +503,11 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("Creator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -487,11 +523,14 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<string>("LastModifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<int>("ServiceType")
                         .HasColumnType("int");
@@ -508,6 +547,8 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BusId");
+
+                    b.HasIndex("EntityStatus");
 
                     b.ToTable("Events");
                 });
@@ -579,6 +620,16 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     b.Navigation("Capacity");
 
                     b.Navigation("Driver");
+                });
+
+            modelBuilder.Entity("Terjeki.Scheduler.Core.Entities.Driver", b =>
+                {
+                    b.HasOne("Terjeki.Scheduler.Core.Entities.ApplicationUser", "User")
+                        .WithOne()
+                        .HasForeignKey("Terjeki.Scheduler.Core.Entities.Driver", "UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Terjeki.Scheduler.Core.Entities.DriverEvent", b =>

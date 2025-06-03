@@ -8,7 +8,7 @@
         public string Description { get; set; }
         public string LicensePlateNumber { get; set; }
         public CapacityModel Capacity { get; set; }
-        public DriverModel Driver { get; set; }
+        public DriverItemModel Driver { get; set; }
         public int CurrentMileage { get; set; }
         public override bool Equals(object o)
         {

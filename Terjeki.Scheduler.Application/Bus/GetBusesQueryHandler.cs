@@ -23,7 +23,7 @@
                    Brand = x.Brand,
                    CurrentMileage = x.CurrentMileage,
                    Driver = x.Driver != null ?
-                             new DriverModel() { Id = x.Driver.Id, Name = x.Driver.Name } :
+                             new DriverItemModel() { Id = x.Driver.Id, Name = x.Driver.Name } :
                              null,
                }).ToListAsync(cancellationToken);
             

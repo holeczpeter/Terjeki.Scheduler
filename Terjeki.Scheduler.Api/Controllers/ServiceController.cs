@@ -13,6 +13,24 @@
             this.mediator = mediator;
             this._logger = logger;
         }
+
+        [HttpPost("create")]
+        public async Task<EventModel> Create([FromBody] CreateServiceCommand request, CancellationToken cancellationToken)
+        {
+            return await mediator.Send(request, cancellationToken);
+        }
+        [HttpPost("update")]
+        public async Task<EventModel> Update([FromBody] UpdateServiceCommand request, CancellationToken cancellationToken)
+        {
+            return await mediator.Send(request, cancellationToken);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task Delete([FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            await mediator.Send(new DeleteServiceCommand(id), cancellationToken);
+        }
+       
         [HttpGet("getAll")]
         public async Task<IEnumerable<EventModel>> GetAll(CancellationToken cancellationToken)
         {

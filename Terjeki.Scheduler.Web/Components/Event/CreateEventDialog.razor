@@ -18,10 +18,12 @@
             <div class="form-input">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Busz kiválasztása </RadzenText>
                 <RadzenDropDown Data=@buses
-                TValue="BusModel" @bind-Value=@form.Bus AllowClear="true" AllowFiltering="true" Style="width: 100%;"
+                TValue="BusItemModel" @bind-Value=@form.Bus AllowClear="true" AllowFiltering="true" Style="width: 100%;"
                 Name="DropDownCustomObjects" />
 
+
             </div>
+
             <div class="form-input">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Sofőr(ök) kiválasztása </RadzenText>
                 <RadzenDropDown Data="@drivers"

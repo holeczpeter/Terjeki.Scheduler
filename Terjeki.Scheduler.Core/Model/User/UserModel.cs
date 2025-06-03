@@ -3,12 +3,7 @@
     public class UserModel
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public RoleModel Role { get; set; }
-        public override string ToString()
-        {
-            return $"{Name}";
-        }
+        public string FullName { get; set; } = default!;
+        public string Email { get; set; } = default!;
     }
 }

@@ -34,11 +34,7 @@
 
         public async Task<bool> DeleteAsync(DeleteHolidayCommand command, CancellationToken cancellationToken = default)
         {
-            var request = new HttpRequestMessage(HttpMethod.Delete, "api/holiday")
-            {
-                Content = JsonContent.Create(command)
-            };
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            var response = await _httpClient.DeleteAsync($"api/holiday/{command.Id}", cancellationToken);
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<bool>(cancellationToken);

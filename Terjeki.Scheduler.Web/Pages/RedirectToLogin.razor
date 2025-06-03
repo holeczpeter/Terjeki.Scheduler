@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
+
+@code {
+    [Parameter] public AuthenticationState AuthContext { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        var user = AuthContext.User;
+        // Ha nincs bejelentkezve, akkor átirányítunk
+        if (user == null || !(user.Identity?.IsAuthenticated ?? false))
+        {
+            var returnUrl = Uri.EscapeDataString(Navigation.Uri);
+            Navigation.NavigateTo($"/login?returnUrl={returnUrl}", forceLoad: true);
+        }
+    }
+}
+
+@if (AuthContext.User.Identity?.IsAuthenticated ?? false)
+{
+    <div class="alert alert-danger">
+        <p>Nincs jogosultságod az oldal megtekintéséhez.</p>
+    </div>
+}

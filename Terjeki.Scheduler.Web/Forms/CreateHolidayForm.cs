@@ -1,6 +1,4 @@
-﻿using Terjeki.Scheduler.Core;
-
-namespace Terjeki.Scheduler.Web.Forms
+﻿namespace Terjeki.Scheduler.Web.Forms
 {
     public class CreateHolidayForm : INotifyPropertyChanged
     {

@@ -2,15 +2,27 @@
 {
     public class DeleteEventCommandHandler : IRequestHandler<DeleteEventCommand, bool>
     {
-        private readonly IMockDatabase _mockDatabase;
-        public DeleteEventCommandHandler(IMockDatabase mockDatabase)
+        private readonly AppDbContext _dbContext;
+
+        public DeleteEventCommandHandler(AppDbContext dbContext)
         {
-            _mockDatabase = mockDatabase;
+            _dbContext = dbContext;
         }
+
         public async Task<bool> Handle(DeleteEventCommand request, CancellationToken cancellationToken)
         {
+            var current = await this._dbContext.Events
+              .Where(x => x.Id == request.Id)
+              .FirstOrDefaultAsync(cancellationToken);
 
-            return await _mockDatabase.DeleteEvent(request.Id, cancellationToken);
+            if (current != null)
+            {
+                current.EntityStatus = EntityStatuses.Deleted;
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                return true;
+            }
+            return false;
+            
         }
     }
 }

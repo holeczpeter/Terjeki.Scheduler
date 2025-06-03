@@ -6,11 +6,11 @@ namespace Terjeki.Scheduler.Infrastucure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Event> builder)
         {
+            BaseEntityConfiguration.Configure(builder);
+
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Description)
-                   .IsRequired()
-                   .HasMaxLength(500);
+            builder.Property(e => e.Description);
 
             builder.Property(e => e.StartDate)
                    .IsRequired();

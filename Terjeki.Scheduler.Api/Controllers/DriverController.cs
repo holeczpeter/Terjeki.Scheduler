@@ -1,6 +1,6 @@
 ﻿namespace Terjeki.Scheduler.Api.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DriverController : ControllerBase
@@ -12,20 +12,20 @@
             this.mediator = mediator;
             this._logger = logger;
         }
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<DriverModel> Create([FromBody] CreateDriverCommand request, CancellationToken cancellationToken)
         {
             return await this.mediator.Send(request, cancellationToken);
         }
-        [HttpPost]
+        [HttpPost("update")]
         public async Task<DriverModel> Update([FromBody] UpdateDriverCommand request, CancellationToken cancellationToken)
         {
             return await this.mediator.Send(request, cancellationToken);
         }
-        [HttpDelete]
-        public async Task Delete([FromBody] DeleteDriverCommand request, CancellationToken cancellationToken)
+        [HttpDelete("{id}")]
+        public async Task<bool> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
         {
-            await this.mediator.Send(request, cancellationToken);
+            return await this.mediator.Send(new DeleteDriverCommand(id), cancellationToken);
         }
         [HttpGet("Get")]
         public async Task<DriverModel> Get([FromQuery] Guid id, CancellationToken cancellationToken)

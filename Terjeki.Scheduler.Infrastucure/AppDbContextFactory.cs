@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Terjeki.Scheduler.Infrastucure
 {
@@ -11,7 +12,14 @@ namespace Terjeki.Scheduler.Infrastucure
             var contextBuilder = new DbContextOptionsBuilder<AppDbContext>();
             contextBuilder.UseSqlServer("Server=(local)\\SQLEXPRESS;Database=TerjekiScheduler;Integrated Security=SSPI;MultipleActiveResultSets=true;TrustServerCertificate=True;");
 
-            return new AppDbContext(contextBuilder.Options);
+            var httpContextAccessor = new HttpContextAccessor
+            {
+                HttpContext = null
+            };
+
+
+            var currentUserService = new CurrentUserService(httpContextAccessor);
+            return new AppDbContext(contextBuilder.Options, currentUserService);
         }
     }
 }

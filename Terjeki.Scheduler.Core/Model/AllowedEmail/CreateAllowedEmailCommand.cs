@@ -1,6 +1,6 @@
 ﻿namespace Terjeki.Scheduler.Core
 {
-    public class CreateUserCommand : IRequest<UserModel>
+    public class CreateAllowedEmailCommand : IRequest<AllowedEmailModel>
     {
         [Required]
         public string Name { get; set; }

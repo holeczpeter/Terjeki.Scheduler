@@ -19,75 +19,69 @@
     <h1>Felhasználók</h1>
 
 </div>
-
-@if (users != null && users.Any())
-{
-    <RadzenDataGrid AllowFiltering="true" Responsive="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" PageSize="10" AllowSorting="true"
-                    Data="@users" TItem="UserModel">
-        <Columns>
-            <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
-                <Template Context="data">
-                    @(users.IndexOf(data) + 1)
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="UserModel.Name" Title="Név">
-                <Template Context="user">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@user.Name</RadzenText>
-                        </RadzenStack>
+<RadzenDataGrid AllowFiltering="true" Responsive="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" PageSize="10" AllowSorting="true"
+                Data="@users" TItem="AllowedEmailModel">
+    <EmptyTemplate>
+        Nem található regisztrálható felhasználó
+    </EmptyTemplate>
+    <Columns>
+        <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                @(users.IndexOf(data) + 1)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="UserModel.Name" Title="Név">
+            <Template Context="user">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@user.Name</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="UserModel.Email" Title="Email">
-                <Template Context="user">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@user.Email</RadzenText>
-                        </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="UserModel.Email" Title="Email">
+            <Template Context="user">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@user.Email</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="UserModel.Role" Title="Jogosultság">
-                <Template Context="user">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@user.Role.Name</RadzenText>
-                        </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="UserModel.Role" Title="Jogosultság">
+            <Template Context="user">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@user.Role.Name</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Context="user"
-                                  Filterable="false" Sortable="false"
-                                  TextAlign="TextAlign.Right"
-                                  Width="200px"
-                                  Frozen="true"
-                                  FrozenPosition="FrozenColumnPosition.Right">
-                <Template Context="user">
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Context="user"
+                              Filterable="false" Sortable="false"
+                              TextAlign="TextAlign.Right"
+                              Width="200px"
+                              Frozen="true"
+                              FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="user">
 
-                    <RadzenButton Icon="edit"
-                                  ButtonStyle="ButtonStyle.Light"
-                                  Variant="Variant.Flat"
-                                  Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
-                                  Click="@(() => OnEdit(user))" @onclick:stopPropagation="true" />
-                    <RadzenButton Icon="delete"
-                                  ButtonStyle="ButtonStyle.Light"
-                                  Variant="Variant.Flat"
-                                  Size="ButtonSize.Medium"
-                                  Shade="Shade.Lighter" class="rz-my-1 rz-ms-1"
-                                  Click="@(() => OnDelete(user.Id))" @onclick:stopPropagation="true" />
-                </Template>
+                <RadzenButton Icon="edit"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                              Click="@(() => OnEdit(user))" @onclick:stopPropagation="true" />
+                <RadzenButton Icon="delete"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Size="ButtonSize.Medium"
+                              Shade="Shade.Lighter" class="rz-my-1 rz-ms-1"
+                              Click="@(() => OnDelete(user.Id))" @onclick:stopPropagation="true" />
+            </Template>
 
-            </RadzenDataGridColumn>
+        </RadzenDataGridColumn>
 
-        </Columns>
-    </RadzenDataGrid>
-}
-else
-{
-    <p>Felhasználók betöltése folyamatban...</p>
-}
-
+    </Columns>
+</RadzenDataGrid>
 
 
 @code {

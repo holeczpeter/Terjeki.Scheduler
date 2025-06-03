@@ -1,4 +1,5 @@
-﻿using Terjeki.Scheduler.Web.Components.Drivers;
+﻿using Terjeki.Scheduler.Web.Components;
+using Terjeki.Scheduler.Web.Components.Drivers;
 
 namespace Terjeki.Scheduler.Web.Pages
 {
@@ -26,14 +27,20 @@ namespace Terjeki.Scheduler.Web.Pages
         }
         private async Task OnEdit(DriverModel driver)
         {
-            var parameters = new Dictionary<string, object>() { { "Selected", driver } };
+            var parameters = new Dictionary<string, object>() { { "SelectedId", driver.Id } };
             var result = await DialogService.OpenAsync<UpdateDriverDialog>($"{driver.Name} adatainak módosítása", parameters);
             if (result != null) await Refresh();
         }
         private async Task OnDelete(Guid id)
         {
-            var result = await DriverService.Delete(new DeleteDriverCommand(id), new CancellationToken());
-            if (result) await Refresh();
+            var parameters = new Dictionary<string, object>() { { "Text", $"Biztosan törlöd a kiválasztott sofőrt?" } };
+            var confirm =  await DialogService.OpenAsync<ConfirmDialog>($"Törlés megerősítése", parameters);
+            if(confirm)
+            {
+                var result = await DriverService.Delete(new DeleteDriverCommand(id), new CancellationToken());
+                if (result) await Refresh();
+            }
+           
         }
     }
 }

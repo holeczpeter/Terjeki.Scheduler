@@ -23,11 +23,11 @@ namespace Terjeki.Scheduler.Web.Components.Event
 
         private List<CapacityModel> capacities;
 
-        private List<BusModel> buses;
+        private List<BusItemModel> buses;
 
         private List<EventModel> events;
 
-        private List<DriverModel> drivers;
+        private List<DriverItemModel> drivers;
 
         protected override async Task OnInitializedAsync()
         {
@@ -35,10 +35,20 @@ namespace Terjeki.Scheduler.Web.Components.Event
             capacities = allCapacities.ToList();
 
             var allDrivers = await DriverService.GetAll(_cancellationTokenSource.Token);
-            drivers = allDrivers.ToList();
+            drivers = allDrivers.Select(x => new DriverItemModel()
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
 
             var allBus = await BusService.GetAll(_cancellationTokenSource.Token);
-            buses = allBus.ToList();
+            buses = allBus.Select(x => new BusItemModel()
+            {
+                Id = x.Id,
+                Brand = x.Brand,
+                CurrentMileage = x.CurrentMileage,
+                LicensePlateNumber = x.LicensePlateNumber
+            }).ToList();
 
             var allEvents = await EventService.GetEvents(_cancellationTokenSource.Token);
             events = allEvents.ToList();
@@ -65,7 +75,7 @@ namespace Terjeki.Scheduler.Web.Components.Event
         {
             if (Int32.TryParse(change?.ToString(), out int currentCapacity))
             {
-                buses = buses.Where(x => x.Capacity.Capacity == currentCapacity).ToList();
+                //buses = buses.Where(x => x.Capacity.Capacity == currentCapacity).ToList();
             }
         }
         private void OnFieldChanged(object? sender, PropertyChangedEventArgs e)
@@ -127,10 +137,10 @@ namespace Terjeki.Scheduler.Web.Components.Event
             var request = new UpdateEventCommand()
             {
                 Id = form.Id,
-                Drivers = form.Drivers,
-                Capacity = form.Capacity,
+                DriverIds = form.Drivers.Select(x=>x.Id).ToList(),
+                Capacity = form.Capacity.Seats,
                 Description = form.Description,
-                Bus = form.Bus,
+                BusId = form.Bus.Id,
                 StartDate = form.Start,
                 EndDate = form.End,
                 Type = EventTypes.Event,

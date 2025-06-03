@@ -7,5 +7,9 @@ namespace Terjeki.Scheduler.Core
         public Guid Id { get; set; }
 
         public Guid? BusId { get; set; }
+
+        public Guid? UserId { get; set; }
+
+        public string? DriverName { get; set; }
     }
 }

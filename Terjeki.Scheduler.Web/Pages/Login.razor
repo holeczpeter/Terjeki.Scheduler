@@ -1,6 +1,5 @@
-﻿@layout EmptyLayout
+﻿
 @page "/login"
-
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Authorization
 @using Terjeki.Scheduler.Core
@@ -69,6 +68,7 @@
             var token = await AuthService.GetTokenAsync();
             if (!string.IsNullOrEmpty(token))
                 jwtProv.NotifyUserAuthentication(token);
+           
             Navigation.NavigateTo("/");
         }
         catch (HttpRequestException ex)

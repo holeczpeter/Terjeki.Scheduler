@@ -33,9 +33,9 @@ namespace Terjeki.Scheduler.Web.Components.Event
                 }
             }
         }
-        private BusModel _bus;
+        private BusItemModel _bus;
 
-        public BusModel Bus
+        public BusItemModel Bus
         {
             get => _bus;
             set
@@ -47,9 +47,9 @@ namespace Terjeki.Scheduler.Web.Components.Event
                 }
             }
         }
-        private List<DriverModel> _drivers;
+        private List<DriverItemModel> _drivers;
 
-        public List<DriverModel> Drivers
+        public List<DriverItemModel> Drivers
         {
             get => _drivers;
             set

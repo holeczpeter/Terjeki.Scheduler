@@ -97,12 +97,7 @@
 
         public async Task<bool> Delete(DeleteEventCommand command, CancellationToken cancellationToken = default)
         {
-            var request = new HttpRequestMessage(HttpMethod.Delete, "api/event")
-            {
-                Content = JsonContent.Create(command)
-            };
-
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            var response = await _httpClient.DeleteAsync($"api/event/{command.Id}", cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

@@ -21,7 +21,7 @@ namespace Terjeki.Scheduler.Web.Components.Services
 
 
         private List<ServiceModel> serviceTypes;
-        private List<BusModel> buses;
+        private List<BusItemModel> buses;
         private List<EventModel> events;
         protected override async Task OnInitializedAsync()
         {
@@ -29,7 +29,13 @@ namespace Terjeki.Scheduler.Web.Components.Services
             events = allEvents.ToList();
 
             var allBus = await BusService.GetAll(_cancellationTokenSource.Token);
-            buses = allBus.ToList();
+            buses = (await BusService.GetAll(_cancellationTokenSource.Token)).Select(x => new BusItemModel()
+            {
+                Id = x.Id,
+                Brand = x.Brand,
+                CurrentMileage = x.CurrentMileage,
+                LicensePlateNumber = x.LicensePlateNumber
+            }).ToList();
 
             var allServiceTypes = await ServiceService.GetAllTypesAsync(_cancellationTokenSource.Token);
             serviceTypes = allServiceTypes.ToList();
@@ -89,17 +95,19 @@ namespace Terjeki.Scheduler.Web.Components.Services
 
         public async Task OnSave()
         {
-            var request = new CreateEventCommand()
+            var request = new CreateServiceCommand()
             {
 
-                Bus = form.Bus,
+                BusId = form.Bus.Id,
+                CurrentMileage = form.Bus.CurrentMileage,
                 StartDate = form.Start,
                 EndDate = form.End,
+                Description = form.Description,
                 Type = EventTypes.Service,
                 ServiceType = form.Type
 
             };
-            var result = await EventService.Create(request, _cancellationTokenSource.Token);
+            var result = await ServiceService.Create(request, _cancellationTokenSource.Token);
             if (result == null)
             {
                 NotificationService.Notify(new NotificationMessage

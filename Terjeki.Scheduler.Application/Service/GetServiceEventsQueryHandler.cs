@@ -17,17 +17,14 @@
                 {
                     Id = e.Id,
                     Capacity = new CapacityModel() { Seats = e.Bus.Capacity.Seats, Extra = e.Bus.Capacity.Extra },
-                    Bus = new BusModel()
+                    Bus = new BusItemModel()
                     {
                         Id = e.Bus.Id,
-                        Capacity = new CapacityModel() { Seats = e.Bus.Capacity.Seats, Extra = e.Bus.Capacity.Extra } ,
-                        Description =  e.Bus.Description,
                         LicensePlateNumber =e.Bus.LicensePlateNumber,
                         Brand =  e.Bus.Brand,
-                        Driver =  new DriverModel() { Id = e.Bus.Driver.Id, Name = e.Bus.Driver.Name },
+                        CurrentMileage = e.Bus.CurrentMileage
                     },
                     Description = e.Description,
-                    Drivers = e.DriverEvents.Select(x=> new DriverModel() { Id = x.Driver.Id, Name = x.Driver.Name }).ToList(),
                     EndDate = e.EndDate,
                     StartDate = e.StartDate,
                     Status = e.Status,

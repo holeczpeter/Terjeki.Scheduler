@@ -26,10 +26,10 @@
             return await mediator.Send(request, cancellationToken);
         }
 
-        [HttpDelete]
-        public async Task Delete([FromBody] DeleteEventCommand request, CancellationToken cancellationToken)
+        [HttpDelete("{id}")]
+        public async Task Delete([FromRoute] Guid id, CancellationToken cancellationToken)
         {
-            await mediator.Send(request, cancellationToken);
+            await mediator.Send(new DeleteEventCommand(id), cancellationToken);
         }
 
         [HttpGet("get")]
@@ -63,7 +63,7 @@
             [FromQuery] DateTime to,
             CancellationToken cancellationToken)
         {
-            var query = new GetDriverEventsQueryByInterval(to, from);
+            var query = new GetDriverEventsQueryByInterval(from, to);
             
             return await mediator.Send(query, cancellationToken);
         }

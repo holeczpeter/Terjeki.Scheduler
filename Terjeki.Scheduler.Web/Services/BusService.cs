@@ -68,12 +68,7 @@ namespace Terjeki.Scheduler.Web.Services
 
         public async Task<bool> Delete(DeleteBusCommand command, CancellationToken cancellationToken = default)
         {
-            var request = new HttpRequestMessage(HttpMethod.Delete, "api/bus")
-            {
-                Content = JsonContent.Create(command)
-            };
-
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            var response = await _httpClient.DeleteAsync($"api/bus/{command.Id}", cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

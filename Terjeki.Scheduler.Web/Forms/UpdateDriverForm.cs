@@ -19,18 +19,32 @@ namespace Terjeki.Scheduler.Web.Components.Drivers
                 }
             }
         }
-        private string _name;
+        private Guid? _userId;
 
-        [Required]
-        public string Name
+        
+        public Guid? UserId
         {
-            get => _name;
+            get => _userId;
             set
             {
-                if (_name != value)
+                if (_userId != value)
                 {
-                    _name = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(_name)));
+                    _userId = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(_userId)));
+                }
+            }
+        }
+       
+        private string _driverName;
+        public string DriverName
+        {
+            get => _driverName;
+            set
+            {
+                if (_driverName != value)
+                {
+                    _driverName = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(_driverName)));
                 }
             }
         }

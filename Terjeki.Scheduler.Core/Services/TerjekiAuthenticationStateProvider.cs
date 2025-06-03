@@ -9,7 +9,7 @@ namespace Terjeki.Scheduler.Core
 
         private ClaimsPrincipal _user = new ClaimsPrincipal(new ClaimsIdentity());
 
-        public void MarkUserAsAuthenticated(UserModel user)
+        public void MarkUserAsAuthenticated(AllowedEmailModel user)
         {
             var identity = new ClaimsIdentity(new[]
             {

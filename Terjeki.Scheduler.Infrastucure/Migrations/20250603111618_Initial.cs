@@ -20,10 +20,10 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     IsUsed = table.Column<bool>(type: "bit", nullable: false),
                     RoleName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Creator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifier = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    LastModifier = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     EntityStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -79,33 +79,15 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     Seats = table.Column<int>(type: "int", nullable: false),
                     Extra = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Creator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifier = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    LastModifier = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     EntityStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Capacities", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Drivers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Creator = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifier = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    EntityStatus = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Drivers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -215,6 +197,31 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Drivers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifier = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
+                    EntityStatus = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Drivers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Drivers_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Buses",
                 columns: table => new
                 {
@@ -227,10 +234,10 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CurrentMileage = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Creator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifier = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    LastModifier = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     EntityStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -258,16 +265,16 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     BusId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     ServiceType = table.Column<int>(type: "int", nullable: false),
                     HolidayType = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Creator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifier = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    LastModifier = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     EntityStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -289,10 +296,10 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     DriverId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Creator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModifier = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    LastModifier = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
                     EntityStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -317,6 +324,11 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                 table: "AllowedEmails",
                 column: "Email",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AllowedEmails_EntityStatus",
+                table: "AllowedEmails",
+                column: "EntityStatus");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -370,14 +382,46 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                 filter: "[DriverId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Buses_EntityStatus",
+                table: "Buses",
+                column: "EntityStatus");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Capacities_EntityStatus",
+                table: "Capacities",
+                column: "EntityStatus");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DriverEvents_DriverId",
                 table: "DriverEvents",
                 column: "DriverId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DriverEvents_EntityStatus",
+                table: "DriverEvents",
+                column: "EntityStatus");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Drivers_EntityStatus",
+                table: "Drivers",
+                column: "EntityStatus");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Drivers_UserId",
+                table: "Drivers",
+                column: "UserId",
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_BusId",
                 table: "Events",
                 column: "BusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_EntityStatus",
+                table: "Events",
+                column: "EntityStatus");
         }
 
         /// <inheritdoc />
@@ -408,9 +452,6 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "Events");
 
             migrationBuilder.DropTable(
@@ -421,6 +462,9 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Drivers");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

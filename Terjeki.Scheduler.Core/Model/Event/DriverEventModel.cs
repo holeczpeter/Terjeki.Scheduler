@@ -2,7 +2,7 @@
 {
     public class DriverEventModel
     {
-        public DriverModel Driver { get; set; }
+        public DriverItemModel Driver { get; set; }
         public List<EventModel> Events { get; set; }
        
     }

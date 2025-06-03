@@ -7,7 +7,7 @@
 @using Terjeki.Scheduler.Web.Services
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize]
 <PageTitle>Szervíz események</PageTitle>
 <div class="floating-button">
     <RadzenButton Click=@(args => OnCreate())
@@ -19,111 +19,106 @@
     <h1>Szervíz események</h1>
   
 </div>
+<RadzenDataGrid AllowFiltering="true" Responsive="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true"
+                PageSize="10" AllowSorting="true"
+                Data="@services" TItem="EventModel">
+    <EmptyTemplate>
+        Nem található szervíz esemény
+    </EmptyTemplate>
+    <Columns>
+        <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                @(services.IndexOf(data) + 1)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template Context="data">
 
-@if (services != null && services.Any())
-{
-    <RadzenDataGrid AllowFiltering="true" Responsive="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true"
-    PageSize="10" AllowSorting="true" 
-    Data="@services" TItem="EventModel">
-        <Columns>
-            <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
-                <Template Context="data">
-                    @(services.IndexOf(data) + 1)
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Width="50px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
-                <Template Context="data">
+                <div style=@GetColor(data)></div>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="EventModel?.Bus?.Brand" Title="Név">
 
-                    <div style=@GetColor(data)></div>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="EventModel?.Bus?.Brand" Title="Név">
+            <Template Context="service">
 
-                <Template Context="service">
-
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.Brand</RadzenText>
-                        </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.Brand</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="EventModel?.Bus?.LicensePlateNumber" Title="Rendszám">
-                <Template Context="service">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.LicensePlateNumber</RadzenText>
-                        </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="EventModel?.Bus?.LicensePlateNumber" Title="Rendszám">
+            <Template Context="service">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.LicensePlateNumber</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="EventModel?.Bus?.CurrentMileage" Title="Km óra állás">
-                <Template Context="service">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.CurrentMileage</RadzenText>
-                        </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="EventModel?.Bus?.CurrentMileage" Title="Km óra állás">
+            <Template Context="service">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.Bus?.CurrentMileage</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(EventModel.StartDate)" Title="Kezdő dátum">
-                <Template Context="service">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service.StartDate.ToString("yyyy.MM.dd")</RadzenText>
-                        </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(EventModel.StartDate)" Title="Kezdő dátum">
+            <Template Context="service">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service.StartDate.ToString("yyyy.MM.dd")</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(EventModel.EndDate)" Title="Vég dátum">
-                <Template Context="service">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service.EndDate.ToString("yyyy.MM.dd")</RadzenText>
-                        </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(EventModel.EndDate)" Title="Vég dátum">
+            <Template Context="service">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service.EndDate.ToString("yyyy.MM.dd")</RadzenText>
                     </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-          
-            <RadzenDataGridColumn Property="@nameof(EventModel.ServiceType)" Title="Szervíz" >
-                <Template Context="service">
-                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenStack Gap="0">
-                            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.ServiceType.GetDescription()</RadzenText>
-                        </RadzenStack>
-                    </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Context="service"
-            Filterable="false" Sortable="false"
-            TextAlign="TextAlign.Right"
-            Width="200px"
-            Frozen="true"
-            FrozenPosition="FrozenColumnPosition.Right">
-                <Template Context="service">
-                    <RadzenButton Icon="edit"
-                    ButtonStyle="ButtonStyle.Light"
-                    Variant="Variant.Flat"
-                    Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
-                    Click="@(() => OnEdit(service))" @onclick:stopPropagation="true" />
-                    <RadzenButton Icon="delete"
-                    ButtonStyle="ButtonStyle.Light"
-                    Variant="Variant.Flat"
-                    Size="ButtonSize.Medium"
-                    Shade="Shade.Lighter" class="rz-my-1 rz-ms-1"
-                    Click="@(() => OnDelete(service.Id))" @onclick:stopPropagation="true" />
-                </Template>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
 
-            </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(EventModel.ServiceType)" Title="Szervíz">
+            <Template Context="service">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@service?.ServiceType.GetDescription()</RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Context="service"
+                              Filterable="false" Sortable="false"
+                              TextAlign="TextAlign.Right"
+                              Width="200px"
+                              Frozen="true"
+                              FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="service">
+                <RadzenButton Icon="edit"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                              Click="@(() => OnEdit(service))" @onclick:stopPropagation="true" />
+                <RadzenButton Icon="delete"
+                              ButtonStyle="ButtonStyle.Light"
+                              Variant="Variant.Flat"
+                              Size="ButtonSize.Medium"
+                              Shade="Shade.Lighter" class="rz-my-1 rz-ms-1"
+                              Click="@(() => OnDelete(service.Id))" @onclick:stopPropagation="true" />
+            </Template>
+
+        </RadzenDataGridColumn>
 
 
-        </Columns>
-    </RadzenDataGrid>
-}
-else
-{
-    <p>Buszok betöltése folyamatban...</p>
-}
+    </Columns>
+</RadzenDataGrid>
 
 @code {
    

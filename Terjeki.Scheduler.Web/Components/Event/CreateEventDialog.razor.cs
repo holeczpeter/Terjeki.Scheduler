@@ -21,40 +21,52 @@ namespace Terjeki.Scheduler.Web.Components.Event
 
         private List<CapacityModel> capacities;
 
-        private List<BusModel> buses;
+        private List<BusItemModel> buses;
 
-        private List<DriverModel> drivers;
+        private List<DriverItemModel> drivers;
 
         private List<EventModel> events;
+
+     
         [Parameter]
         public DateTime? CurrentDate { get; set; }
         [Parameter]
         public EventGroupModel EventGroupModel { get; set; }
         [Parameter]
-        public DriverEventModel CurrentDriverEventModel { get; set; }
+        public DriverItemModel CurrentDriverEventModel { get; set; }
         protected override async Task OnInitializedAsync()
         {
             var allCapacities = await CapacityService.GetAll(_cancellationTokenSource.Token);
             capacities = allCapacities.ToList();
 
             var allDrivers = await DriverService.GetAll(_cancellationTokenSource.Token);
-            drivers = allDrivers.ToList();
+            drivers = allDrivers.Select(x => new DriverItemModel()
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
 
             var allBus = await BusService.GetAll(_cancellationTokenSource.Token);
-            buses = allBus.ToList();
+            buses = allBus.Select(x => new BusItemModel()
+            {
+                Id = x.Id,
+                Brand = x.Brand,
+                CurrentMileage = x.CurrentMileage,
+                LicensePlateNumber = x.LicensePlateNumber
+            }).ToList();
 
             var allEvents = await EventService.GetEvents(_cancellationTokenSource.Token);
             events = allEvents.ToList();
 
             if (CurrentDate != null && CurrentDriverEventModel != null)
             {
-                var drivers = new List<DriverModel> { CurrentDriverEventModel.Driver };
-                form = new CreateEventForm()
-                {
-                    Drivers = drivers,
-                    Start = CurrentDate.Value,
-                    End = CurrentDate.Value,
-                };
+                //var drivers = new List<DriverModel> { CurrentDriverEventModel.Driver };
+                //form = new CreateEventForm()
+                //{
+                //    Drivers = drivers,
+                //    Start = CurrentDate.Value,
+                //    End = CurrentDate.Value,
+                //};
             }
             if (CurrentDate != null && EventGroupModel != null)
             {
@@ -76,9 +88,10 @@ namespace Terjeki.Scheduler.Web.Components.Event
         {
             if (Int32.TryParse(change?.ToString(), out int currentCapacity))
             {
-                buses = buses.Where(x => x.Capacity.Capacity == currentCapacity).ToList();
+               // buses = buses.Where(x => x.Capacity.Capacity == currentCapacity).ToList();
             }
         }
+        
 
         private void ValidateForm(object? sender, FieldChangedEventArgs e)
         {
@@ -130,9 +143,9 @@ namespace Terjeki.Scheduler.Web.Components.Event
         {
             var request = new CreateEventCommand()
             {
-                Capacity = form.Capacity,
-                Bus = form.Bus,
-                Drivers = form.Drivers,
+                Capacity = form.Capacity.Capacity,
+                BusId = form.Bus.Id,
+                DriverIds = form.Drivers.Select(x=>x.Id).ToList(),
                 Description = form.Description,
                 StartDate = form.Start,
                 EndDate = form.End,
