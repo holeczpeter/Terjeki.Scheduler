@@ -1,11 +1,12 @@
 ﻿@using MediatR
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @using Terjeki.Scheduler.Core
 @using Terjeki.Scheduler.Web.Services
 @inject IViewService ViewService
 
 @inject IAuthService AuthService             
-@inject JwtAuthenticationStateProvider AuthProvider
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -18,7 +19,7 @@
 <div class="@(NavMenuCssClass + " nav-scrollable nav-bg " + (ViewService.ViewType == ViewTypes.Desktop ? "show" : ""))" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="scheduler" >
+            <NavLink class="nav-link" href="" >
                 <div class="nav-item-container">
                     <RadzenIcon Icon="calendar_month" />
                     <span> Naptár</span>
@@ -103,7 +104,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
         if (user.Identity.IsAuthenticated)
@@ -123,11 +124,8 @@
 
     private async Task Logout()
     {
-        // 1) Token törlése localStorage-ból
-        await AuthService.LogoutAsync();
-        // 2) AuthenticationStateProvider értesítése
        
-        // 3) Átirányítás a login oldalra (force reload)
+        await AuthService.LogoutAsync();
         Navigation.NavigateTo("/login", forceLoad: true);
     }
 }

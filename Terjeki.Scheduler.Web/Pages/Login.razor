@@ -1,12 +1,12 @@
 ﻿
 @page "/login"
-@layout AuthenticationLayout
+
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Authorization
 @using Terjeki.Scheduler.Core
 @using Terjeki.Scheduler.Web.Services
 @inject IAuthService AuthService
-@inject JwtAuthenticationStateProvider AuthProvider
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 @inject HttpClient Client
 <RadzenStack Gap="1.5rem">
@@ -68,7 +68,8 @@
         try
         {
             await AuthService.LoginAsync(new LoginDto(form.Email, form.Password));
-            await AuthProvider.MarkUserAsAuthenticatedAsync(await AuthService.GetTokenAsync() ?? string.Empty);
+            await AuthStateProvider.GetAuthenticationStateAsync();
+           
             Navigation.NavigateTo("/");
         }
         catch (HttpRequestException ex)

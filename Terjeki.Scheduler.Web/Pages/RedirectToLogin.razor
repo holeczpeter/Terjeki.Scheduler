@@ -7,10 +7,18 @@
     protected override async Task OnInitializedAsync()
     {
         var auth = await AuthStateTask;
-        if (!auth.User.Identity?.IsAuthenticated ?? true)
+        var isAuth = auth.User.Identity?.IsAuthenticated ?? false;
+
+        // relatív útvonal pl. "fetchdata"
+        var current = Navigation.ToBaseRelativePath(Navigation.Uri)
+                               .Split('?')[0]
+                               .ToLowerInvariant();
+
+        // ne redirectelj, ha már login vagy register oldalon vagyunk
+        if (!isAuth && current != "login" && current != "register")
         {
             var returnUrl = Uri.EscapeDataString(Navigation.Uri);
-            Navigation.NavigateTo($"/login?returnUrl={returnUrl}");
+            Navigation.NavigateTo($"/login?returnUrl={returnUrl}", forceLoad: true);
         }
     }
 }

@@ -16,8 +16,6 @@ namespace Terjeki.Scheduler.Web
             services.AddScoped<IHolidayService, HolidayService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IEventService, EventService>();
-            services.AddSingleton<TerjekiAuthenticationStateProvider>();
-            services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<TerjekiAuthenticationStateProvider>());
           
             services.AddAuthorizationCore();
             return services;

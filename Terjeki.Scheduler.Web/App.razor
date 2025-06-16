@@ -5,23 +5,21 @@
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
 @inject IViewService ViewService
-
-
 <CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
+  <Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
                     <RedirectToLogin />
                 </NotAuthorized>
             </AuthorizeRouteView>
-        </Found>
-        <NotFound>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p>Az oldal nem található.</p>
-            </LayoutView>
-        </NotFound>
-    </Router>
+    </Found>
+    <NotFound>
+      <LayoutView Layout="@typeof(MainLayout)">
+        <p>Page not found.</p>
+      </LayoutView>
+    </NotFound>
+  </Router>
 </CascadingAuthenticationState>
 
 @code {

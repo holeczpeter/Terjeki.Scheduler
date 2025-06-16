@@ -8,11 +8,10 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddRadzenComponents();
 
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<JwtAuthenticationStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
-    sp.GetRequiredService<JwtAuthenticationStateProvider>());
 
+builder.Services.AddAuthorizationCore();
+
+builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 builder.Services.AddTransient<AuthMessageHandler>();
 builder.Services.AddTransient<UnauthorizedHttpHandler>(sp =>
 {
@@ -23,7 +22,7 @@ builder.Services.AddTransient<UnauthorizedHttpHandler>(sp =>
 
 builder.Services.AddHttpClient("ApiClient", client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5227/");
+    client.BaseAddress = new Uri("https://localhost:5227/");
 })
 .AddHttpMessageHandler<AuthMessageHandler>()
 .AddHttpMessageHandler<UnauthorizedHttpHandler>();
@@ -31,7 +30,6 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped(sp =>
     sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient"));
 
-builder.Services.AddAuthorizationCore();
 builder.Services.AddApplicationServices();
 builder.Services.AddWebApplicationServices();
 

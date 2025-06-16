@@ -186,37 +186,32 @@
             return Ok();
         }
 
-        
+
         private async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
         {
-            // alap‐claims
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub,   user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim(ClaimTypes.Name,               user.FullName),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email!)
+                new Claim(ClaimTypes.NameIdentifier,     user.Id.ToString())
             };
 
-            // szerepkörök lekérdezése és claimként hozzáadása
             var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
-            // kulcs, aláírás, lejárat
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
+            var creds = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+            var issuer = _config["Jwt:Issuer"];
+            var audience = _config["Jwt:Audience"];
             var expires = DateTime.UtcNow.AddHours(1);
 
-            // JWT előállítása
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Issuer"],
+                issuer: issuer,
+                audience: audience,
                 claims: claims,
                 expires: expires,
-                signingCredentials: creds
-            );
+                signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

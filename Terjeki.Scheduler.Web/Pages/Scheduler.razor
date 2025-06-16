@@ -15,7 +15,7 @@
 @inject IViewService ViewService
 @inject DialogService DialogService
 @inject TooltipService tooltipService
-@inject JwtAuthenticationStateProvider AuthProvider
+@inject AuthenticationStateProvider AuthStateProvider
 @attribute [Authorize]
 <PageTitle>Naptár</PageTitle>
 
@@ -142,7 +142,7 @@
             <tbody>
                 @if (isBus)
                 {
-                    @foreach (var eventGroup in eventGroups.Where(x=>x.Bus.LicensePlateNumber == "MAP-630"))
+                    @foreach (var eventGroup in eventGroups)
                     {
                         <tr style="@GetRowStyle(eventGroup.Bus)">
                             <td style="position:sticky;left:0;z-index:10;background:white;">
@@ -442,7 +442,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
         if (user.Identity.IsAuthenticated)

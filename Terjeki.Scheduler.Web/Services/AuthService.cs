@@ -27,6 +27,7 @@ namespace Terjeki.Scheduler.Web.Services
             resp.EnsureSuccessStatusCode();
             var data = await resp.Content.ReadFromJsonAsync<LoginResult>();
             await localStorageService.SetItemAsync(TokenKey, data.Token);
+         
         }
 
         public async Task StartTwoFactorAsync()
@@ -59,7 +60,9 @@ namespace Terjeki.Scheduler.Web.Services
 
         public async Task<string?> GetTokenAsync()
         {
-            return await localStorageService.GetItemAsStringAsync(TokenKey,new CancellationToken());
+            var raw  =  await localStorageService.GetItemAsStringAsync(TokenKey,new CancellationToken());
+             return  raw?.Trim().Trim('"'); 
+
         }
 
         class LoginResult { public string Token { get; set; } = default!; }
