@@ -1,114 +1,55 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Text.Json;
 
-namespace Terjeki.Scheduler.Web.Services
+public class JwtAuthenticationStateProvider : AuthenticationStateProvider
 {
-    public class JwtAuthenticationStateProvider : AuthenticationStateProvider
+    private const string TokenKey = "authToken";
+    private readonly ILocalStorageService _storage;
+
+    public JwtAuthenticationStateProvider(ILocalStorageService storage)
     {
-        private readonly IJSRuntime _js;
-        private readonly HttpClient _http;
-        private const string TokenKey = "authToken";
+        _storage = storage;
+    }
 
-        public JwtAuthenticationStateProvider(IJSRuntime js, HttpClient http)
-        {
-            _js = js;
-            _http = http;
-        }
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        var token = await _storage.GetItemAsync<string>(TokenKey);
+        if (string.IsNullOrWhiteSpace(token))
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
-        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
-        {
-            var token = await _js.InvokeAsync<string>("localStorage.getItem", TokenKey);
+        token = token.Trim().Trim('"'); // token tisztítása
+        var handler = new JwtSecurityTokenHandler();
+        if (!handler.CanReadToken(token))
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
-            Console.WriteLine($"[AUTH] Token: {token}");
+        var jwt = handler.ReadJwtToken(token);
+        var identity = new ClaimsIdentity(jwt.Claims, "jwtAuthType");
+        var user = new ClaimsPrincipal(identity);
 
-            if (string.IsNullOrWhiteSpace(token))
-                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        return new AuthenticationState(user);
+    }
 
-            var claims = ParseClaimsFromJwt(token);
-            foreach (var claim in claims)
-            {
-                Console.WriteLine($"[AUTH] Claim: {claim.Type} = {claim.Value}");
-            }
+    public async Task MarkUserAsAuthenticatedAsync(string token)
+    {
+        token = token.Trim().Trim('"');
+        await _storage.SetItemAsync(TokenKey, token);
 
-            var identity = string.IsNullOrWhiteSpace(token)
-                ? new ClaimsIdentity()
-                : new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
-            var principal = new ClaimsPrincipal(identity);
-            return new AuthenticationState(new ClaimsPrincipal(identity));
-        }
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(token);
+        var identity = new ClaimsIdentity(jwt.Claims, "jwtAuthType");
+        var user = new ClaimsPrincipal(identity);
 
-        public void NotifyUserAuthentication(string token)
-            => NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        NotifyAuthenticationStateChanged(
+            Task.FromResult(new AuthenticationState(user)));
+    }
 
-        public void NotifyUserLogout()
-            => NotifyAuthenticationStateChanged(Task.FromResult(
-                new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));
-        
-        public ValueTask<string> GetTokenAsync()
-        {
-            return _js.InvokeAsync<string>("localStorage.getItem", "authToken");
-        }
-        private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
-        {
-            var claims = new List<Claim>();
-            var payload = jwt.Split('.')[1];
-            var jsonBytes = ParseBase64WithoutPadding(payload);
-            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
-
-            foreach (var kvp in keyValuePairs)
-            {
-                // Ha a role claim egyes szám
-                if (kvp.Key == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
-                {
-                    if (kvp.Value is JsonElement element && element.ValueKind == JsonValueKind.Array)
-                    {
-                        foreach (var role in element.EnumerateArray())
-                        {
-                            claims.Add(new Claim(ClaimTypes.Role, role.GetString()!));
-                        }
-                    }
-                    else
-                    {
-                        claims.Add(new Claim(ClaimTypes.Role, kvp.Value.ToString()!));
-                    }
-                    continue;
-                }
-                // ha a role claim a "role" vagy "roles" kulcson jönne
-                if (kvp.Key == "role" || kvp.Key == "roles")
-                {
-                    if (kvp.Value is JsonElement element && element.ValueKind == JsonValueKind.Array)
-                    {
-                        foreach (var role in element.EnumerateArray())
-                        {
-                            claims.Add(new Claim(ClaimTypes.Role, role.GetString()!));
-                        }
-                    }
-                    else
-                    {
-                        claims.Add(new Claim(ClaimTypes.Role, kvp.Value.ToString()!));
-                    }
-                    continue;
-                }
-                // egyéb claim
-                claims.Add(new Claim(kvp.Key, kvp.Value.ToString()!));
-            }
-            return claims;
-        }
-        private static byte[] ParseBase64WithoutPadding(string base64)
-        {
-            // JWT base64Url: "-" helyett "+", "_" helyett "/"
-            base64 = base64.Replace('-', '+').Replace('_', '/');
-            switch (base64.Length % 4)
-            {
-                case 2: base64 += "=="; break;
-                case 3: base64 += "="; break;
-            }
-            return Convert.FromBase64String(base64);
-        }
-
+    public async Task MarkUserAsLoggedOutAsync()
+    {
+        await _storage.RemoveItemAsync(TokenKey);
+        var anon = new ClaimsPrincipal(new ClaimsIdentity());
+        NotifyAuthenticationStateChanged(
+            Task.FromResult(new AuthenticationState(anon)));
     }
 }

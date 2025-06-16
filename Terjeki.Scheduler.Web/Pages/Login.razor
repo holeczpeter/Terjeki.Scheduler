@@ -1,5 +1,6 @@
 ﻿
 @page "/login"
+@layout AuthenticationLayout
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Authorization
 @using Terjeki.Scheduler.Core
@@ -7,7 +8,7 @@
 @inject IAuthService AuthService
 @inject JwtAuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
-
+@inject HttpClient Client
 <RadzenStack Gap="1.5rem">
     <EditForm Model="form" OnValidSubmit="DoLogin">
         <DataAnnotationsValidator />
@@ -41,7 +42,7 @@
     <div class="text-center mt-4">
         <span>Még nincs fiókod?</span>
         <RadzenButton Text="Regisztráció"
-                      ButtonStyle="ButtonStyle.Primary"
+        ButtonStyle="ButtonStyle.Primary"
         Click="() => NavigateRegister()" />
     </div>
 
@@ -54,6 +55,9 @@
 @code {
     private LoginForm form = new();
     private string? error;
+
+
+
     void NavigateRegister()
     {
         Navigation.NavigateTo("/register");
@@ -63,12 +67,8 @@
         error = null;
         try
         {
-            var jwtProv = (JwtAuthenticationStateProvider)AuthProvider;
             await AuthService.LoginAsync(new LoginDto(form.Email, form.Password));
-            var token = await AuthService.GetTokenAsync();
-            if (!string.IsNullOrEmpty(token))
-                jwtProv.NotifyUserAuthentication(token);
-           
+            await AuthProvider.MarkUserAsAuthenticatedAsync(await AuthService.GetTokenAsync() ?? string.Empty);
             Navigation.NavigateTo("/");
         }
         catch (HttpRequestException ex)

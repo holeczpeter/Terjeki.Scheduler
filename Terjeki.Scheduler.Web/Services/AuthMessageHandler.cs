@@ -16,7 +16,7 @@ namespace Terjeki.Scheduler.Web.Services
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            var authStateProvider = _serviceProvider.GetRequiredService<JwtAuthenticationStateProvider>();
+            var authStateProvider = _serviceProvider.GetRequiredService<IAuthService>();
             var token = await authStateProvider.GetTokenAsync();
             if (!string.IsNullOrEmpty(token))
             {

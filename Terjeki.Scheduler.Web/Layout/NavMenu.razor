@@ -126,7 +126,7 @@
         // 1) Token törlése localStorage-ból
         await AuthService.LogoutAsync();
         // 2) AuthenticationStateProvider értesítése
-        AuthProvider.NotifyUserLogout();
+       
         // 3) Átirányítás a login oldalra (force reload)
         Navigation.NavigateTo("/login", forceLoad: true);
     }

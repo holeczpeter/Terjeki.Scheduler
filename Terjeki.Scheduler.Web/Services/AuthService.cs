@@ -1,16 +1,15 @@
-﻿using Microsoft.JSInterop;
+﻿using Blazored.LocalStorage;
 
 namespace Terjeki.Scheduler.Web.Services
 {
     public class AuthService : IAuthService
     {
         private readonly HttpClient _http;
-        private readonly IJSRuntime _js;
-
-        public AuthService(HttpClient http, IJSRuntime js)
+        private readonly ILocalStorageService localStorageService;
+        public AuthService(HttpClient http,  ILocalStorageService localStorageService)
         {
             _http = http;
-            _js = js;
+            this.localStorageService = localStorageService;
         }
 
         private const string TokenKey = "authToken";
@@ -27,7 +26,7 @@ namespace Terjeki.Scheduler.Web.Services
             var resp = await _http.PostAsJsonAsync("api/account/login", dto);
             resp.EnsureSuccessStatusCode();
             var data = await resp.Content.ReadFromJsonAsync<LoginResult>();
-            await _js.InvokeVoidAsync("localStorage.setItem", TokenKey, data.Token);
+            await localStorageService.SetItemAsync(TokenKey, data.Token);
         }
 
         public async Task StartTwoFactorAsync()
@@ -50,17 +49,17 @@ namespace Terjeki.Scheduler.Web.Services
             var resp = await _http.PostAsJsonAsync("api/account/login/2fa", dto);
             resp.EnsureSuccessStatusCode();
             var data = await resp.Content.ReadFromJsonAsync<LoginResult>();
-            await _js.InvokeVoidAsync("localStorage.setItem", TokenKey, data.Token);
+            await localStorageService.SetItemAsync(TokenKey, data.Token);
         }
 
         public async Task LogoutAsync()
         {
-            await _js.InvokeVoidAsync("localStorage.removeItem", TokenKey);
+            await localStorageService.RemoveItemAsync(TokenKey);
         }
 
         public async Task<string?> GetTokenAsync()
         {
-            return await _js.InvokeAsync<string?>("localStorage.getItem", TokenKey);
+            return await localStorageService.GetItemAsStringAsync(TokenKey,new CancellationToken());
         }
 
         class LoginResult { public string Token { get; set; } = default!; }
