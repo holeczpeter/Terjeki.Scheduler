@@ -4,10 +4,10 @@
 @using Terjeki.Scheduler.Web.Components.Drivers
 @using Terjeki.Scheduler.Web.Components.Users
 @using Terjeki.Scheduler.Web.Services
-
 @inject DialogService DialogService
 @inject NavigationManager Navigation
 @attribute [Authorize(Roles = "Admin")]
+
 <PageTitle>Felhasználók</PageTitle>
 <div class="floating-button">
     <RadzenButton Click=@(args => OnCreate())

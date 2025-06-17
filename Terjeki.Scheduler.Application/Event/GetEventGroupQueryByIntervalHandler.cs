@@ -31,7 +31,7 @@ namespace Terjeki.Scheduler.Application
                 
             }
 
-            // 1) IQueryable-ként indítjuk az eventQuery-t
+    
             IQueryable<Event> eventQuery = _dbContext.Events
                 .Where(e =>
                     e.EntityStatus == EntityStatuses.Active &&
@@ -40,7 +40,6 @@ namespace Terjeki.Scheduler.Application
                     request.Start.Date <= e.EndDate.Date
                 );
 
-            // 2) Ha nem admin, tovább szűrünk a saját eseményekre
             if (!isAdmin)
             {
                 var driverId = myDriver!.Id;
@@ -50,12 +49,13 @@ namespace Terjeki.Scheduler.Application
                         de.EntityStatus == EntityStatuses.Active));
             }
 
-            // 3) Most adjuk hozzá az Include / ThenInclude hívásokat
+            
             var includedEvents = eventQuery
                 .Include(e => e.DriverEvents)
                     .ThenInclude(de => de.Driver);
 
-            // 4) Csatlakoztatjuk a buszokhoz
+       
+
             var result = await _dbContext.Buses
                 .Include(b => b.Capacity)
                 .GroupJoin(

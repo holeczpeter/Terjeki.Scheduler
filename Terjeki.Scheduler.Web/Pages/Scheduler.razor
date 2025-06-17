@@ -98,16 +98,16 @@
     </div>
     <div class="calendar-type-view">
         <TButton Label="Busz nézet"
-        Type="@TButton.TypeEnum.Primary"
-        Size="@TButton.SizeEnum.Medium"
-        Disabled="@isBus"
-        OnClick="@ChangeViewType">
+            Type="@TButton.TypeEnum.Primary"
+            Size="@TButton.SizeEnum.Medium"
+            Disabled="@isBus"
+            OnClick="@ChangeViewType">
         </TButton>
         <TButton Label="Sofőr nézet"
-        Type="@TButton.TypeEnum.Primary"
-        Size="@TButton.SizeEnum.Medium"
-        Disabled="@(!isBus)"
-        OnClick="@ChangeViewType">
+            Type="@TButton.TypeEnum.Primary"
+            Size="@TButton.SizeEnum.Medium"
+            Disabled="@(!isBus)"
+            OnClick="@ChangeViewType">
         </TButton>
 
     </div>
@@ -177,10 +177,10 @@
                                                     var index = tuple.index;
                                                     var isPast = ev.StartDate.Date < viewStart;
                                                     var isFuture = ev.EndDate.Date > viewEnd;
-                                                    //TODO
-                                                    //var realStart = ev.StartDate.Date <= viewDays[0].Date ? viewDays[0].Date : ev.StartDate;
+                                               
+                                                    var realStart = ev.StartDate.Date <= viewDays[0].Date ? viewDays[0].Date : ev.StartDate;
 
-                                                    if (GetDayIndex(ev.StartDate.Date) == GetDayIndex(currentDate))
+                                                    if (GetDayIndex(realStart) == GetDayIndex(currentDate))
                                                     {
 
                                                         <div style="@GetEventStyle(ev,index)"
@@ -255,8 +255,10 @@
                                 while (dayIndex < viewDays.Count)
                                 {
                                     var currentDate = viewDays[dayIndex].Date;
-                                    var eventsForDay = eventGroup.Events.Where(e =>
-                                    e.StartDate.Date == currentDate).ToList();
+                                    var eventsForDay = eventGroup.Events
+                                                    .Where(e => e.StartDate.Date <= currentDate.Date && currentDate.Date <= e.EndDate.Date)
+                                                    .ToList();
+                                  
 
                                     if (eventsForDay.Any())
                                     {
@@ -272,7 +274,9 @@
                                                     var index = tuple.index;
                                                     var isPast = ev.StartDate.Date < viewStart;
                                                     var isFuture = ev.EndDate.Date > viewEnd;
-                                                    if (GetDayIndex(ev.StartDate) == GetDayIndex(currentDate))
+                                                    var realStart = ev.StartDate.Date <= viewDays[0].Date ? viewDays[0].Date : ev.StartDate;
+
+                                                    if (GetDayIndex(realStart) == GetDayIndex(currentDate))
                                                     {
 
                                                         <div style="@GetEventStyle(ev,index)"
@@ -475,15 +479,23 @@
             elementRefs[kvp.Key] = kvp.Value;
         }
     }
+    private DateTime GetStartOfWeek(DateTime date)
+    {
+        // hu-HU szerint a hétfő a 1-es nap, vasárnap a 0
+        var culture = CultureInfo.GetCultureInfo("hu-HU");
+        var firstDay = culture.DateTimeFormat.FirstDayOfWeek;  // hétfő
+        int diff = (7 + (date.DayOfWeek - firstDay)) % 7;
+        return date.Date.AddDays(-diff);
+    }
     private async Task LoadEventsForPeriod(DateTime startOfPeriod)
     {
-        // Frissítjük az aktuális időszak kezdő és végdátumát
-        currentPeriodStartDate = startOfPeriod;
-        currentPeriodEndDate = currentPeriodView == CalendarPeriodViews.Week ? startOfPeriod.AddDays(6) : startOfPeriod.AddMonths(1).AddDays(-1);
+        
+       
         if (currentPeriodView == CalendarPeriodViews.Week)
         {
 
-            // Heti nézetnél a hét napjainak beállítása
+            currentPeriodStartDate = GetStartOfWeek(startOfPeriod);
+            currentPeriodEndDate = startOfPeriod.AddDays(6);
             viewDays.Clear();
             for (int i = 0; i < 7; i++)
             {
@@ -498,8 +510,10 @@
         }
         else
         {
-            // Havi nézetnél a hónap napjainak beállítása
+            currentPeriodStartDate = new DateTime(startOfPeriod.Year,startOfPeriod.Month, 1) ;
+            currentPeriodEndDate = startOfPeriod.AddMonths(1).AddDays(-1);
             viewDays.Clear();
+
             for (int i = 0; i < DateTime.DaysInMonth(startOfPeriod.Year, startOfPeriod.Month); i++)
             {
                 var date = currentPeriodStartDate.AddDays(i);
@@ -955,7 +969,8 @@
 
     int GetColSpan(EventModel ev)
     {
-        return currentPeriodEndDate < ev.EndDate ? (currentPeriodEndDate - ev.StartDate).Days + 1 : (ev.EndDate - ev.StartDate).Days + 1;
+        var realStart = ev.StartDate.Date <= currentPeriodStartDate ? currentPeriodStartDate : ev.StartDate;
+        return currentPeriodEndDate < ev.EndDate ? (currentPeriodEndDate - realStart).Days + 1 : (ev.EndDate - realStart).Days + 1;
     }
 
     int GetDayIndex(DateTime date)
