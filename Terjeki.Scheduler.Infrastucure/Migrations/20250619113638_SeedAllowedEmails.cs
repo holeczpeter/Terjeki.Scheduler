@@ -7,6 +7,9 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
     /// <inheritdoc />
     public partial class SeedAllowedEmails : Migration
     {
+
+
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -191,5 +194,6 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
             migrationBuilder.Sql("DELETE FROM [AllowedEmails];");
 
         }
+
     }
 }

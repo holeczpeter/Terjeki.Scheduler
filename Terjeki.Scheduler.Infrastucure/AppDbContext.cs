@@ -1,11 +1,13 @@
 ﻿
 
+using System.Text.Json;
+
 namespace Terjeki.Scheduler.Infrastucure
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         private readonly ICurrentUserService _currentUserService;
-
+        public DbSet<AuditEntry> AuditEntries { get; set; } = null!;
         public DbSet<Event> Events { get; set; }
         public DbSet<Driver> Drivers { get; set; }
         public DbSet<Bus> Buses { get; set; }
@@ -21,6 +23,10 @@ namespace Terjeki.Scheduler.Infrastucure
         {
            
         }
+        //protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        //{
+        //    configurationBuilder.Conventions.Add(_ => new BlankTriggerAddingConvention());
+        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -29,6 +35,7 @@ namespace Terjeki.Scheduler.Infrastucure
         }
         public override int SaveChanges()
         {
+            var userId = _currentUserService.GetUserId();
             var currentUsername = _currentUserService.GetUserName();
             var utcNow = DateTime.UtcNow;
             var entries = ChangeTracker.Entries<BaseEntity>();
@@ -52,12 +59,25 @@ namespace Terjeki.Scheduler.Infrastucure
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var currentUsername = _currentUserService.GetUserName();
+            var userId = _currentUserService.GetUserId();
+            var currentUsername = _currentUserService.GetUserName() ?? "Anonymous";
             var utcNow = DateTime.UtcNow;
             var entries = ChangeTracker.Entries<BaseEntity>();
+            ChangeTracker.DetectChanges();
 
-            foreach (var entry in entries)
+            var auditEntries = new List<AuditEntry>();
+
+            // Only track BaseEntity changes, excluding Identity tables (AspNet*)
+            var baseEntries = ChangeTracker
+                .Entries<BaseEntity>()
+                .Where(e => (e.State == EntityState.Added
+                          || e.State == EntityState.Modified
+                          || e.State == EntityState.Deleted)
+                            && !e.Metadata.GetTableName()!.StartsWith("AspNet"));
+
+            foreach (var entry in baseEntries)
             {
+                // Update BaseEntity audit fields
                 if (entry.State == EntityState.Added)
                 {
                     entry.Entity.Creator = currentUsername;
@@ -65,13 +85,49 @@ namespace Terjeki.Scheduler.Infrastucure
                     entry.Entity.LastModifier = currentUsername;
                     entry.Entity.LastModified = utcNow;
                 }
-
-                if (entry.State == EntityState.Modified)
+                else if (entry.State == EntityState.Modified)
                 {
                     entry.Entity.LastModifier = currentUsername;
                     entry.Entity.LastModified = utcNow;
                 }
+
+                // Map EF state to audit action
+                var action = entry.State switch
+                {
+                    EntityState.Added => Actions.Insert,
+                    EntityState.Modified => Actions.Update,
+                    EntityState.Deleted => Actions.Delete
+                };
+
+                // Prepare audit record
+                var audit = new AuditEntry
+                {
+                    TableName = entry.Metadata.GetTableName()!,
+                    Action = action,
+                    Timestamp = utcNow,
+                    UserId = userId,
+                    UserName = currentUsername, 
+                    KeyValues = JsonSerializer.Serialize(
+                        entry.Properties
+                             .Where(p => p.Metadata.IsPrimaryKey())
+                             .ToDictionary(p => p.Metadata.Name, p => p.CurrentValue)),
+                    OldValues = entry.State == EntityState.Added ? "{}" :
+                                JsonSerializer.Serialize(
+                                    entry.Properties
+                                         .Where(p => p.IsModified)
+                                         .ToDictionary(p => p.Metadata.Name, p => p.OriginalValue)),
+                    NewValues = entry.State == EntityState.Deleted ? "{}" :
+                                JsonSerializer.Serialize(
+                                    entry.Properties
+                                         .Where(p => p.IsModified || entry.State == EntityState.Added)
+                                         .ToDictionary(p => p.Metadata.Name, p => p.CurrentValue))
+                };
+
+                auditEntries.Add(audit);
             }
+
+            if (auditEntries.Any())
+                AuditEntries.AddRange(auditEntries);
 
             return base.SaveChangesAsync(cancellationToken);
         }

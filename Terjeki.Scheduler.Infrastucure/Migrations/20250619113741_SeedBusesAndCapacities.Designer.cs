@@ -12,8 +12,8 @@ using Terjeki.Scheduler.Infrastucure;
 namespace Terjeki.Scheduler.Infrastucure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250603111618_Initial")]
-    partial class Initial
+    [Migration("20250619113741_SeedBusesAndCapacities")]
+    partial class SeedBusesAndCapacities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -206,6 +206,152 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     b.HasIndex("EntityStatus");
 
                     b.ToTable("AllowedEmails");
+                });
+
+            modelBuilder.Entity("Terjeki.Scheduler.Core.AuditEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Action")
+                        .HasMaxLength(16)
+                        .HasColumnType("int");
+
+                    b.Property<string>("KeyValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NewValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TableName", "Timestamp");
+
+                    b.ToTable("AuditEntries");
+                });
+
+            modelBuilder.Entity("Terjeki.Scheduler.Core.AuditLogEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Creator")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EntityName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifier")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogEntity");
+                });
+
+            modelBuilder.Entity("Terjeki.Scheduler.Core.AuditLogProperty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AuditEntityId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Creator")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifier")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NewValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PropertyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuditEntityId");
+
+                    b.ToTable("AuditLogProperty");
                 });
 
             modelBuilder.Entity("Terjeki.Scheduler.Core.Entities.ApplicationUser", b =>
@@ -604,6 +750,18 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Terjeki.Scheduler.Core.AuditLogProperty", b =>
+                {
+                    b.HasOne("Terjeki.Scheduler.Core.AuditLogEntity", "AuditLogEntity")
+                        .WithMany("AuditLogProperties")
+                        .HasForeignKey("AuditEntityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_AUDITANDITEMS_CONNECTION");
+
+                    b.Navigation("AuditLogEntity");
+                });
+
             modelBuilder.Entity("Terjeki.Scheduler.Core.Entities.Bus", b =>
                 {
                     b.HasOne("Terjeki.Scheduler.Core.Entities.Capacity", "Capacity")
@@ -659,6 +817,11 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Bus");
+                });
+
+            modelBuilder.Entity("Terjeki.Scheduler.Core.AuditLogEntity", b =>
+                {
+                    b.Navigation("AuditLogProperties");
                 });
 
             modelBuilder.Entity("Terjeki.Scheduler.Core.Entities.Bus", b =>

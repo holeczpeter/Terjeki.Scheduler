@@ -72,6 +72,45 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuditEntries",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TableName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    KeyValues = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OldValues = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NewValues = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Action = table.Column<int>(type: "int", maxLength: 16, nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", maxLength: 256, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditEntries", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AuditLogEntity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EntityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EntityName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifier = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogEntity", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Capacities",
                 columns: table => new
                 {
@@ -219,6 +258,34 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AuditLogProperty",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AuditEntityId = table.Column<int>(type: "int", nullable: false),
+                    PropertyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OldValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NewValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Action = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifier = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogProperty", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AUDITANDITEMS_CONNECTION",
+                        column: x => x.AuditEntityId,
+                        principalTable: "AuditLogEntity",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -370,6 +437,16 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AuditEntries_TableName_Timestamp",
+                table: "AuditEntries",
+                columns: new[] { "TableName", "Timestamp" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuditLogProperty_AuditEntityId",
+                table: "AuditLogProperty",
+                column: "AuditEntityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Buses_CapacityId",
                 table: "Buses",
                 column: "CapacityId");
@@ -446,10 +523,19 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "AuditEntries");
+
+            migrationBuilder.DropTable(
+                name: "AuditLogProperty");
+
+            migrationBuilder.DropTable(
                 name: "DriverEvents");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "AuditLogEntity");
 
             migrationBuilder.DropTable(
                 name: "Events");
