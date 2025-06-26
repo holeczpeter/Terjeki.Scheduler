@@ -16,6 +16,7 @@
             {
                 Id = Guid.NewGuid(),
                 Bus = currentBus,
+                Summary = request.Summary,  
                 Description = request.Description,
                 EndDate = request.EndDate,
                 StartDate = request.StartDate,
@@ -39,6 +40,7 @@
                     LicensePlateNumber = x.Bus.LicensePlateNumber,
                     Brand = x.Bus.Brand,
                 },
+                Summary = x.Summary,
                 Description = x.Description,
                 Drivers = x.DriverEvents.Select(d => new DriverItemModel() { Id = d.DriverId, Name = d.Driver.Name }).ToList(),
                 EndDate = x.EndDate,

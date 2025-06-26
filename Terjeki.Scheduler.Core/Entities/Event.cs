@@ -19,5 +19,6 @@
         public ServiceTypes ServiceType { get; set; }
 
         public HolidayTypes HolidayType { get; set; }
+        public string Summary { get; set; }
     }
 }

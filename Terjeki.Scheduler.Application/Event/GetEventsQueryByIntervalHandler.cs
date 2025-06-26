@@ -28,6 +28,7 @@
                         Brand = x.Bus.Brand,
                        
                     },
+                    Summary = x.Summary,
                     Description = x.Description,
                     Drivers = x.DriverEvents.Select(d => new DriverItemModel() { Id = d.DriverId, Name = d.Driver.Name }).ToList(),
                     EndDate = x.EndDate,

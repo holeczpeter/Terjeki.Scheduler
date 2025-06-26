@@ -102,6 +102,7 @@ namespace Terjeki.Scheduler.Web.Components.Services
                 CurrentMileage = form.Bus.CurrentMileage,
                 StartDate = form.Start,
                 EndDate = form.End,
+                Summary = form.Summary,
                 Description = form.Description,
                 Type = EventTypes.Service,
                 ServiceType = form.Type

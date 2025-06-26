@@ -337,6 +337,7 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     Type = table.Column<int>(type: "int", nullable: false),
                     ServiceType = table.Column<int>(type: "int", nullable: false),
                     HolidayType = table.Column<int>(type: "int", nullable: false),
+                    Summary = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Creator = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),

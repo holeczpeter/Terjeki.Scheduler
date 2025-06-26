@@ -89,6 +89,19 @@ namespace Terjeki.Scheduler.Web.Components.Event
                 }
             }
         }
+        private string _summary;
+        public string Summary
+        {
+            get => _summary;
+            set
+            {
+                if (_summary != value)
+                {
+                    _summary = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Summary)));
+                }
+            }
+        }
         private string _description;
         public string Description
         {
@@ -99,6 +112,19 @@ namespace Terjeki.Scheduler.Web.Components.Event
                 {
                     _description = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Description)));
+                }
+            }
+        }
+        private bool _isPlan;
+        public bool IsPlan
+        {
+            get => _isPlan;
+            set
+            {
+                if (_isPlan != value)
+                {
+                    _isPlan = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPlan)));
                 }
             }
         }

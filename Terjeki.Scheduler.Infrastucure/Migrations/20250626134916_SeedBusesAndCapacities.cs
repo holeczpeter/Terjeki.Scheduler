@@ -5,6 +5,7 @@
 namespace Terjeki.Scheduler.Infrastucure.Migrations
 {
     /// <inheritdoc />
+
     public partial class SeedBusesAndCapacities : Migration
     {
         /// <inheritdoc />
@@ -52,3 +53,4 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
     }
 }
+

@@ -100,6 +100,7 @@ namespace Terjeki.Scheduler.Web.Components.Holiday
             var request = new CreateHolidayCommand()
             {
                 DriverId = form.Driver.Id,
+                Summary = form.Summary, 
                 Description = form.Description,
                 StartDate = form.Start,
                 EndDate = form.End,

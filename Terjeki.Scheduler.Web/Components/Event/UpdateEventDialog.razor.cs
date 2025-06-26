@@ -59,10 +59,12 @@ namespace Terjeki.Scheduler.Web.Components.Event
                 Id = Selected.Id,
                 Bus = Selected.Bus,
                 Capacity = Selected.Capacity,
+                Summary = Selected.Summary,
                 Description = Selected.Description,
                 Start = Selected.StartDate,
                 End = Selected.EndDate,
                 Drivers = Selected.Drivers,
+                IsPlan = Selected.Status == EventStatuses.Plan
             };
             editContext = new EditContext(form);
             messageStore = new ValidationMessageStore(editContext);
@@ -139,12 +141,13 @@ namespace Terjeki.Scheduler.Web.Components.Event
                 Id = form.Id,
                 DriverIds = form.Drivers.Select(x=>x.Id).ToList(),
                 Capacity = form.Capacity.Seats,
+                Summary = form.Summary,
                 Description = form.Description,
                 BusId = form.Bus.Id,
                 StartDate = form.Start,
                 EndDate = form.End,
                 Type = EventTypes.Event,
-                Status = form.Bus != null ? EventStatuses.Accepted : EventStatuses.Plan
+                Status = form.Bus != null && !form.IsPlan ? EventStatuses.Accepted : EventStatuses.Plan
 
             };
             var result = await EventService.Update(request, _cancellationTokenSource.Token);

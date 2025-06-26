@@ -43,6 +43,7 @@ namespace Terjeki.Scheduler.Web.Components.Holiday
             {
                 Id = Selected.Id,
                 Driver = currentDriverModel,
+                Summary = Selected.Summary,
                 Description = Selected.Description,
                 Start = Selected.StartDate,
                 End = Selected.EndDate,
@@ -116,6 +117,7 @@ namespace Terjeki.Scheduler.Web.Components.Holiday
             {
                 Id = form.Id,
                 DriverId = form.Driver.Id,
+                Summary = form.Summary, 
                 Description = form.Description,
                 StartDate = form.Start,
                 EndDate = form.End,

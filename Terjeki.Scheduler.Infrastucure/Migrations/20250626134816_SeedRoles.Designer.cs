@@ -12,7 +12,7 @@ using Terjeki.Scheduler.Infrastucure;
 namespace Terjeki.Scheduler.Infrastucure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250619113544_SeedRoles")]
+    [Migration("20250626134816_SeedRoles")]
     partial class SeedRoles
     {
         /// <inheritdoc />
@@ -686,6 +686,9 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");

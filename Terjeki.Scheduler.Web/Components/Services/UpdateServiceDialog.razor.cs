@@ -39,6 +39,7 @@ namespace Terjeki.Scheduler.Web.Components.Services
             {
                 Id = Selected.Id,
                 Bus = Selected.Bus,
+                Summary = Selected.Summary,
                 Description = Selected.Description,
                 Start = Selected.StartDate,
                 End = Selected.EndDate,
@@ -115,6 +116,7 @@ namespace Terjeki.Scheduler.Web.Components.Services
                 EndDate = form.End,
                 Type = EventTypes.Service,
                 ServiceType = form.Type,
+                Summary = form.Summary,
                 Description = form.Description,
             };
             var result = await ServiceService.Update(request, _cancellationTokenSource.Token);

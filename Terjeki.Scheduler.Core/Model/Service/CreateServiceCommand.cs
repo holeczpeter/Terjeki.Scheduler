@@ -16,5 +16,6 @@
 
         public ServiceTypes ServiceType { get; set; }
         public int CurrentMileage { get; set; }
+        public string Summary { get; set; }
     }
 }

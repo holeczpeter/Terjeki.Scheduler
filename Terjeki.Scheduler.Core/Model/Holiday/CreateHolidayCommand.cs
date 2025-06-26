@@ -8,5 +8,6 @@
         public string Description { get; set; }
         public EventTypes Type { get; set; }
         public HolidayTypes HolidayType { get; set; }
+        public string Summary { get; set; }
     }
 }

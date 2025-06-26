@@ -16,6 +16,7 @@
             var newEvent = new Event()
             {
                 Id = Guid.NewGuid(),
+                Summary = request.Summary,
                 Description = request.Description,
                 EndDate = request.EndDate,
                 StartDate = request.StartDate,
@@ -35,6 +36,7 @@
             return await _dbContext.Events.Where(x=>x.Id == newEvent.Id).Select(x=> new EventModel()
             {
                 Id = x.Id,
+                Summary = x.Summary,    
                 Description = x.Description,
                 Drivers = x.DriverEvents.Select(d => new DriverItemModel() { Id = d.DriverId, Name = d.Driver.Name }).ToList(),
                 EndDate = x.EndDate,

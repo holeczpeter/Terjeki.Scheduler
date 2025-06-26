@@ -98,7 +98,9 @@ table {
     display: none;
 }
 
-
+.event-function {
+    display:flex;
+}
 
 .tooltiptext::after {
         content: "";
@@ -110,7 +112,12 @@ table {
         border-style: solid;
         border-color: #555 transparent transparent transparent;
     }
-
+.custom-tooltip {
+    max-width: 300px; /* Állítsd tetszőleges értékre */
+    white-space: normal; /* Sorvégi tördelés engedélyezése */
+    word-wrap: break-word; /* Régebbi böngészők támogatása */
+    overflow-wrap: break-word; /* Modern szabvány */
+}
 div:hover > .tooltiptext {
     display: block;
     visibility: visible;

@@ -1,0 +1,14 @@
+﻿.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #C39952 !important;
+}
+
+.rz-switch.rz-switch-checked .rz-switch-circle {
+    background: #C39952 !important;
+}
+
+    .rz-switch.rz-switch-checked .rz-switch-circle:before {
+        background: white !important;
+    }
+.rz-switch .rz-switch-circle:before {
+    background: #74787e !important;
+}

@@ -80,6 +80,7 @@ namespace Terjeki.Scheduler.Application
                             Id = ev.Id,
                             StartDate = ev.StartDate,
                             EndDate = ev.EndDate,
+                            Summary = ev.Summary,
                             Description = ev.Description,
                             Bus = new BusItemModel
                             {

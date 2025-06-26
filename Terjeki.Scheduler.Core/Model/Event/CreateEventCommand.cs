@@ -18,5 +18,6 @@
         public EventTypes Type { get; set; }
 
         public ServiceTypes ServiceType { get; set; }
+        public string Summary { get; set; }
     }
 }

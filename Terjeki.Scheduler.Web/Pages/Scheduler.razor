@@ -116,18 +116,24 @@
         <table style="border-collapse: collapse;">
             <thead>
                 <tr>
-                    <th style="position:sticky;left:0;z-index:10;background:white; width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
+                    <th rowspan="2"
+                    style="position:sticky; left:0; z-index:10; background:white;
+                        width:197px!important; min-width:197px!important; max-width:197px!important;">
                         <div class="date-header">
                             @if (isBus)
                             {
                                 <span class="mobile-dayname-header">Busz</span>
+                                <div>
+                                    <RadzenIcon Icon="arrow_downward"  onclick="@(() => OrderByLicensePlateNumber())" /> Rendszám
+                                </div>
                             }
-                            else if (!isBus)
+                            else
                             {
                                 <span class="mobile-dayname-header">Sofőr</span>
                             }
                         </div>
                     </th>
+
                     @foreach (var day in viewDays)
                     {
                         <th style="width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
@@ -147,10 +153,10 @@
                         <tr style="@GetRowStyle(eventGroup.Bus)">
                             <td style="position:sticky;left:0;z-index:10;background:white;">
                                 <div class="event-object">
-                                    <span>Férőhely: @eventGroup?.Capacity?.Capacity</span>
+
                                     @if (eventGroup.Bus != null)
                                     {
-                                        <span>@eventGroup?.Bus?.LicensePlateNumber</span>
+                                        <span>@eventGroup?.Bus?.LicensePlateNumber -  (@eventGroup?.Capacity.Capacity) fő</span>
                                     }
                                 </div>
                             </td>
@@ -190,7 +196,7 @@
                                                         @onmouseleave="HideTooltip"
                                                         draggable="true"
                                                         ondragstart="@(() => SetDragItem(ev))"
-                                                        onclick="@(() => OnUpdate(ev))"
+                                                        ondblclick="@(() => OnUpdate(ev))"
                                                         @onclick:stopPropagation="true">
                                                             @if (isPast)
                                                             {
@@ -199,7 +205,7 @@
                                                             @if (ev.Type == EventTypes.Event)
                                                             {
                                                                 <div style="display:flex">
-                                                                    @ev.Description
+                                                                    @ev.Summary
                                                                     @($"{ev.StartDate:yyyy.MM.dd}")
                                                                     @($"{ev.EndDate:yyyy.MM.dd}")
                                                                 </div>
@@ -214,7 +220,18 @@
                                                                 </div>
 
                                                             }
-                                                            <RadzenButton Icon="undo" Click="@(() => Undo(ev))" ButtonStyle="ButtonStyle.Primary" class="rz-border-radius-10 rz-shadow-10" />
+                                                            <div class="event-function">
+                                                                <RadzenButton Icon="delete"
+                                                                ButtonStyle="ButtonStyle.Light"
+                                                                Variant="Variant.Flat"
+                                                                Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                                                                Click="@(() => OnDelete(ev))" @onclick:stopPropagation="true" />
+                                                                <RadzenButton Icon="undo"
+                                                                ButtonStyle="ButtonStyle.Light"
+                                                                Variant="Variant.Flat"
+                                                                Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                                                                Click="@(() => Undo(ev))" @onclick:stopPropagation="true" />
+                                                            </div>
                                                             @if (isFuture)
                                                             {
                                                                 <RadzenIcon Icon="double_arrow" />
@@ -231,7 +248,8 @@
                                     else
                                     {
                                         <td ondragover="event.preventDefault()"
-                                        onclick="@(() => OnCreate(eventGroup, currentDate))"
+                                        ondblclick="@(() => OnCreate(eventGroup, currentDate))"
+                                        @onclick:stopPropagation="true"
                                         @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
                                         </td>
                                         dayIndex++;
@@ -286,8 +304,8 @@
                                                         @onmouseenter="@(() => ShowTooltip(ev))"
                                                         @onmouseleave="HideTooltip"
                                                         draggable="true"
+                                                        ondblclick="@(() => OnUpdate(ev))"
                                                         ondragstart="@(() => SetDragItem(ev,eventGroup.Driver))"
-                                                 
                                                         @onclick:stopPropagation="true">
                                                             @if (isPast)
                                                             {
@@ -297,7 +315,7 @@
                                                             {
                                                                 <div style="display:flex">
                                                                     @ev.Bus.LicensePlateNumber
-                                                                    @ev.Description
+                                                                    @ev.Summary
                                                                     @($"{ev.StartDate:yyyy.MM.dd}")
                                                                     @($"{ev.EndDate:yyyy.MM.dd}")
                                                                 </div>
@@ -311,7 +329,18 @@
                                                                     @($"{ev.EndDate:yyyy.MM.dd}")
                                                                 </div>
                                                             }
-
+                                                            <div class="event-function">
+                                                                <RadzenButton Icon="delete"
+                                                                ButtonStyle="ButtonStyle.Light"
+                                                                Variant="Variant.Flat"
+                                                                Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                                                                Click="@(() => OnDelete(ev))" @onclick:stopPropagation="true" />
+                                                                <RadzenButton Icon="undo"
+                                                                ButtonStyle="ButtonStyle.Light"
+                                                                Variant="Variant.Flat"
+                                                                Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                                                                Click="@(() => Undo(ev))" @onclick:stopPropagation="true" />
+                                                            </div>
                                                             @if (isFuture)
                                                             {
                                                                 <RadzenIcon Icon="double_arrow" />
@@ -327,7 +356,8 @@
                                     else
                                     {
                                         <td ondragover="event.preventDefault()"
-                                        onclick="@(() => OnCreate(eventGroup, currentDate))"
+                                        ondblclick="@(() => OnCreate(eventGroup, currentDate))"
+                                        @onclick:stopPropagation="true"
                                         @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
                                         </td>
                                         dayIndex++;
@@ -345,11 +375,11 @@
 
 
 @code {
-        [CascadingParameter] Task<AuthenticationState> authStateTask { get; set; }
-        [Inject] IServiceService ServiceService { get; set; }
-        [Inject] IBusService BusService { get; set; }
-        [Inject] IHolidayService HolidayService { get; set; }
-        [Inject] IEventService EventService { get; set; }
+    [CascadingParameter] Task<AuthenticationState> authStateTask { get; set; }
+    [Inject] IServiceService ServiceService { get; set; }
+    [Inject] IBusService BusService { get; set; }
+    [Inject] IHolidayService HolidayService { get; set; }
+    [Inject] IEventService EventService { get; set; }
     public RenderFragment<TooltipService> ToolTipContent => (service) => @<div class='custom-tooltip'>
         @if(MouseOverEvent.Type == EventTypes.Holiday)
     {
@@ -357,7 +387,8 @@
         <div><strong>Sofőr:</strong> @MouseOverEvent.Drivers?.FirstOrDefault()</div>
         <div><strong>Kezdés:</strong> @MouseOverEvent.StartDate.ToString("yyyy.MM.dd")</div>
         <div><strong>Befejezés:</strong> @MouseOverEvent.EndDate.ToString("yyyy.MM.dd")</div>
-        <div><strong>Leírás:</strong> @MouseOverEvent.Description</div>
+        <div><strong>Leírás:</strong> @MouseOverEvent.Summary</div>
+        <div style=""><strong>Részletek:</strong> @MouseOverEvent.Description</div>
 
     }
         @if(MouseOverEvent.Type == EventTypes.Service)
@@ -366,7 +397,8 @@
         <div><strong>Busz:</strong> @MouseOverEvent.Bus?.LicensePlateNumber</div>
         <div><strong>Kezdés:</strong> @MouseOverEvent.StartDate.ToString("yyyy.MM.dd")</div>
         <div><strong>Befejezés:</strong> @MouseOverEvent.EndDate.ToString("yyyy.MM.dd")</div>
-        <div><strong>Leírás:</strong> @MouseOverEvent.Description</div>
+        <div><strong>Leírás:</strong> @MouseOverEvent.Summary</div>
+        <div><strong>Részletek:</strong> @MouseOverEvent.Description</div>
 
     }
     else if(MouseOverEvent.Type == EventTypes.Event)
@@ -377,7 +409,8 @@
         <div><strong>Busz:</strong> @MouseOverEvent?.Bus?.LicensePlateNumber</div>
         <div><strong>Indulás:</strong> @MouseOverEvent.StartDate.ToString("yyyy.MM.dd")</div>
         <div><strong>Érkezés:</strong> @MouseOverEvent.EndDate.ToString("yyyy.MM.dd")</div>
-        <div><strong>Leírás:</strong> @MouseOverEvent.Description</div>
+        <div><strong>Leírás:</strong> @MouseOverEvent.Summary</div>
+        <div><strong>Részletek:</strong> @MouseOverEvent.Description</div>
         <div><strong>Sofőrök:</strong></div>
     }
         @if(MouseOverEvent.Status == EventStatuses.Plan)
@@ -385,7 +418,8 @@
         <div><strong>Férőhely:</strong> @MouseOverEvent.Capacity?.Capacity</div>
         <div><strong>Indulás:</strong> @MouseOverEvent.StartDate.ToString("yyyy.MM.dd")</div>
         <div><strong>Érkezés:</strong> @MouseOverEvent.EndDate.ToString("yyyy.MM.dd")</div>
-        <div><strong>Leírás:</strong> @MouseOverEvent.Description</div>
+        <div><strong>Leírás:</strong> @MouseOverEvent.Summary</div>
+        <div><strong>Részletek:</strong> @MouseOverEvent.Description</div>
         <div><strong>Sofőrök:</strong></div>
     }
         @if(MouseOverEvent.Drivers != null)
@@ -480,6 +514,12 @@
             elementRefs[kvp.Key] = kvp.Value;
         }
     }
+    private void OrderByLicensePlateNumber()
+    {
+        buses = buses.OrderBy(x => x.LicensePlateNumber).ToList();
+
+    }
+
     private DateTime GetStartOfWeek(DateTime date)
     {
         // hu-HU szerint a hétfő a 1-es nap, vasárnap a 0
@@ -737,6 +777,7 @@
         var updatedEvent = new EventModel
             {
                 Id = draggedItem.Id,
+                Summary = draggedItem.Summary,
                 Description = draggedItem.Description,
                 Capacity = eventGroup.Capacity,
                 Bus = eventGroup.Bus,
@@ -793,6 +834,7 @@
                 Id = updatedEvent.Id,
                 DriverIds = updatedEvent.Drivers.Select(x => x.Id).ToList(),
                 Capacity = updatedEvent.Capacity.Seats,
+                Summary = updatedEvent.Summary,    
                 Description = updatedEvent.Description,
                 BusId = updatedEvent.Bus.Id,
                 StartDate = updatedEvent.StartDate,
@@ -830,6 +872,7 @@
         var updatedEvent = new EventModel
             {
                 Id = draggedItem.Id,
+                Summary = draggedItem.Summary,
                 Description = draggedItem.Description,
                 Capacity = draggedItem.Capacity,
                 Bus = draggedItem.Bus,
@@ -850,6 +893,7 @@
                         Id = updatedEvent.Id,
                         DriverIds = updatedEvent.Drivers.Select(x => x.Id).ToList(),
                         Capacity = updatedEvent.Capacity.Seats,
+                        Summary = updatedEvent.Summary,
                         Description = updatedEvent.Description,
                         BusId = updatedEvent.Bus.Id,
                         StartDate = updatedEvent.StartDate,
@@ -865,7 +909,7 @@
                 var serviceRequest = new UpdateServiceCommand
                     {
                         Id = updatedEvent.Id,
-
+                        Summary = updatedEvent.Summary,
                         Description = updatedEvent.Description,
                         BusId = updatedEvent.Bus.Id,
                         StartDate = updatedEvent.StartDate,
@@ -882,6 +926,7 @@
                     {
                         Id = updatedEvent.Id,
                         DriverId = updatedEvent.Drivers.Select(x => x.Id).FirstOrDefault(),
+                        Summary = updatedEvent.Summary,
                         Description = updatedEvent.Description,
                         StartDate = updatedEvent.StartDate,
                         EndDate = updatedEvent.EndDate,
@@ -1017,20 +1062,20 @@
     {
         if (!IsAdmin) return;
         var result = await DialogService.OpenAsync<CreateEventDialog>($"Esemény rögzítése");
-        if (result != null) await LoadEventsForPeriod(DateTime.Today);
+        if (result != null) await LoadEventsForPeriod(currentPeriodStartDate);
     }
     private async Task OnCreateService()
     {
         if (!IsAdmin) return;
         var result = await DialogService.OpenAsync<CreateServiceDialog>($"Szervíz időpont felvitele");
-        if (result != null) await LoadEventsForPeriod(DateTime.Today);
+        if (result != null) await LoadEventsForPeriod(currentPeriodStartDate);
 
     }
     private async Task OnCreateHoliday()
     {
         if (!IsAdmin) return;
         var result = await DialogService.OpenAsync<CreateHolidayDialog>($"Távollét rögzítése");
-        if (result != null) await LoadEventsForPeriod(DateTime.Today);
+        if (result != null) await LoadEventsForPeriod(currentPeriodStartDate);
 
     }
     private async Task OnCreate(EventGroupModel eventGroupModel, DateTime currentDate)
@@ -1038,14 +1083,14 @@
         if (!IsAdmin) return;
         var parameters = new Dictionary<string, object>() { { "EventGroupModel", eventGroupModel }, { "CurrentDate", currentDate } };
         var result = await DialogService.OpenAsync<CreateEventDialog>($"Esemény rögzítése", parameters);
-        if (result != null) await LoadEventsForPeriod(DateTime.Today);
+        if (result != null) await LoadEventsForPeriod(currentPeriodStartDate);
     }
     private async Task OnCreate(DriverEventModel eventObjectModel, DateTime currentDate)
     {
         if (!IsAdmin) return;
         var parameters = new Dictionary<string, object>() { { "CurrentDriverEventModel", eventObjectModel }, { "CurrentDate", currentDate } };
         var result = await DialogService.OpenAsync<CreateEventDialog>($"Esemény rögzítése", parameters);
-        if (result != null) await LoadEventsForPeriod(DateTime.Today);
+        if (result != null) await LoadEventsForPeriod(currentPeriodStartDate);
     }
     private async Task OnUpdate(EventModel eventModel)
     {
@@ -1056,19 +1101,19 @@
 
             var parameters = new Dictionary<string, object>() { { "Selected", eventModel } };
             var result = await DialogService.OpenAsync<UpdateEventDialog>($"{eventModel.StartDate.ToShortDateString()} - {eventModel.EndDate.ToShortDateString()} esemény módosítása", parameters);
-            if (result != null) await LoadEventsForPeriod(DateTime.Today);
+            if (result != null) await LoadEventsForPeriod(currentPeriodStartDate);
         }
         else if (eventModel.Type == EventTypes.Service)
         {
             var parameters = new Dictionary<string, object>() { { "Selected", eventModel } };
             var result = await DialogService.OpenAsync<UpdateServiceDialog>($"{eventModel.Bus.Brand} szervíz módosítása", parameters);
-            if (result != null) await LoadEventsForPeriod(DateTime.Today);
+            if (result != null) await LoadEventsForPeriod(currentPeriodStartDate);
         }
         else if (eventModel.Type == EventTypes.Holiday)
         {
             var parameters = new Dictionary<string, object>() { { "Selected", eventModel } };
             var result = await DialogService.OpenAsync<UpdateHolidayDialog>($"{eventModel.Drivers.FirstOrDefault()} távollét módosítása", parameters);
-            if (result != null) await LoadEventsForPeriod(DateTime.Today);
+            if (result != null) await LoadEventsForPeriod(currentPeriodStartDate);
         }
     }
 
@@ -1076,27 +1121,40 @@
     {
         if (!IsAdmin) return;
         var result = false;
-        if (eventModel.Type == EventTypes.Event)
+        var parameters = new Dictionary<string, object>() { { "Text", $"Biztosan törlöd a kiválasztott utat?" } };
+        var confirm = await DialogService.OpenAsync<ConfirmDialog>($"Törlés megerősítése", parameters);
+        if (confirm)
         {
-            result = await EventService.Delete(new DeleteEventCommand(eventModel.Id));
+            if (eventModel.Type == EventTypes.Event)
+            {
+                result = await EventService.Delete(new DeleteEventCommand(eventModel.Id));
+            }
+            else if (eventModel.Type == EventTypes.Service)
+            {
+                result = await EventService.Delete(new DeleteEventCommand(eventModel.Id));
+            }
+            else if (eventModel.Type == EventTypes.Holiday)
+            {
+                result = await HolidayService.DeleteAsync(new DeleteHolidayCommand(eventModel.Id));
+            }
+            if (result) await LoadEventsForPeriod(currentPeriodStartDate);
         }
-        else if (eventModel.Type == EventTypes.Service)
-        {
-            result = await EventService.Delete(new DeleteEventCommand(eventModel.Id));
-        }
-        else if (eventModel.Type == EventTypes.Holiday)
-        {
-            result = await HolidayService.DeleteAsync(new DeleteHolidayCommand(eventModel.Id));
-        }
-        if (result) await LoadEventsForPeriod(DateTime.Today);
+
+
 
     }
     private async Task Undo(EventModel eventModel)
     {
         if (!IsAdmin) return;
         var result = false;
-        result = await EventService.Undo(new UndoLastChangeCommand() { EntityId = eventModel.Id, EntityName = "Events" });
-        if (result) await LoadEventsForPeriod(DateTime.Today);
+        var parameters = new Dictionary<string, object>() { { "Text", $"Biztosan visszavonod a módosítást?" } };
+        var confirm = await DialogService.OpenAsync<ConfirmDialog>($"Visszavonás megerősítése", parameters);
+        if (confirm)
+        { 
+            result = await EventService.Undo(new UndoLastChangeCommand() { EntityId = eventModel.Id, EntityName = "Events" });
+            if (result) await LoadEventsForPeriod(currentPeriodStartDate);
+        }
+        
 
     }
 }

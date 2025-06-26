@@ -10,7 +10,10 @@ namespace Terjeki.Scheduler.Infrastucure.Persistence.Configurations
 
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Description);
+            builder.Property(e => e.Summary)
+                .IsRequired(false);
+            builder.Property(e => e.Description)
+                .IsRequired(false);
 
             builder.Property(e => e.StartDate)
                    .IsRequired();

@@ -24,6 +24,7 @@
                         Brand =  e.Bus.Brand,
                         CurrentMileage = e.Bus.CurrentMileage
                     },
+                    Summary = e.Summary,
                     Description = e.Description,
                     EndDate = e.EndDate,
                     StartDate = e.StartDate,

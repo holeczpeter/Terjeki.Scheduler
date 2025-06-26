@@ -37,6 +37,11 @@
             </div>
             <div class="form-input">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Leírás </RadzenText>
+                <RadzenTextArea @bind-Value=@form.Summary Cols="30" Rows="3" aria-label="TextArea with 3 rows and 30 columns" Style="width: 100%;" />
+                <ValidationMessage For="@(() => form.Summary)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Részletek </RadzenText>
                 <RadzenTextArea @bind-Value=@form.Description Cols="30" Rows="3" aria-label="TextArea with 3 rows and 30 columns" Style="width: 100%;" />
                 <ValidationMessage For="@(() => form.Description)" />
             </div>
@@ -49,6 +54,10 @@
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Befejezés dátuma </RadzenText>
                 <RadzenDatePicker @bind-Value=@form.End Name="RadzenDatePickerBindValue" ShowCalendarWeek DateFormat="yyyy.MM.dd" Style="width: 100%;" />
                 <ValidationMessage For="@(() => form.End)" />
+            </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Terv? </RadzenText>
+                <RadzenSwitch @bind-Value=@form.IsPlan InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})"/>
             </div>
         </div>
         <div class="flex-button">

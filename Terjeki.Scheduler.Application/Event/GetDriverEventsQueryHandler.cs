@@ -61,6 +61,7 @@
                         Id = de.Event.Id,
                         StartDate = de.Event.StartDate,
                         EndDate = de.Event.EndDate,
+                        Summary = de.Event.Summary,
                         Description = de.Event.Description,
                         Type = de.Event.Type,
                         Status = de.Event.Status,

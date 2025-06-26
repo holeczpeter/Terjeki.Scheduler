@@ -1,6 +1,7 @@
 @import url(./notification.css);
 @import url(./scheduler.css);
 @import url(./menu.css);
+@import url(./switch.css);
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }

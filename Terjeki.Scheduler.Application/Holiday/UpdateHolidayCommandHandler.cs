@@ -14,7 +14,7 @@
         {
             var currentEvent = await _dbContext.Events.Where(x => x.Id == request.Id).FirstOrDefaultAsync(cancellationToken);
 
-            
+            currentEvent.Summary = request.Summary;
             currentEvent.Description = request.Description;
             currentEvent.EndDate = request.EndDate;
             currentEvent.StartDate = request.StartDate;
@@ -57,6 +57,7 @@
             return await _dbContext.Events.Where(x => x.Id == currentEvent.Id).Select(x => new EventModel()
             {
                 Id = x.Id,
+                Summary = x.Summary,
                 Description = x.Description,
                 Drivers = x.DriverEvents.Select(d => new DriverItemModel() { Id = d.DriverId, Name = d.Driver.Name }).ToList(),
                 EndDate = x.EndDate,
