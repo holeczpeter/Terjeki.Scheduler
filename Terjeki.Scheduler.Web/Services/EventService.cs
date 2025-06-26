@@ -94,6 +94,17 @@
 
             throw new HttpRequestException($"Event update failed: {response.StatusCode}");
         }
+        public async Task<bool> Undo(UndoLastChangeCommand command, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/event/undo", command, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"Event deletion failed: {response.StatusCode}");
+            }
+            return true;
+            
+        }
 
         public async Task<bool> Delete(DeleteEventCommand command, CancellationToken cancellationToken = default)
         {

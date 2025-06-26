@@ -98,16 +98,16 @@
     </div>
     <div class="calendar-type-view">
         <TButton Label="Busz nézet"
-            Type="@TButton.TypeEnum.Primary"
-            Size="@TButton.SizeEnum.Medium"
-            Disabled="@isBus"
-            OnClick="@ChangeViewType">
+        Type="@TButton.TypeEnum.Primary"
+        Size="@TButton.SizeEnum.Medium"
+        Disabled="@isBus"
+        OnClick="@ChangeViewType">
         </TButton>
         <TButton Label="Sofőr nézet"
-            Type="@TButton.TypeEnum.Primary"
-            Size="@TButton.SizeEnum.Medium"
-            Disabled="@(!isBus)"
-            OnClick="@ChangeViewType">
+        Type="@TButton.TypeEnum.Primary"
+        Size="@TButton.SizeEnum.Medium"
+        Disabled="@(!isBus)"
+        OnClick="@ChangeViewType">
         </TButton>
 
     </div>
@@ -177,21 +177,21 @@
                                                     var index = tuple.index;
                                                     var isPast = ev.StartDate.Date < viewStart;
                                                     var isFuture = ev.EndDate.Date > viewEnd;
-                                               
+
                                                     var realStart = ev.StartDate.Date <= viewDays[0].Date ? viewDays[0].Date : ev.StartDate;
 
                                                     if (GetDayIndex(realStart) == GetDayIndex(currentDate))
                                                     {
 
                                                         <div style="@GetEventStyle(ev,index)"
-                                                             id="event-@ev.Id"
-                                                             @ref="@(refMap[ev.Id])"
-                                                             @onmouseenter="@(() => ShowTooltip(ev))"
-                                                             @onmouseleave="HideTooltip"
-                                                             draggable="true"
-                                                             ondragstart="@(() => SetDragItem(ev))"
-                                                             onclick="@(() => OnUpdate(ev))"
-                                                             @onclick:stopPropagation="true">
+                                                        id="event-@ev.Id"
+                                                        @ref="@(refMap[ev.Id])"
+                                                        @onmouseenter="@(() => ShowTooltip(ev))"
+                                                        @onmouseleave="HideTooltip"
+                                                        draggable="true"
+                                                        ondragstart="@(() => SetDragItem(ev))"
+                                                        onclick="@(() => OnUpdate(ev))"
+                                                        @onclick:stopPropagation="true">
                                                             @if (isPast)
                                                             {
                                                                 <RadzenIcon Icon="keyboard_double_arrow_left" />
@@ -214,6 +214,7 @@
                                                                 </div>
 
                                                             }
+                                                            <RadzenButton Icon="undo" Click="@(() => Undo(ev))" ButtonStyle="ButtonStyle.Primary" class="rz-border-radius-10 rz-shadow-10" />
                                                             @if (isFuture)
                                                             {
                                                                 <RadzenIcon Icon="double_arrow" />
@@ -230,8 +231,8 @@
                                     else
                                     {
                                         <td ondragover="event.preventDefault()"
-                                            onclick="@(() => OnCreate(eventGroup, currentDate))"
-                                            @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
+                                        onclick="@(() => OnCreate(eventGroup, currentDate))"
+                                        @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
                                         </td>
                                         dayIndex++;
                                     }
@@ -258,7 +259,7 @@
                                     var eventsForDay = eventGroup.Events
                                                     .Where(e => e.StartDate.Date <= currentDate.Date && currentDate.Date <= e.EndDate.Date)
                                                     .ToList();
-                                  
+
 
                                     if (eventsForDay.Any())
                                     {
@@ -266,8 +267,8 @@
                                         var remainingDays = viewDays.Count - dayIndex;
                                         <td style="padding:6px; border-radius:6px; z-index: -1;width: 197px!important;min-width: 197px!important;max-width: 197px!important;">
                                             <div style="@GetDivStyle()"
-                                                 ondragover="event.preventDefault()"
-                                                 @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
+                                            ondragover="event.preventDefault()"
+                                            @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
                                                 @foreach (var tuple in eventsForDay.Select((ev, index) => (ev, index)))
                                                 {
                                                     var ev = tuple.ev;
@@ -280,14 +281,14 @@
                                                     {
 
                                                         <div style="@GetEventStyle(ev,index)"
-                                                             id="event-@ev.Id"
-                                                             @ref="@(refMap[ev.Id])"
-                                                             @onmouseenter="@(() => ShowTooltip(ev))"
-                                                             @onmouseleave="HideTooltip"
-                                                             draggable="true"
-                                                             ondragstart="@(() => SetDragItem(ev,eventGroup.Driver))"
-                                                             onclick="@(() => OnUpdate(ev))"
-                                                             @onclick:stopPropagation="true">
+                                                        id="event-@ev.Id"
+                                                        @ref="@(refMap[ev.Id])"
+                                                        @onmouseenter="@(() => ShowTooltip(ev))"
+                                                        @onmouseleave="HideTooltip"
+                                                        draggable="true"
+                                                        ondragstart="@(() => SetDragItem(ev,eventGroup.Driver))"
+                                                 
+                                                        @onclick:stopPropagation="true">
                                                             @if (isPast)
                                                             {
                                                                 <RadzenIcon Icon="keyboard_double_arrow_left" />
@@ -326,8 +327,8 @@
                                     else
                                     {
                                         <td ondragover="event.preventDefault()"
-                                            onclick="@(() => OnCreate(eventGroup, currentDate))"
-                                            @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
+                                        onclick="@(() => OnCreate(eventGroup, currentDate))"
+                                        @ondrop="(e => OnDrop(e, currentDate,eventGroup))">
                                         </td>
                                         dayIndex++;
                                     }
@@ -344,11 +345,11 @@
 
 
 @code {
-    [CascadingParameter] Task<AuthenticationState> authStateTask { get; set; }
-    [Inject] IServiceService ServiceService { get; set; }
-    [Inject] IBusService BusService { get; set; }
-    [Inject] IHolidayService HolidayService { get; set; }
-    [Inject] IEventService EventService { get; set; }
+        [CascadingParameter] Task<AuthenticationState> authStateTask { get; set; }
+        [Inject] IServiceService ServiceService { get; set; }
+        [Inject] IBusService BusService { get; set; }
+        [Inject] IHolidayService HolidayService { get; set; }
+        [Inject] IEventService EventService { get; set; }
     public RenderFragment<TooltipService> ToolTipContent => (service) => @<div class='custom-tooltip'>
         @if(MouseOverEvent.Type == EventTypes.Holiday)
     {
@@ -398,7 +399,7 @@
 
 
     </div>
-        ;
+    ;
     public RenderFragment<TooltipService> ServiceToolTipContent => (service) => @<div class='custom-tooltip'>
         <div><strong>Busz:</strong> @MouseOverEvent.Bus.LicensePlateNumber</div>
         <div><strong>Indulás:</strong> @MouseOverEvent.StartDate.ToString("yyyy.MM.dd")</div>
@@ -489,8 +490,8 @@
     }
     private async Task LoadEventsForPeriod(DateTime startOfPeriod)
     {
-        
-       
+
+
         if (currentPeriodView == CalendarPeriodViews.Week)
         {
 
@@ -1090,5 +1091,12 @@
         if (result) await LoadEventsForPeriod(DateTime.Today);
 
     }
+    private async Task Undo(EventModel eventModel)
+    {
+        if (!IsAdmin) return;
+        var result = false;
+        result = await EventService.Undo(new UndoLastChangeCommand() { EntityId = eventModel.Id, EntityName = "Events" });
+        if (result) await LoadEventsForPeriod(DateTime.Today);
 
+    }
 }

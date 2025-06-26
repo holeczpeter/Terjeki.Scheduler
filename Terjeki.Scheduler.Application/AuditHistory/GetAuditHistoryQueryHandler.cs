@@ -21,6 +21,7 @@ namespace Terjeki.Scheduler.Application
                 Id = a.Id,
                 Timestamp = a.Timestamp,
                 UserId = a.UserId,
+                UserName = a.UserName,
                 OldValues = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(a.OldValues)!,
                 NewValues = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(a.NewValues)!
             }).ToList();

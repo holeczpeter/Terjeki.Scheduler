@@ -25,7 +25,11 @@
         {
             return await mediator.Send(request, cancellationToken);
         }
-
+        [HttpPost("undo")]
+        public async Task<bool> Undo([FromBody] UndoLastChangeCommand request, CancellationToken cancellationToken)
+        {
+           return  await mediator.Send(request, cancellationToken);
+        }
         [HttpDelete("{id}")]
         public async Task Delete([FromRoute] Guid id, CancellationToken cancellationToken)
         {

@@ -2,12 +2,12 @@
 
 namespace Terjeki.Scheduler.Application
 {
-    internal class UndoLastChangeCommandHandler : IRequestHandler<UndoLastChangeCommand>
+    internal class UndoLastChangeCommandHandler : IRequestHandler<UndoLastChangeCommand, bool>
     {
         private readonly AppDbContext _db;
         public UndoLastChangeCommandHandler(AppDbContext db) => _db = db;
 
-        public async Task Handle(UndoLastChangeCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(UndoLastChangeCommand request, CancellationToken cancellationToken)
         {
             // Build JSON key for matching
             var keyJson = JsonSerializer.SerializeToElement(new Dictionary<string, object> { { "Id", request.EntityId } });
@@ -23,11 +23,9 @@ namespace Terjeki.Scheduler.Application
                 throw new KeyNotFoundException($"No audit entries found for {request.EntityName} with Id {request.EntityId}");
 
             var oldValues = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(audit.OldValues)!;
-
-            // Determine entity type and load entity
-            var entityType = Assembly.GetExecutingAssembly()
-                                      .GetTypes()
-                                      .First(t => t.Name == audit.TableName);
+            var entityType = _db.Model.GetEntityTypes()
+                .First(et => et.GetTableName() == audit.TableName)
+                .ClrType;
             var entity = await _db.FindAsync(entityType, new object[] { request.EntityId }, cancellationToken);
             if (entity == null)
                 throw new InvalidOperationException($"Entity {request.EntityName} with Id {request.EntityId} not found");
@@ -43,7 +41,7 @@ namespace Terjeki.Scheduler.Application
 
             // Save changes (will generate a new audit entry for the undo)
             await _db.SaveChangesAsync(cancellationToken);
-          
+            return true;
         }
 
        
