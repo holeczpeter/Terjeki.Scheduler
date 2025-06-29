@@ -5,9 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using Terjeki.Scheduler.Core.Entities;
+using Terjeki.Scheduler.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-// Add services to the container.
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -61,6 +62,10 @@ builder.Services
             ClockSkew = TimeSpan.Zero,
         };
     });
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddAuthorization();
 builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
     p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));

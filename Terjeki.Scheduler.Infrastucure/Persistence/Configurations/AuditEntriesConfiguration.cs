@@ -23,8 +23,7 @@ namespace Terjeki.Scheduler.Infrastucure.Persistence.Configurations
             builder.Property(e => e.Timestamp)
                   .IsRequired();
             builder.Property(e => e.UserId)
-                  .IsRequired()
-                  .HasMaxLength(256);
+                   .IsRequired(false);
             builder.HasIndex(e => new { e.TableName, e.Timestamp });
 
         }

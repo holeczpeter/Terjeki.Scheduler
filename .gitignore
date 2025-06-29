@@ -23,3 +23,7 @@ wwwroot/dist/
 # Git-ignored files
 *.db
 *.sqlite
+
+# Local configuration
+appsettings.Development.json
+/Terjeki.Scheduler.Api/appsettings.Development.json

@@ -10,5 +10,7 @@ namespace Terjeki.Scheduler.Web.Services
         Task LogoutAsync();
         Task<string> RegisterAsync(RegisterDto dto);
         Task StartTwoFactorAsync();
+        Task<bool> SendPasswordResetLinkAsync(ForgotPasswordModel dto);
+        Task<bool> ResetPasswordAsync(ResetPasswordModel dto);
     }
 }

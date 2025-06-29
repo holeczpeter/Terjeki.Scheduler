@@ -14,16 +14,16 @@ namespace Terjeki.Scheduler.Infrastucure
         public DbSet<Capacity> Capacities { get; set; }
         public DbSet<DriverEvent> DriverEvents { get; set; }
         public DbSet<AllowedEmail> AllowedEmails { get; set; }
-        
+
         public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService currentUserService) : base(options)
         {
             _currentUserService = currentUserService;
         }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-           
+
         }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -54,70 +54,68 @@ namespace Terjeki.Scheduler.Infrastucure
 
             return base.SaveChanges();
         }
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var userId = _currentUserService.GetUserId();
+            var userId = _currentUserService.GetUserId();  
             var currentUsername = _currentUserService.GetUserName() ?? "Anonymous";
             var utcNow = DateTime.UtcNow;
-            var entries = ChangeTracker.Entries<BaseEntity>();
-            ChangeTracker.DetectChanges();
+
+            
+            var entries = ChangeTracker
+                .Entries<BaseEntity>()
+                .Where(e =>
+                    (e.State == EntityState.Added ||
+                     e.State == EntityState.Modified ||
+                     e.State == EntityState.Deleted) &&
+                    !e.Metadata.GetTableName()!.StartsWith("AspNet"));
 
             var auditEntries = new List<AuditEntry>();
 
-            // Only track BaseEntity changes, excluding Identity tables (AspNet*)
-            var baseEntries = ChangeTracker
-                .Entries<BaseEntity>()
-                .Where(e => (e.State == EntityState.Added
-                          || e.State == EntityState.Modified
-                          || e.State == EntityState.Deleted)
-                            && !e.Metadata.GetTableName()!.StartsWith("AspNet"));
-
-            foreach (var entry in baseEntries)
+            foreach (var entry in entries)
             {
-                // Update BaseEntity audit fields
+                
                 if (entry.State == EntityState.Added)
                 {
-                    entry.Entity.Creator = currentUsername;
                     entry.Entity.Created = utcNow;
-                    entry.Entity.LastModifier = currentUsername;
+                    entry.Entity.Creator = currentUsername;
                     entry.Entity.LastModified = utcNow;
+                    entry.Entity.LastModifier = currentUsername;
                 }
                 else if (entry.State == EntityState.Modified)
                 {
-                    entry.Entity.LastModifier = currentUsername;
                     entry.Entity.LastModified = utcNow;
+                    entry.Entity.LastModifier = currentUsername;
                 }
 
-                // Map EF state to audit action
-                var action = entry.State switch
-                {
-                    EntityState.Added => Actions.Insert,
-                    EntityState.Modified => Actions.Update,
-                    EntityState.Deleted => Actions.Delete
-                };
-
-                // Prepare audit record
+                
                 var audit = new AuditEntry
                 {
                     TableName = entry.Metadata.GetTableName()!,
-                    Action = action,
+                    Action = entry.State switch
+                    {
+                        EntityState.Added => Actions.Insert,
+                        EntityState.Modified => Actions.Update,
+                        _ => Actions.Delete
+                    },
                     Timestamp = utcNow,
-                    UserId = userId,
-                    UserName = currentUsername, 
+                    UserId = userId,      
+                    UserName = currentUsername,
                     KeyValues = JsonSerializer.Serialize(
                         entry.Properties
                              .Where(p => p.Metadata.IsPrimaryKey())
                              .ToDictionary(p => p.Metadata.Name, p => p.CurrentValue)),
-                    OldValues = entry.State == EntityState.Added ? "{}" :
-                                JsonSerializer.Serialize(
-                                    entry.Properties
-                                         .Where(p => p.IsModified)
-                                         .ToDictionary(p => p.Metadata.Name, p => p.OriginalValue)),
-                    NewValues = entry.State == EntityState.Deleted ? "{}" :
-                                JsonSerializer.Serialize(
-                                    entry.Properties
-                                         .Where(p => p.IsModified || entry.State == EntityState.Added)
-                                         .ToDictionary(p => p.Metadata.Name, p => p.CurrentValue))
+                    OldValues = entry.State == EntityState.Added
+                                    ? "{}"
+                                    : JsonSerializer.Serialize(
+                                        entry.Properties
+                                             .Where(p => p.IsModified)
+                                             .ToDictionary(p => p.Metadata.Name, p => p.OriginalValue)),
+                    NewValues = entry.State == EntityState.Deleted
+                                    ? "{}"
+                                    : JsonSerializer.Serialize(
+                                        entry.Properties
+                                             .Where(p => p.IsModified || entry.State == EntityState.Added)
+                                             .ToDictionary(p => p.Metadata.Name, p => p.CurrentValue))
                 };
 
                 auditEntries.Add(audit);
@@ -126,8 +124,8 @@ namespace Terjeki.Scheduler.Infrastucure
             if (auditEntries.Any())
                 AuditEntries.AddRange(auditEntries);
 
-            return base.SaveChangesAsync(cancellationToken);
+            return await base.SaveChangesAsync(cancellationToken);
         }
-        
+
     }
 }

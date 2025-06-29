@@ -1,0 +1,15 @@
+﻿@layout AuthLayout
+@page "/email-confirmation-failed"
+@using Microsoft.AspNetCore.Components
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-danger">
+        <div class="card-body text-center">
+            <h2 class="card-title text-danger">E-mail megerősítés sikertelen</h2>
+            <p class="card-text">Sajnáljuk, de nem sikerült megerősíteni az e-mail címed. Lehet, hogy a link lejárt vagy hibás volt.</p>
+            <p>Próbáld meg újra a regisztrációt, vagy lépj kapcsolatba az ügyfélszolgálattal.</p>
+            <NavLink class="btn btn-outline-primary me-2" href="/register">Új regisztráció</NavLink>
+            <NavLink class="btn btn-outline-secondary" href="/support">Kapcsolatfelvétel</NavLink>
+        </div>
+    </div>
+</div>

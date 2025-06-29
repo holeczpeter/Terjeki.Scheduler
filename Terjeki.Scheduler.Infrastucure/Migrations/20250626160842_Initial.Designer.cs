@@ -12,8 +12,8 @@ using Terjeki.Scheduler.Infrastucure;
 namespace Terjeki.Scheduler.Infrastucure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250626134841_SeedAllowedEmails")]
-    partial class SeedAllowedEmails
+    [Migration("20250626160842_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -241,8 +241,6 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(256)
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserName")

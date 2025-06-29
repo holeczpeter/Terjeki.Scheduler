@@ -83,7 +83,7 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                     NewValues = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Action = table.Column<int>(type: "int", maxLength: 16, nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", maxLength: 256, nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>

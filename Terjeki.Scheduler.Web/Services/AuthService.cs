@@ -20,7 +20,7 @@ namespace Terjeki.Scheduler.Web.Services
             resp.EnsureSuccessStatusCode();
             return "Registration OK — check your email.";
         }
-
+       
         public async Task LoginAsync(LoginDto dto)
         {
             var resp = await _http.PostAsJsonAsync("api/account/login", dto);
@@ -52,7 +52,7 @@ namespace Terjeki.Scheduler.Web.Services
             var data = await resp.Content.ReadFromJsonAsync<LoginResult>();
             await localStorageService.SetItemAsync(TokenKey, data.Token);
         }
-
+       
         public async Task LogoutAsync()
         {
             await localStorageService.RemoveItemAsync(TokenKey);
@@ -63,6 +63,22 @@ namespace Terjeki.Scheduler.Web.Services
             var raw  =  await localStorageService.GetItemAsStringAsync(TokenKey,new CancellationToken());
              return  raw?.Trim().Trim('"'); 
 
+        }
+
+        public async Task<bool> SendPasswordResetLinkAsync(ForgotPasswordModel dto)
+        {
+            var resp = await _http.PostAsJsonAsync("api/account/forgot-password", dto);
+            resp.EnsureSuccessStatusCode();
+            var data = await resp.Content.ReadFromJsonAsync<bool>();
+            return data;
+        }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordModel dto)
+        {
+            var resp = await _http.PostAsJsonAsync("api/account/reset-password", dto);
+            resp.EnsureSuccessStatusCode();
+            var data = await resp.Content.ReadFromJsonAsync<bool>();
+            return data;
         }
 
         class LoginResult { public string Token { get; set; } = default!; }

@@ -5,10 +5,10 @@
 namespace Terjeki.Scheduler.Infrastucure.Migrations
 {
     /// <inheritdoc />
-
     public partial class SeedBusesAndCapacities : Migration
     {
         /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
@@ -53,4 +53,3 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
 
     }
 }
-

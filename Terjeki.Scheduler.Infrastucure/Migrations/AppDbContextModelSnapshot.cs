@@ -238,8 +238,6 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(256)
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserName")

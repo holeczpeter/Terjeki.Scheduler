@@ -5,7 +5,7 @@
 namespace Terjeki.Scheduler.Infrastucure.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedAllowedEmails : Migration
+    public partial class SeedAlloweEmails : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -12,7 +12,7 @@ using Terjeki.Scheduler.Infrastucure;
 namespace Terjeki.Scheduler.Infrastucure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250626134816_SeedRoles")]
+    [Migration("20250626160900_SeedRoles")]
     partial class SeedRoles
     {
         /// <inheritdoc />
@@ -241,8 +241,6 @@ namespace Terjeki.Scheduler.Infrastucure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(256)
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserName")
