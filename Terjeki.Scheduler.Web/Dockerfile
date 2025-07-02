@@ -29,3 +29,22 @@ EXPOSE 80
 
 # Indítsuk az NGINX-et
 CMD ["nginx", "-g", "daemon off;"]
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+
+COPY Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj Terjeki.Scheduler.Web/
+RUN dotnet restore Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj
+
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish Terjeki.Scheduler.Web.csproj -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Terjeki.Scheduler.Web.dll"]
