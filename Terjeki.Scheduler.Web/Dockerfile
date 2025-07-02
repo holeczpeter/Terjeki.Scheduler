@@ -1,30 +1,23 @@
-# --- 1) Build lépések ---
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-
-# Másoljuk be az egész repót
-COPY . .
-
-# Restore a sln alapján
-# 1) Build stage: fordítjuk és publish-eljük a Blazor WASM-t
+# 1) Build stage: fordítás + publish
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Másoljuk be a csproj-ot és a kódot
+# Másoljuk be csak a projekt fájlokat, hogy a cache jól mûködjön
 COPY Terjeki.Scheduler.Web.csproj ./
-RUN dotnet restore Terjeki.Scheduler.Web.csproj
+RUN dotnet restore ./Terjeki.Scheduler.Web.csproj
 
+# Másoljuk be a teljes kódot, és publish-eljük
 COPY . ./
 RUN dotnet publish Terjeki.Scheduler.Web.csproj -c Release -o /app/publish
 
-# 2) Runtime stage: NGINX-sel szolgáljuk ki a wwwroot-ot
-FROM nginx:alpine
-# (opcionális: ha SPA routinghoz kell, készíts saját nginx.conf-ot)
-COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
-
-# Ha külön SPA-handling kell, illeszd ide a custom nginx.conf-t:
+# 2) Runtime stage: NGINX, statikus fájlok kiszolgálása
+FROM nginx:alpine AS runtime
+# Ha szükséged van custom nginx.conf-re, itt másold be:
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# A publishelt wwwroot-ot másoljuk az nginx html könyvtárba
+COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
+
