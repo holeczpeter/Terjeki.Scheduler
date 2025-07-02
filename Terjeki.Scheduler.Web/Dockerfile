@@ -1,12 +1,14 @@
 # --- build stage ---
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Az egész repo-ból másolunk:
-COPY . .
+COPY ["Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj", "Terjeki.Scheduler.Web/"]
+COPY ["Terjeki.Scheduler.Application/Terjeki.Scheduler.Application.csproj", "Terjeki.Scheduler.Application/"]
+COPY ["Terjeki.Scheduler.Core/Terjeki.Scheduler.Core.csproj", "Terjeki.Scheduler.Core/"]
+COPY ["Terjeki.Scheduler.Infrastucure/Terjeki.Scheduler.Infrastucure.csproj", "Terjeki.Scheduler.Infrastucure/"]
+RUN dotnet restore "./Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj"
 
-# Meglévő Web projektünket publisheljük
-WORKDIR /src/Terjeki.Scheduler.Web
+COPY . .
 RUN dotnet publish -c Release -o /app/publish
 
 # --- runtime stage ---
