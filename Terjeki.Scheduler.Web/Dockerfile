@@ -1,23 +1,25 @@
-# 1) Build stage: fordítás + publish
+# --- 1) Build stage: SDK kép Blazor publish-hez ---
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Másoljuk be csak a projekt fájlokat, hogy a cache jól mûködjön
-COPY Terjeki.Scheduler.Web.csproj ./
-RUN dotnet restore ./Terjeki.Scheduler.Web.csproj
+# 1.1) Másoljuk be csak a csproj-ot (csak ennek a mappának a gyökerébõl)
+COPY *.csproj ./
 
-# Másoljuk be a teljes kódot, és publish-eljük
+# 1.2) Restore
+RUN dotnet restore
+
+# 1.3) Másoljuk be az összes forrást ebbõl a mappából, és publish-eljük
 COPY . ./
-RUN dotnet publish Terjeki.Scheduler.Web.csproj -c Release -o /app/publish
+RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
-# 2) Runtime stage: NGINX, statikus fájlok kiszolgálása
+# --- 2) Runtime stage: nginx statikus fájlokhoz ---
 FROM nginx:alpine AS runtime
-# Ha szükséged van custom nginx.conf-re, itt másold be:
+
+# (SPA routinghoz késõbb ide jöhet az nginx.conf, ha kell)
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# A publishelt wwwroot-ot másoljuk az nginx html könyvtárba
+# A publisholt wwwroot-ot másoljuk az nginx html könyvtárba
 COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
-
