@@ -1,28 +1,27 @@
-# 1) Build stage
+# 1) Build stage: restore & publish
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src/Terjeki.Scheduler.Web
+WORKDIR /src
 
-# copy only the client project file, restore deps
-COPY Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj ./
+# copy only the WASM project and its assets
+COPY ./*.csproj ./
 RUN dotnet restore Terjeki.Scheduler.Web.csproj
 
-# copy rest of the Web project
-COPY Terjeki.Scheduler.Web/. ./
+# copy the rest of the client sources
+COPY . ./
 
-# publish static wwwroot
+# publish to get static wwwroot
 RUN dotnet publish Terjeki.Scheduler.Web.csproj \
     -c Release \
     -o /app/publish \
     /p:UseAppHost=false
 
-# 2) Runtime stage
+# 2) Runtime stage: serve with NGINX
 FROM nginx:alpine AS runtime
 WORKDIR /usr/share/nginx/html
 
-# If you later need SPA fallback, target nginx.conf here
+# (optional) if you need client-side fallback routing, you can add your own nginx.conf:
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# copy published files in
 COPY --from=build /app/publish/wwwroot .
 
 EXPOSE 80
