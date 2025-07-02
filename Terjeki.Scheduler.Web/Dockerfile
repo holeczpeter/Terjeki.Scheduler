@@ -1,28 +1,26 @@
-# 1) Build stage
+# 1) BUILD stádium: Blazor WebAssembly lefordítása
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src/Terjeki.Scheduler.Web
 
-# copy only the client project file, restore deps
+# Csak a csproj másolása, hogy gyorsan restore-oljon
 COPY Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj ./
 RUN dotnet restore Terjeki.Scheduler.Web.csproj
 
-# copy rest of the Web project
+# Teljes WebAssembly-projekt másolása, publish
 COPY Terjeki.Scheduler.Web/. ./
-
-# publish static wwwroot
 RUN dotnet publish Terjeki.Scheduler.Web.csproj \
     -c Release \
     -o /app/publish \
     /p:UseAppHost=false
 
-# 2) Runtime stage
+# 2) RUNTIME stádium: nginx a statikus fájlokhoz
 FROM nginx:alpine AS runtime
 WORKDIR /usr/share/nginx/html
 
-# If you later need SPA fallback, target nginx.conf here
+# Ha SPA “fallback” kell, ide másolj egy saját nginx.conf-et:
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# copy published files in
+# Másold át a publish-elt wwwroot-ot
 COPY --from=build /app/publish/wwwroot .
 
 EXPOSE 80
