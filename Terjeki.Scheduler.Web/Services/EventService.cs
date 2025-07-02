@@ -38,7 +38,10 @@
             throw new HttpRequestException($"Events fetch failed: {response.StatusCode}");
         }
 
-        public async Task<IEnumerable<EventGroupModel>> GetGrouped(DateTime from, DateTime to, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<EventGroupModel>> GetGrouped(DateTime from, 
+            DateTime to, 
+           
+            CancellationToken cancellationToken = default)
         {
             var fromStr = from.ToString("s"); 
             var toStr = to.ToString("s");

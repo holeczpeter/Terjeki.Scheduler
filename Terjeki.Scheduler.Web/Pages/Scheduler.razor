@@ -110,6 +110,14 @@
         OnClick="@ChangeViewType">
         </TButton>
 
+
+    </div>
+    <div class="content">
+        <div class="form-input">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Keresés</RadzenText>
+            <RadzenTextBox @bind-Value="searchText" @oninput="@Search"
+            Style="width:100%;min-width:300px" />
+        </div>
     </div>
     <div class="responsive-table-wrapper">
 
@@ -117,22 +125,59 @@
             <thead>
                 <tr>
                     <th rowspan="2"
-                    style="position:sticky; left:0; z-index:10; background:white;
-                        width:197px!important; min-width:197px!important; max-width:197px!important;">
-                        <div class="date-header">
-                            @if (isBus)
-                            {
-                                <span class="mobile-dayname-header">Busz</span>
-                                <div>
-                                    <RadzenIcon Icon="arrow_downward"  onclick="@(() => OrderByLicensePlateNumber())" /> Rendszám
-                                </div>
-                            }
-                            else
-                            {
-                                <span class="mobile-dayname-header">Sofőr</span>
-                            }
-                        </div>
+                    style="position:sticky; left:0; z-index:2; background:white;
+                        width:110px!important; min-width:112px!important; max-width:110px!important;">
+                        @if (isBus)
+                        {
+                            <div class="bus-header"
+                            @onclick="OrderByLicensePlateNumber"
+                            @onmouseover="() => ShowArrow(OrderField.LicensePlate)"
+                            @onmouseout="() => HideArrow(OrderField.LicensePlate)">
+                                Rendszám
+                                @if (currentOrderField == OrderField.LicensePlate || hoveredColumn == OrderField.LicensePlate.ToString())
+                                {
+                                    if (sortDirection == SortDirection.Desc)
+                                    {
+                                        <span><RadzenIcon Icon="arrow_downward" /></span>
+                                    }
+                                    else
+                                    {
+                                        <span><RadzenIcon Icon="arrow_upward" /></span>
+                                    }
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="mobile-dayname-header">Sofőr</span>
+                        }
                     </th>
+                    @if (isBus)
+                    {
+                        <th rowspan="2"
+                            style="position:sticky; left:110px;  z-index:2; background:white;
+                                width:87px!important; min-width:87px!important; max-width:87px!important;">
+                            <div class="date-header">
+
+                                <div class="bus-header"
+                                @onclick="OrderByCapacity" style="cursor:pointer" >
+                                    <span>Létszám</span>
+                                    @if (currentOrderField == OrderField.Capacity || hoveredColumn == OrderField.Capacity.ToString())
+                                    {
+                                        if (sortDirection == SortDirection.Desc)
+                                        {
+                                            <span><RadzenIcon Icon="arrow_downward"  /></span>
+                                        }
+                                        else 
+                                        {
+                                            <span><RadzenIcon Icon="arrow_upward" /></span>
+                                        }
+
+                                    }
+                                    </div>
+                            </div>
+                        </th>
+                    }
 
                     @foreach (var day in viewDays)
                     {
@@ -148,7 +193,7 @@
             <tbody>
                 @if (isBus)
                 {
-                    @foreach (var eventGroup in eventGroups)
+                    @foreach (var eventGroup in filteredEventGroups)
                     {
                         <tr style="@GetRowStyle(eventGroup.Bus)">
                             <td style="position:sticky;left:0;z-index:10;background:white;">
@@ -156,7 +201,16 @@
 
                                     @if (eventGroup.Bus != null)
                                     {
-                                        <span>@eventGroup?.Bus?.LicensePlateNumber -  (@eventGroup?.Capacity.Capacity) fő</span>
+                                        <span>@eventGroup?.Bus?.LicensePlateNumber </span>
+                                    }
+                                </div>
+                            </td>
+                            <td style="position:sticky;left:110px;z-index:10;background:white;">
+                                <div class="event-object">
+
+                                    @if (eventGroup.Bus != null)
+                                    {
+                                        <span>@eventGroup?.Capacity.Capacity fő</span>
                                     }
                                 </div>
                             </td>
@@ -443,6 +497,7 @@
 
     </div>
     ;
+    private OrderField currentOrderField = OrderField.None;
     Dictionary<Guid, ElementReference> elementRefs = new();
     Dictionary<Guid, ElementReference> refMap = new();
 
@@ -456,8 +511,11 @@
     ElementReference htmlelement;
     record WeekDay(DateTime Date, string Label, string DateString, bool IsWeekend, string ShortDayName);
     List<DriverEventModel> driverEvents = new();
-    List<EventGroupModel> eventGroups = new();
-
+    List<EventGroupModel> allEventGroups = new();
+    List<EventGroupModel> filteredEventGroups = new();
+    public string hoveredColumn;
+    public void ShowArrow(OrderField column) => hoveredColumn = column.ToString();
+    public void HideArrow(OrderField column) => hoveredColumn = string.Empty;
     List<WeekDay> viewDays = new();
     Radzen.DataGridGridLines gridLines = Radzen.DataGridGridLines.Both;
     bool allowAlternatingRows = true;
@@ -476,9 +534,8 @@
     DriverItemModel draggedDriver;
     private IList<BusModel> buses = new List<BusModel>();
     private bool IsAdmin = false;
-
-
-
+    private string searchText = string.Empty;
+    SortDirection sortDirection = SortDirection.Asc;
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -514,12 +571,70 @@
             elementRefs[kvp.Key] = kvp.Value;
         }
     }
-    private void OrderByLicensePlateNumber()
+    private async Task OrderByLicensePlateNumber()
     {
-        buses = buses.OrderBy(x => x.LicensePlateNumber).ToList();
+        // Ha már erre az oszlopra volt rendezve, toggle-oljuk az irányt,
+        // különben beállítjuk alapból növekvőre
+        if (currentOrderField == OrderField.LicensePlate)
+        {
+            sortDirection = sortDirection == SortDirection.Asc
+                ? SortDirection.Desc
+                : SortDirection.Asc;
+        }
+        else
+        {
+            currentOrderField = OrderField.LicensePlate;
+            sortDirection = SortDirection.Asc;
+        }
 
+        ApplySort();
+        // Frissítjük a UI-t
+        await InvokeAsync(StateHasChanged);
     }
 
+    private async Task OrderByCapacity()
+    {
+        if (currentOrderField == OrderField.Capacity)
+        {
+            sortDirection = sortDirection == SortDirection.Asc
+                ? SortDirection.Desc
+                : SortDirection.Asc;
+        }
+        else
+        {
+            currentOrderField = OrderField.Capacity;
+            sortDirection = SortDirection.Asc;
+        }
+
+        ApplySort();
+        await InvokeAsync(StateHasChanged);
+    }
+    private void ApplySort()
+    {
+        // Licence-plate szerinti rendezés
+        if (currentOrderField == OrderField.LicensePlate)
+        {
+            filteredEventGroups = sortDirection == SortDirection.Asc
+                ? filteredEventGroups
+                    .OrderBy(g => g.Bus.LicensePlateNumber)
+                    .ToList()
+                : filteredEventGroups
+                    .OrderByDescending(g => g.Bus.LicensePlateNumber)
+                    .ToList();
+        }
+        // Capacity szerinti rendezés
+        else if (currentOrderField == OrderField.Capacity)
+        {
+            filteredEventGroups = sortDirection == SortDirection.Asc
+                ? filteredEventGroups
+                    .OrderBy(g => g.Capacity.Capacity)
+                    .ToList()
+                : filteredEventGroups
+                    .OrderByDescending(g => g.Capacity.Capacity)
+                    .ToList();
+        }
+        // Ha nincs aktív rendezés, nem változtatunk
+    }
     private DateTime GetStartOfWeek(DateTime date)
     {
         // hu-HU szerint a hétfő a 1-es nap, vasárnap a 0
@@ -527,6 +642,28 @@
         var firstDay = culture.DateTimeFormat.FirstDayOfWeek;  // hétfő
         int diff = (7 + (date.DayOfWeek - firstDay)) % 7;
         return date.Date.AddDays(-diff);
+    }
+    protected async Task Search(ChangeEventArgs args)
+    {
+        searchText = $"{args.Value}";
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            
+            filteredEventGroups = allEventGroups;
+        }
+        else
+        {
+            filteredEventGroups = allEventGroups
+                .Where(g =>
+                    g.Events.Any(ev =>
+                        ev.Drivers.Any(d =>
+                            d.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+                        )
+                    )
+                )
+                .ToList();
+        }
+        StateHasChanged();
     }
     private async Task LoadEventsForPeriod(DateTime startOfPeriod)
     {
@@ -573,8 +710,10 @@
         {
             this.rowHeight = 20;
             var eventGroupList = await EventService.GetGrouped(currentPeriodStartDate, currentPeriodEndDate);
-            eventGroups = eventGroupList.ToList();
-            foreach (var group in eventGroups)
+            allEventGroups = eventGroupList.ToList();
+            filteredEventGroups = allEventGroups;
+           
+            foreach (var group in allEventGroups)
             {
                 foreach (var item in group.Events)
                 {
