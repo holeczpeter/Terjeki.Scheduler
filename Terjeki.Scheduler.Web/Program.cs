@@ -17,10 +17,10 @@ builder.Services.AddTransient<UnauthorizedHttpHandler>(sp =>
     var logger = sp.GetRequiredService<ILogger<UnauthorizedHttpHandler>>();
     return new UnauthorizedHttpHandler(navigationManager, logger);
 });
-
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"]!;
 builder.Services.AddHttpClient("ApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5227/");
+    client.BaseAddress = new Uri(apiBaseUrl);
 })
 .AddHttpMessageHandler<AuthMessageHandler>()
 .AddHttpMessageHandler<UnauthorizedHttpHandler>();
