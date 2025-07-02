@@ -1,5 +1,0 @@
-{
-  "schemaVersion": 2,
-  "dockerfilePath": "./Terjeki.Scheduler.Api/Dockerfile",
-  "buildContext": "./Terjeki.Scheduler.Api"
-}
