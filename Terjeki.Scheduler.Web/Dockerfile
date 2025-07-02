@@ -1,50 +1,34 @@
-# --- 1. Build stage: SDK image a publishhez ---
+# --- 1. Restore és build stage ---
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-
-# Másoljuk be az egész repo-t (csak a Web projekthez kell, de így egyszerûbb)
-COPY . .
-
-# Lépjünk be a WebAssembly-projekt mappájába
-WORKDIR /src/Terjeki.Scheduler.Web
-
-# Restore + publish (statikus wwwroot készül)
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
-
-# --- 2. Runtime stage: NGINX image a statikus fájlokhoz ---
-FROM nginx:alpine AS runtime
-
-# Ha SPA routinghoz késõbb kell custom conf, legyen itt az nginx.conf:
-# (helyette most a defaultot használja az Alpine NGINX)
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-WORKDIR /usr/share/nginx/html
-
-# Másoljuk át a publish-elt fájlokat a wwwroot-ból
-COPY --from=build /app/publish/wwwroot .
-
-# Alapértelmezett port
-EXPOSE 80
-
-# Indítsuk az NGINX-et
-CMD ["nginx", "-g", "daemon off;"]
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj Terjeki.Scheduler.Web/
-RUN dotnet restore Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj
+# Másoljuk be az egész .sln + minden .csproj-ot, hogy a restore menjen
+COPY Terjeki.Scheduler.sln ./
+COPY Terjeki.Scheduler.Web/*.csproj Terjeki.Scheduler.Web/
+COPY Terjeki.Scheduler.Infrastructure/*.csproj Terjeki.Scheduler.Infrastructure/
+COPY Terjeki.Scheduler.Core/*.csproj Terjeki.Scheduler.Core/
+COPY Terjeki.Scheduler.Application/*.csproj Terjeki.Scheduler.Application/
 
+# Restore a megoldásra
+RUN dotnet restore Terjeki.Scheduler.sln
 
+# Buildeljük a Web projektet (vagy akár az egész solutiont)
+WORKDIR /src/Terjeki.Scheduler.Web
+RUN dotnet build -c $BUILD_CONFIGURATION -o /app/build
+
+# --- 2. Publish stage ---
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish Terjeki.Scheduler.Web.csproj -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR /src/Terjeki.Scheduler.Web
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+# --- 3. Runtime stage ---
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-COPY --from=publish /app/publish .
+
+# Ha Blazor WebAssembly-t szolgálsz, és statikus fájlokat akarsz nginx helyett dotnettel:
+EXPOSE 80
+COPY --from=publish /app/publish ./
+
 ENTRYPOINT ["dotnet", "Terjeki.Scheduler.Web.dll"]
