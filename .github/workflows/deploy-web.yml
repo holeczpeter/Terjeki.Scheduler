@@ -2,7 +2,7 @@ name: Build & Deploy API via GHCR
 
 on:
   push:
-    branches: [ "developer" ]
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
