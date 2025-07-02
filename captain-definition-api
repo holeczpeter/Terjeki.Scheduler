@@ -1,5 +1,11 @@
 {
   "schemaVersion": 2,
   "dockerfilePath": "./Terjeki.Scheduler.Api/Dockerfile",
-  "buildContext": "./Terjeki.Scheduler.Api"
+  "buildContext": "./Terjeki.Scheduler.Api",
+  "healthCheck": {
+      "path": "/health",
+      "port": 8080,
+      "method": "GET",
+      "successHttpStatuses": [200]
+    }
 }
