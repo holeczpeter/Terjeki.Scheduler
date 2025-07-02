@@ -1,4 +1,8 @@
-﻿.responsive-table-wrapper {
+﻿.rz-column-drag, .rz-datatable-loading-content .rzi-circle-o-notch, .rz-datatable-header .rzi-plus, .rz-sortable-column .rzi-grid-sort, .rz-datatable .rzi-chevron-circle-down, .rz-datatable .rzi-chevron-circle-right, .rz-fileupload-row .rz-button .rzi-close, .rz-fileupload-row .rz-button .rzi-times, .rz-fileupload-row .rz-button .rz-icon-trash, .rz-menuitem .rz-menuitem-icon, .rzi {
+
+    font-size:14px!important;
+}
+.responsive-table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }

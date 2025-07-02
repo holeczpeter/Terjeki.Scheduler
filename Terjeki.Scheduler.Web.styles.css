@@ -82,6 +82,32 @@
     background: var(--background-neutral-subtle, #FFF);
     justify-content: space-between;
 }
+/* /Components/ConfirmDialog.razor.rz.scp.css */
+.content[b-ctd6noodzw] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-200, 8px);
+    flex: 1 0 0;
+    align-self: stretch;
+    padding-top: var(--spacing-600, 24px);
+    padding-right: var(--spacing-800, 32px);
+    padding-bottom: var(--spacing-1000, 40px);
+    padding-left: var(--spacing-800, 32px);
+}
+
+
+.flex-button[b-ctd6noodzw] {
+    display: flex;
+    padding: var(--spacing-0, 0px);
+    align-items: center;
+    gap: var(--spacing-200, 8px);
+    align-self: stretch;
+    padding: var(--spacing-300, 12px) var(--spacing-800, 32px) var(--spacing-600, 24px) var(--spacing-800, 32px);
+    border-top: var(--border-width-base, 1px) solid var(--border-neutral-divider, rgba(48, 84, 133, 0.20));
+    background: var(--background-neutral-subtle, #FFF);
+    justify-content: space-between;
+}
 /* /Components/Drivers/CreateDriverDialog.razor.rz.scp.css */
 .content[b-aycljy1osd] {
     display: flex;
@@ -776,8 +802,35 @@ footer[b-x7mgtrlqih] {
     right: 30px;
     top: 100px;
 }
+/* /Pages/Forgotpassword.razor.rz.scp.css */
+.content[b-l8z7tfkkl3] {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
 /* /Pages/Login.razor.rz.scp.css */
 .content[b-6os6a51pcw] {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
+/* /Pages/Register.razor.rz.scp.css */
+.content[b-t34zdcv144] {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
+/* /Pages/ResetPassword.razor.rz.scp.css */
+.content[b-dtkwz32fhs] {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -791,7 +844,8 @@ footer[b-x7mgtrlqih] {
     flex-direction: column;
     gap: 10px;
 }
-.date-header[b-i3wuiuzxrq] {
+
+    .date-header[b-i3wuiuzxrq] {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -805,12 +859,15 @@ footer[b-x7mgtrlqih] {
 }
 
 table[b-i3wuiuzxrq] {
-    border-collapse: collapse;
-    width:100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-top: 1px solid grey;
+    
 }
 
 td[b-i3wuiuzxrq], th[b-i3wuiuzxrq] {
     border: 1px solid #ccc;
+    z-index: 1;
 }
 tbody[b-i3wuiuzxrq], td[b-i3wuiuzxrq], tfoot[b-i3wuiuzxrq], th[b-i3wuiuzxrq], thead[b-i3wuiuzxrq], tr[b-i3wuiuzxrq] {
     border-color: inherit;
@@ -886,7 +943,23 @@ table[b-i3wuiuzxrq] {
     display: none;
 }
 
-
+.event-function[b-i3wuiuzxrq] {
+    display:flex;
+}
+.bus-header[b-i3wuiuzxrq] {
+    display:flex;
+    flex: 1;
+    min-width: 0;
+    padding: 8px;
+    min-height: 24px;
+    color: #1C1F26;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+    cursor: pointer;
+    gap: 1rem;
+}
 
 .tooltiptext[b-i3wuiuzxrq]::after {
         content: "";
@@ -898,7 +971,12 @@ table[b-i3wuiuzxrq] {
         border-style: solid;
         border-color: #555 transparent transparent transparent;
     }
-
+.custom-tooltip[b-i3wuiuzxrq] {
+    max-width: 300px; /* Állítsd tetszőleges értékre */
+    white-space: normal; /* Sorvégi tördelés engedélyezése */
+    word-wrap: break-word; /* Régebbi böngészők támogatása */
+    overflow-wrap: break-word; /* Modern szabvány */
+}
 div:hover > .tooltiptext[b-i3wuiuzxrq] {
     display: block;
     visibility: visible;
