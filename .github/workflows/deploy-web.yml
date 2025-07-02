@@ -1,4 +1,4 @@
-name: Build & Deploy API via GHCR
+name: Build & Deploy Web via GHCR
 
 on:
   push:
@@ -22,10 +22,10 @@ jobs:
       - name: Build & push API image to GHCR
         uses: docker/build-push-action@v5
         with:
-          context: ./Terjeki.Scheduler.Api
-          file: ./Terjeki.Scheduler.Api/Dockerfile
+          context: ./Terjeki.Scheduler.Web
+          file: ./Terjeki.Scheduler.Web/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/terjeki-scheduler-api:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/terjeki-scheduler-web:${{ github.sha }}
 
       - name: Deploy to CapRover
         uses: caprover/deploy-from-github@v1.1.2
