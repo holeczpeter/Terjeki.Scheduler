@@ -18,4 +18,4 @@ RUN dotnet publish "./Terjeki.Scheduler.Web.csproj" -c Release -o /app/publish /
 FROM  base AS final
 WORKDIR /usr/share/nginx/html
 COPY --from=publish /app/publish/wwwroot .
-COPY  Terjeki.Scheduler.Web/nginx.conf /etc/nginx/nginx.conf
+COPY  ./Terjeki.Scheduler.Web/nginx.conf /etc/nginx/nginx.conf
