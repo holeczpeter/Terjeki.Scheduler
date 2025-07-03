@@ -1,6 +1,8 @@
-# … előző lépések változatlanok …
+### 1) Build stage (dotnet SDK) ###
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
 
-# Copy csproj-ok
+# copy sln + csproj fájlok
 COPY Terjeki.Scheduler.sln ./
 COPY Terjeki.Scheduler.Core/*.csproj   Terjeki.Scheduler.Core/
 COPY Terjeki.Scheduler.Infrastructure/*.csproj Terjeki.Scheduler.Infrastructure/
@@ -8,17 +10,17 @@ COPY Terjeki.Scheduler.Application/*.csproj    Terjeki.Scheduler.Application/
 COPY Terjeki.Scheduler.Api/*.csproj            Terjeki.Scheduler.Api/
 COPY Terjeki.Scheduler.Web/*.csproj            Terjeki.Scheduler.Web/
 
-# Restore a teljes solution-re
+# restore az egész solution-re
 RUN dotnet restore Terjeki.Scheduler.sln
 
-# Másoljuk át a maradék forrást
+# másold be az összes forrást
 COPY . .
 
-# Publish csak a Blazor WebAssembly projektet
+# publikáld le a Blazor WebAssembly-t
 WORKDIR /src/Terjeki.Scheduler.Web
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
-# Runtime
+### 2) Runtime stage (NGINX) ###
 FROM nginx:alpine AS runtime
 WORKDIR /usr/share/nginx/html
 COPY --from=build /app/publish/wwwroot ./
