@@ -13,8 +13,9 @@ WORKDIR /src/Terjeki.Scheduler.Web
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
 # 2) Runtime lépés: Nginx, statikus fájlok kiszolgálására
-FROM nginx:alpine AS runtime
-WORKDIR /usr/share/nginx/html
-COPY --from=build /app/publish/wwwroot .
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+COPY --from=build /app/Terjeki.Scheduler.Web/out ./
+ENTRYPOINT ["dotnet", "Terjeki.Scheduler.Web.dll"]
