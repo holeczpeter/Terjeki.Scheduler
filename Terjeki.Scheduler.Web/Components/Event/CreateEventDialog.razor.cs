@@ -151,7 +151,8 @@ namespace Terjeki.Scheduler.Web.Components.Event
                 StartDate = form.Start,
                 EndDate = form.End,
                 Type = EventTypes.Event,
-                Status = form.Bus != null && !form.IsPlan ? EventStatuses.Accepted : EventStatuses.Plan
+                Status = form.Bus != null && !form.IsPlan ? EventStatuses.Accepted : EventStatuses.Plan,
+                IsNotification = form.IsNotification,
                 
 
             };

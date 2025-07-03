@@ -1,6 +1,6 @@
 ﻿namespace Terjeki.Scheduler.Core
 {
-    public class CreateServiceCommand : IRequest<EventModel>
+    public class CreateServiceCommand : IRequest<EventModel>, INotificationEvent
     {
         
         public Guid BusId { get; set; }
@@ -17,5 +17,6 @@
         public ServiceTypes ServiceType { get; set; }
         public int CurrentMileage { get; set; }
         public string Summary { get; set; }
+        public bool IsNotification { get; set; }
     }
 }

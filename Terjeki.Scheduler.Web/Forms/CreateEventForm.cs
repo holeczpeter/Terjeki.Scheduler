@@ -114,6 +114,19 @@ namespace Terjeki.Scheduler.Web.Components.Event
                 }
             }
         }
+        private bool _isNotification;
+        public bool IsNotification
+        {
+            get => _isNotification;
+            set
+            {
+                if (_isNotification != value)
+                {
+                    _isNotification = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsNotification)));
+                }
+            }
+        }
         public List<Guid> DriverIds { get; internal set; }
 
         public event PropertyChangedEventHandler PropertyChanged;

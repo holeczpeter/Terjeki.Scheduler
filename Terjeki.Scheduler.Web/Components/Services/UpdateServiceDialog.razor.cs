@@ -43,7 +43,8 @@ namespace Terjeki.Scheduler.Web.Components.Services
                 Description = Selected.Description,
                 Start = Selected.StartDate,
                 End = Selected.EndDate,
-                Type = Selected.ServiceType
+                Type = Selected.ServiceType,
+               
             };
             editContext = new EditContext(form);
             messageStore = new ValidationMessageStore(editContext);
@@ -118,6 +119,7 @@ namespace Terjeki.Scheduler.Web.Components.Services
                 ServiceType = form.Type,
                 Summary = form.Summary,
                 Description = form.Description,
+                IsNotification = form.IsNotification
             };
             var result = await ServiceService.Update(request, _cancellationTokenSource.Token);
             

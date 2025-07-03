@@ -1,15 +1,19 @@
-﻿namespace Terjeki.Scheduler.Application
+﻿using System.Text;
+using Terjeki.Scheduler.Core.Model.Email;
+
+namespace Terjeki.Scheduler.Application
 {
     public class UpdateEventCommandHandler : IRequestHandler<UpdateEventCommand, EventModel>
     {
         private readonly AppDbContext _dbContext;
-
-        public UpdateEventCommandHandler(AppDbContext dbContext)
+        private readonly IMediator _mediator;
+        public UpdateEventCommandHandler(AppDbContext dbContext, IMediator mediator)
         {
             _dbContext = dbContext;
+            _mediator = mediator;
         }
 
-       
+
         public async Task<EventModel> Handle(UpdateEventCommand request, CancellationToken cancellationToken)
         {
 
@@ -57,6 +61,46 @@
                 _dbContext.DriverEvents.Add(newDriverEvent);
             }
             await _dbContext.SaveChangesAsync(cancellationToken);
+            if (request.IsNotification)
+            {
+                foreach (var item in driverIdsToAdd)
+                {
+                    var currentDriver = await _dbContext.Drivers
+                                      .Where(d => d.Id == item)
+                                      .Select(d => d.Name)
+                                      .FirstOrDefaultAsync(cancellationToken);
+                    var htmlBody = Messages.BuildNewEventMessage(currentDriver, request, currentBus);
+                    var message = new MessageModel
+                    {
+                        To = "holecz.peter85@gmail.com",
+                        Subject = "Új esemény – utazás részletei",
+                        Body = htmlBody.ToString()
+                    };
+
+
+                    await _mediator.Publish(message);
+                }
+                var driverIdsToModify = existingDriverEvents
+                  .Select(de => de.DriverId)
+                  .Intersect(incomingDriverIds)
+                  .ToList();
+                foreach (var item in driverIdsToModify)
+                {
+                    var currentDriver = await _dbContext.Drivers.Where(d => d.Id == item)
+                                      .Select(d => d.Name)
+                                      .FirstOrDefaultAsync(cancellationToken);
+                    var htmlBody = Messages.BuildNewEventMessage(currentDriver, request, currentBus);
+                    var message = new MessageModel
+                    {
+                        To = "holecz.peter85@gmail.com",
+                        Subject = "Módosított esemény – utazás részletei",
+                        Body = htmlBody.ToString()
+                    };
+
+
+                    await _mediator.Publish(message);
+                }
+            }
             return await _dbContext.Events.Where(x => x.Id == currentEvent.Id).Select(x => new EventModel()
             {
                 Id = x.Id,

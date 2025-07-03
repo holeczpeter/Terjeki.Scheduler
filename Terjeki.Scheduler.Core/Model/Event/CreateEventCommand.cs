@@ -19,5 +19,6 @@
 
         public ServiceTypes ServiceType { get; set; }
         public string Summary { get; set; }
+        public bool IsNotification { get; set; }
     }
 }

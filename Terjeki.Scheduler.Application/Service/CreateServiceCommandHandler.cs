@@ -1,12 +1,15 @@
-﻿namespace Terjeki.Scheduler.Application
+﻿using Terjeki.Scheduler.Core.Model.Email;
+
+namespace Terjeki.Scheduler.Application
 {
     internal class CreateServiceCommandHandler : IRequestHandler<CreateServiceCommand, EventModel>
     {
         private readonly AppDbContext _dbContext;
-
-        public CreateServiceCommandHandler(AppDbContext dbContext)
+        private readonly IMediator _mediator;
+        public CreateServiceCommandHandler(AppDbContext dbContext, IMediator mediator)
         {
             _dbContext = dbContext;
+            _mediator = mediator;
         }
         public async Task<EventModel> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
         {
@@ -27,6 +30,26 @@
             _dbContext.Events.AddAsync(newEvent, cancellationToken);
 
 
+           
+            if (request.IsNotification)
+            {
+                var drivers = await _dbContext.Buses
+                         .Select(d => d.Driver.Name)
+                         .ToListAsync(cancellationToken);
+                foreach (var driver in drivers)
+                {
+                   
+                    var htmlBody = Messages.BuildServiceDowntimeMessage(driver, currentBus, request.StartDate,request.EndDate, request.ServiceType.GetDescription());
+                    var message = new MessageModel
+                    {
+                        To = "holecz.peter85@gmail.com",
+                        Subject = "Új szervíz",
+                        Body = htmlBody.ToString()
+                    };
+                    await _mediator.Publish(message);
+                }
+
+            }
             if (currentBus != null) { currentBus.CurrentMileage = request.CurrentMileage; };
             await _dbContext.SaveChangesAsync(cancellationToken);
             return await _dbContext.Events.Where(x => x.Id == newEvent.Id).Select(x => new EventModel()

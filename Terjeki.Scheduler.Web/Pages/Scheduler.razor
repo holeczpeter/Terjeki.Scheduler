@@ -112,13 +112,27 @@
 
 
     </div>
-    <div class="content">
-        <div class="form-input">
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Keresés</RadzenText>
-            <RadzenTextBox @bind-Value="searchText" @oninput="@Search"
-            Style="width:100%;min-width:300px" />
+    @if (isBus)
+    {
+        <div class="content">
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Keresés</RadzenText>
+                <RadzenTextBox @bind-Value="searchText" @oninput="@Search" Placeholder="Sofőr neve"
+                Style="width:100%;min-width:300px" />
+            </div>
         </div>
-    </div>
+    }
+    else if (!isBus)
+    { 
+        <div class="content">
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Keresés</RadzenText>
+                <RadzenTextBox @bind-Value="searchText" @oninput="@SearchInDriverEvents" Placeholder="Rendszám"
+                Style="width:100%;min-width:300px" />
+            </div>
+        </div>
+    }
+
     <div class="responsive-table-wrapper">
 
         <table style="border-collapse: collapse;">
@@ -155,7 +169,7 @@
                     @if (isBus)
                     {
                         <th rowspan="2"
-                            style="position:sticky; left:110px;  z-index:2; background:white;
+                        style="position:sticky; left:110px;  z-index:2; background:white;
                                 width:87px!important; min-width:87px!important; max-width:87px!important;">
                             <div class="date-header">
 
@@ -174,7 +188,7 @@
                                         }
 
                                     }
-                                    </div>
+                                </div>
                             </div>
                         </th>
                     }
@@ -315,7 +329,7 @@
                 }
                 else if (!isBus)
                 {
-                    @foreach (var eventGroup in driverEvents)
+                    @foreach (var eventGroup in filteredDriverEvents)
                     {
                         <tr style="@GetRowStyle(eventGroup.Driver)">
                             <td style="position:sticky;left:0;z-index:2;background:white;">
@@ -511,6 +525,7 @@
     ElementReference htmlelement;
     record WeekDay(DateTime Date, string Label, string DateString, bool IsWeekend, string ShortDayName);
     List<DriverEventModel> driverEvents = new();
+    List<DriverEventModel> filteredDriverEvents = new();
     List<EventGroupModel> allEventGroups = new();
     List<EventGroupModel> filteredEventGroups = new();
     public string hoveredColumn;
@@ -648,7 +663,7 @@
         searchText = $"{args.Value}";
         if (string.IsNullOrWhiteSpace(searchText))
         {
-            
+
             filteredEventGroups = allEventGroups;
         }
         else
@@ -662,6 +677,26 @@
                     )
                 )
                 .ToList();
+        }
+        StateHasChanged();
+    }
+    protected async Task SearchInDriverEvents(ChangeEventArgs args)
+    {
+        searchText = $"{args.Value}";
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+
+            filteredDriverEvents = driverEvents;
+        }
+        else
+        {
+            filteredDriverEvents = driverEvents
+               .Where(g => g.Events.Any(ev =>
+                   ev.Bus?.LicensePlateNumber != null
+                   && ev.Bus.LicensePlateNumber
+                        .Contains(searchText, StringComparison.OrdinalIgnoreCase)
+               )).ToList();
+            var a = filteredDriverEvents;
         }
         StateHasChanged();
     }
@@ -764,6 +799,7 @@
             this.rowHeight = 20;
             var ev = (List<DriverEventModel>)await EventService.GetDriverEvents(currentPeriodStartDate, currentPeriodEndDate);
             driverEvents = ev.ToList();
+            filteredDriverEvents = driverEvents;
             foreach (var group in driverEvents)
             {
                 foreach (var item in group.Events)

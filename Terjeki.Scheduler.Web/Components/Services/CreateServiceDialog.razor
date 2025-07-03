@@ -55,6 +55,10 @@
                 <RadzenDatePicker @bind-Value=@form.End Name="RadzenDatePickerBindValue" ShowCalendarWeek DateFormat="yyyy.MM.dd" Style="width: 100%;" />
                 <ValidationMessage For="@(() => form.End)" />
             </div>
+            <div class="form-input">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3"> Értesítés küldése? </RadzenText>
+                <RadzenSwitch @bind-Value=@form.IsNotification InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})" />
+            </div>
         </div>
         <div class="flex-button">
 

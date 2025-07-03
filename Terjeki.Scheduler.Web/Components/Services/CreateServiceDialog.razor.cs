@@ -105,7 +105,8 @@ namespace Terjeki.Scheduler.Web.Components.Services
                 Summary = form.Summary,
                 Description = form.Description,
                 Type = EventTypes.Service,
-                ServiceType = form.Type
+                ServiceType = form.Type,
+                IsNotification = form.IsNotification,   
 
             };
             var result = await ServiceService.Create(request, _cancellationTokenSource.Token);

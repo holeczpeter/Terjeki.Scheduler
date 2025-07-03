@@ -1,12 +1,15 @@
-﻿namespace Terjeki.Scheduler.Application
+﻿using Terjeki.Scheduler.Core.Model.Email;
+
+namespace Terjeki.Scheduler.Application
 {
     internal class UpdateServiceCommandHandler : IRequestHandler<UpdateServiceCommand, EventModel>
     {
         private readonly AppDbContext _dbContext;
-
-        public UpdateServiceCommandHandler(AppDbContext dbContext)
+        private readonly IMediator _mediator;
+        public UpdateServiceCommandHandler(AppDbContext dbContext, IMediator mediator)
         {
             _dbContext = dbContext;
+            _mediator = mediator;
         }
 
 
@@ -29,6 +32,27 @@
             {
                 if (currentBus != null) { currentBus.CurrentMileage = request.CurrentMileage; };
             }
+            if (request.IsNotification)
+            {
+                var drivers = await _dbContext.Buses
+                         .Where(x=>x.Id == currentBus.Id)
+                         .Select(d => d.Driver.Name)
+                         .ToListAsync(cancellationToken);
+                foreach (var driver in drivers)
+                {
+
+                    var htmlBody = Messages.BuildModifedServiceDowntimeMessage(driver, currentBus, request.StartDate, request.EndDate, request.ServiceType.GetDescription());
+                    var message = new MessageModel
+                    {
+                        To = "holecz.peter85@gmail.com",
+                        Subject = "Szervíz esemény módosult",
+                        Body = htmlBody.ToString()
+                    };
+                    await _mediator.Publish(message);
+                }
+
+            }
+
             await _dbContext.SaveChangesAsync(cancellationToken);
             return await _dbContext.Events.Where(x => x.Id == currentEvent.Id).Select(x => new EventModel()
             {
