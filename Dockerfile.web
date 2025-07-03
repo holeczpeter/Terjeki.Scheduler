@@ -1,28 +1,32 @@
-### 1) Build stage (dotnet SDK) ###
+# --- 1) Build stage: SDK image a publish-hoz ---
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# copy sln + csproj fájlok
+# Másoljuk be a sln-et és az összes csproj-ot a megfelelő mappákba
 COPY Terjeki.Scheduler.sln ./
+
 COPY Terjeki.Scheduler.Core/*.csproj   Terjeki.Scheduler.Core/
-COPY Terjeki.Scheduler.Infrastructure/*.csproj Terjeki.Scheduler.Infrastructure/
+COPY Terjeki.Scheduler.Infrastucure/*.csproj Terjeki.Scheduler.Infrastucure/
 COPY Terjeki.Scheduler.Application/*.csproj    Terjeki.Scheduler.Application/
 COPY Terjeki.Scheduler.Api/*.csproj            Terjeki.Scheduler.Api/
 COPY Terjeki.Scheduler.Web/*.csproj            Terjeki.Scheduler.Web/
 
-# restore az egész solution-re
+# Restore az egész solution-re
 RUN dotnet restore Terjeki.Scheduler.sln
 
-# másold be az összes forrást
+# Másoljuk be a teljes forrást
 COPY . .
 
-# publikáld le a Blazor WebAssembly-t
+# Publish a Blazor WebAssembly project-et
 WORKDIR /src/Terjeki.Scheduler.Web
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
-### 2) Runtime stage (NGINX) ###
+# --- 2) Runtime stage: nginx a statikus fájlokhoz ---
 FROM nginx:alpine AS runtime
 WORKDIR /usr/share/nginx/html
+
+# Másoljuk át a wwwroot-ot
 COPY --from=build /app/publish/wwwroot ./
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
