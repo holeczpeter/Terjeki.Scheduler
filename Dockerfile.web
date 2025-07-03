@@ -1,23 +1,28 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0-noble AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ["Terjeki.Scheduler.Core/Terjeki.Scheduler.Core.csproj", "Terjeki.Scheduler.Core/"]
-COPY ["Terjeki.Scheduler.Application/Terjeki.Scheduler.Application.csproj", "Terjeki.Scheduler.Application/"]
-COPY ["Terjeki.Scheduler.Infrastucure/Terjeki.Scheduler.Infrastucure.csproj", "Terjeki.Scheduler.Infrastucure/"]
-COPY ["Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj", "Terjeki.Scheduler.Web/"]
+COPYTerjeki.Scheduler.Core/Terjeki.Scheduler.Core.csproj Terjeki.Scheduler.Core/
+COPY Terjeki.Scheduler.Infrastucure/Terjeki.Scheduler.Infrastucure.csproj Terjeki.Scheduler.Infrastucure/
+COPY Terjeki.Scheduler.Application/Terjeki.Scheduler.Application.csproj Terjeki.Scheduler.Application/
+COPY Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj Terjeki.Scheduler.Web/
 
-RUN dotnet restore "./Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj"
-COPY . .
+RUN dotnet restore Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj
+
+FROM restore AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+WORKDIR /src/Terjeki.Scheduler.Web
+RUN dotnet build Terjeki.Scheduler.Web.csproj -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-WORKDIR "/src/Terjeki.Scheduler.Web"
-RUN dotnet publish "./Terjeki.Scheduler.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish Terjeki.Scheduler.Web.csproj -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM nginx:latest AS final
-EXPOSE 54836
-WORKDIR /usr/share/nginx/html
-COPY --from=publish /app/publish/wwwroot .
-COPY --from=publish /app/publish/Resources .
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Terjeki.Scheduler.Web.dll"]
 
