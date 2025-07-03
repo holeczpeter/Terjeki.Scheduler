@@ -4,7 +4,7 @@ WORKDIR /src
 
 COPY ["Terjeki.Scheduler.Core/Terjeki.Scheduler.Core.csproj", "Terjeki.Scheduler.Core/"]
 COPY ["Terjeki.Scheduler.Application/Terjeki.Scheduler.Application.csproj", "Terjeki.Scheduler.Application/"]
-COPY ["Terjeki.Scheduler.Infrastructure/Terjeki.Scheduler.Infrastructure.csproj", "Terjeki.Scheduler.Infrastructure/"]
+COPY ["Terjeki.Scheduler.Infrastucture/Terjeki.Scheduler.Infrastucture.csproj", "Terjeki.Scheduler.Infrastucture/"]
 COPY ["Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj", "Terjeki.Scheduler.Web/"]
 
 RUN dotnet restore "./Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj"
