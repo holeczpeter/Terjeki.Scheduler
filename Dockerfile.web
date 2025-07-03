@@ -1,29 +1,24 @@
-# 1. Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/sdk:8.0-noble AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["Directory.Build.targets", "."]
+COPY ["nuget.config", "."]
+COPY ["Terjeki.Scheduler.Core/Terjeki.Scheduler.Core.csproj", "Terjeki.Scheduler.Core/"]
+COPY ["Terjeki.Scheduler.Application/Terjeki.Scheduler.Application.csproj", "Terjeki.Scheduler.Application/"]
+COPY ["Terjeki.Scheduler.Infrastructure/Terjeki.Scheduler.Infrastructure.csproj", "Terjeki.Scheduler.Infrastructure/"]
+COPY ["Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj", "Terjeki.Scheduler.Web/"]
 
-# Másoljuk be a sln-t és az összes csproj-ot
-
-
-COPY Terjeki.Scheduler.Core/*.csproj   Terjeki.Scheduler.Core/
-COPY Terjeki.Scheduler.Infrastucure/*.csproj Terjeki.Scheduler.Infrastucure/
-COPY Terjeki.Scheduler.Application/*.csproj    Terjeki.Scheduler.Application/
-COPY Terjeki.Scheduler.Web/*.csproj            Terjeki.Scheduler.Web/
-
-# Restore NuGet-csomagok
-RUN dotnet restore
-
-# Másoljuk be az egész kódot, és publish
+RUN dotnet restore "./Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj"
 COPY . .
-WORKDIR /app/Terjeki.Scheduler.Web
-RUN dotnet publish -c Release -o out /p:UseAppHost=false
 
-# 2. Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
-WORKDIR /app
-EXPOSE 80
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+WORKDIR "/src/Terjeki.Scheduler.Web"
+RUN dotnet publish "./Terjeki.Scheduler.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# Másoljuk át a publishelt fájlokat
-COPY --from=build /app/Terjeki.Scheduler.Web/out ./
+FROM nginx:latest AS final
+EXPOSE 54836
+WORKDIR /usr/share/nginx/html
+COPY --from=publish /app/publish/wwwroot .
+COPY --from=publish /app/publish/Resources .
 
-ENTRYPOINT ["dotnet", "Terjeki.Scheduler.Web.dll"]
