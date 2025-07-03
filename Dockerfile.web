@@ -3,12 +3,13 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Másoljuk be a sln-t és az összes csproj-ot
-COPY Terjeki.Scheduler.sln . 
-COPY Terjeki.Scheduler.Core/*.csproj Terjeki.Scheduler.Core/
-COPY Terjeki.Scheduler.Infrastructure/*.csproj Terjeki.Scheduler.Infrastructure/
-COPY Terjeki.Scheduler.Application/*.csproj Terjeki.Scheduler.Application/
-COPY Terjeki.Scheduler.Api/*.csproj Terjeki.Scheduler.Api/
-COPY Terjeki.Scheduler.Web/*.csproj Terjeki.Scheduler.Web/
+COPY Terjeki.Scheduler.sln ./
+
+COPY Terjeki.Scheduler.Core/*.csproj   Terjeki.Scheduler.Core/
+COPY Terjeki.Scheduler.Infrastucure/*.csproj Terjeki.Scheduler.Infrastucure/
+COPY Terjeki.Scheduler.Application/*.csproj    Terjeki.Scheduler.Application/
+COPY Terjeki.Scheduler.Api/*.csproj            Terjeki.Scheduler.Api/
+COPY Terjeki.Scheduler.Web/*.csproj            Terjeki.Scheduler.Web/
 
 # Restore NuGet-csomagok
 RUN dotnet restore
