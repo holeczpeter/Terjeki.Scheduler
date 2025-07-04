@@ -7,13 +7,13 @@ WORKDIR /src
 
 COPY ["Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj", "Terjeki.Scheduler.Web/"]
 RUN dotnet restore "./Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj"
-
+--verbosity minimal
 COPY . .
 WORKDIR "/src/Terjeki.Scheduler.Web"
-RUN dotnet build "./Terjeki.Scheduler.Web.csproj" -c Release -o /app/build
+RUN dotnet build "./Terjeki.Scheduler.Web.csproj" -c Release -o /app/build --no-restore -v minimal
 
 FROM build AS publish
-RUN dotnet publish "./Terjeki.Scheduler.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Terjeki.Scheduler.Web.csproj" -c Release -o /app/publish --no-restore -v minimal \ /p:UseAppHost=false
 
 FROM  base AS final
 WORKDIR /usr/share/nginx/html

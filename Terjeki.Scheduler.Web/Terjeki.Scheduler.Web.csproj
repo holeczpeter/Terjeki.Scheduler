@@ -37,6 +37,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\.dockerignore" Link=".dockerignore">
+      <DependentUpon>$(DockerDefaultDockerfile)</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Terjeki.Scheduler.Application\Terjeki.Scheduler.Application.csproj" />
     <ProjectReference Include="..\Terjeki.Scheduler.Core\Terjeki.Scheduler.Core.csproj" />
   </ItemGroup>
