@@ -13,9 +13,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Terjeki.Scheduler.Api/Terjeki.Scheduler.Api.csproj", "Terjeki.Scheduler.Api/"]
-COPY ["Terjeki.Scheduler.Application/Terjeki.Scheduler.Application.csproj", "Terjeki.Scheduler.Application/"]
-COPY ["Terjeki.Scheduler.Core/Terjeki.Scheduler.Core.csproj", "Terjeki.Scheduler.Core/"]
-COPY ["Terjeki.Scheduler.Infrastucure/Terjeki.Scheduler.Infrastucure.csproj", "Terjeki.Scheduler.Infrastucure/"]
 RUN dotnet restore "./Terjeki.Scheduler.Api/Terjeki.Scheduler.Api.csproj"
 COPY . .
 WORKDIR "/src/Terjeki.Scheduler.Api"
