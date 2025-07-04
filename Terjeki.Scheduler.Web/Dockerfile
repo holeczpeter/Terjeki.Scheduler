@@ -1,27 +1,31 @@
-# --- Build the Blazor WebAssembly app ---
+# ----------------------------------------
+# 1) Build stage: Blazor WASM publish
+# ----------------------------------------
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-web
 WORKDIR /src
 
-# 1) csak a csproj-ok, gyorsabb cache
+# gyors cache: csak csproj-ok
 COPY Terjeki.Scheduler.Web/*.csproj ./Terjeki.Scheduler.Web/
 RUN dotnet restore Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj --verbosity minimal
 
-# 2) az összes forrás
+# forráskód másolása
 COPY . .
 
-# 3) publish WASM output
+# publishelés
 WORKDIR /src/Terjeki.Scheduler.Web
 RUN dotnet publish -c Release -o /publish /p:UseAppHost=false --verbosity minimal
 
-# --- Runtime image: serve with Nginx ---
+# ----------------------------------------
+# 2) Runtime stage: statikus fájlok Nginx alatt
+# ----------------------------------------
 FROM nginx:alpine AS runtime-web
 
-# törölheted az alapértelmezett html fájlokat
+# töröljük a default html-t
 RUN rm -rf /usr/share/nginx/html/*
 
-# másoljuk át a publishelt wwwroot-ot
+# átmásoljuk a publishelt wwwroot-ot
 COPY --from=build-web /publish/wwwroot /usr/share/nginx/html
 
-# Expose és indítás
+# port és indítás
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
