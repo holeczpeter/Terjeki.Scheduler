@@ -13,33 +13,28 @@ RUN dotnet restore Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj --verbosit
 
 # 2) Build stage
 FROM restore AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-web
 WORKDIR /src
 
-# Másoljuk be az összes forráskódot
+# Copy project file and restore
+COPY Terjeki.Scheduler.Web/*.csproj ./Terjeki.Scheduler.Web/
+RUN dotnet restore Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj
+
+# Copy everything and publish static assets
 COPY . .
-
 WORKDIR /src/Terjeki.Scheduler.Web
-RUN dotnet build Terjeki.Scheduler.Web.csproj \
-    -c Release \
-    -o /app/build \
-    --no-restore \
-    --verbosity minimal
+RUN dotnet publish -c Release -o /publish /p:UseAppHost=false
 
-# 3) Publish stage
-FROM build AS publish
-RUN dotnet publish Terjeki.Scheduler.Web.csproj \
-    -c Release \
-    -o /app/publish \
-    --no-restore \
-    --verbosity minimal \
-    -p:UseAppHost=false
-
-# 4) Runtime stage
-FROM nginx AS final
-EXPOSE 80
-EXPOSE 443
-
+# 2. NGINX stage
+FROM nginx:alpine AS web
 WORKDIR /usr/share/nginx/html
-COPY --from=publish /app/publish/wwwroot .
-# Ha van saját nginx.conf-od:
-COPY Terjeki.Scheduler.Web/nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
+
+# Remove default nginx static assets
+RUN rm -rf ./*
+
+# Copy Blazor WebAssembly build output
+COPY --from=build-web /publish ./
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
