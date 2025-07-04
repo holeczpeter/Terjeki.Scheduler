@@ -1,4 +1,4 @@
-FROM nginx AS base
+FROM nginx    AS base
 EXPOSE 80
 EXPOSE 443
 
@@ -6,18 +6,26 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 COPY ["Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj", "Terjeki.Scheduler.Web/"]
-RUN dotnet restore "./Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj" \
---verbosity minimal
+RUN dotnet restore "Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj" --verbosity minimal
+
 COPY . .
 WORKDIR "/src/Terjeki.Scheduler.Web"
-RUN dotnet build "./Terjeki.Scheduler.Web.csproj" \
--c Release -o /app/build  -v minimal
+
+RUN dotnet build "Terjeki.Scheduler.Web.csproj" \
+    -c Release \
+    -o /app/build \
+    --no-restore \
+    --verbosity minimal
 
 FROM build AS publish
-RUN dotnet publish "./Terjeki.Scheduler.Web.csproj" \
--c Release -o /app/publish -v minimal \ /p:UseAppHost=false
+RUN dotnet publish "Terjeki.Scheduler.Web.csproj" \
+    -c Release \
+    -o /app/publish \
+    --no-restore \
+    --verbosity minimal \
+    -p:UseAppHost=false
 
-FROM  base AS final
+FROM base AS final
 WORKDIR /usr/share/nginx/html
 COPY --from=publish /app/publish/wwwroot .
-COPY  ./Terjeki.Scheduler.Web/nginx.conf /etc/nginx/nginx.conf
+COPY Terjeki.Scheduler.Web/nginx.conf /etc/nginx/nginx.conf
