@@ -1,3 +1,4 @@
 {
-   "templateId": "docker-compose"
+  "schemaVersion": 2,
+  "templateId": "docker-compose"
 }
