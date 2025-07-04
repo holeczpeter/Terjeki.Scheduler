@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Terjeki.Scheduler.Web",
   "resources": {
-    "hash": "sha256-ev03Ui455A7cTvdo3s1f/bXrWEo/lcAnbJybdrOQ0kA=",
+    "hash": "sha256-2go5Qx6aL3PW60T4OnZv70aP/toxGpdPthAe9clL8iU=",
     "jsModuleNative": {
       "dotnet.native.8.0.17.qnqnu9is6n.js": "sha256-YyxJV6dv935qHoQAmjB+2qRjHeGpm4SyWxE0T/KvsIE="
     },
@@ -263,10 +263,10 @@
       "System.Xml.XmlSerializer.wasm": "sha256-a2n4NljHCk+cAlqGRzYXQOmfyVE+F0MxrtVa+8QHAE0=",
       "System.Xml.XPath.wasm": "sha256-Lq0gK0+UPGkf8ru+Va2+ijfaa6mzw22wgd1V7Up7dWs=",
       "System.Xml.XPath.XDocument.wasm": "sha256-mbt0rKHoxuQcHbhlXUV16XaemWZyZjFgGsV6nxYrdFI=",
-      "Terjeki.Scheduler.Application.wasm": "sha256-MgqKkrM9x20pBvDcaX1lD8fgcwd8M9HXRmgmlW1o5eE=",
-      "Terjeki.Scheduler.Core.wasm": "sha256-HKTbUx2TTfiqNT42ch8V4qo9I13kWsMxYl+nQFvMJt8=",
-      "Terjeki.Scheduler.Infrastucure.wasm": "sha256-1G7Qetr2oYidKLsST+VGNbzVn6Tdv5xCInRjJgjaP20=",
-      "Terjeki.Scheduler.Web.wasm": "sha256-zoIurWTWBoL2GCJ1kzfX/WJ/HltO2xJkdKUq1usVGbQ=",
+      "Terjeki.Scheduler.Application.wasm": "sha256-bccx2j09DtmDID4R+Uz1W+Ps2bFoNJUwp66dO62QAQk=",
+      "Terjeki.Scheduler.Core.wasm": "sha256-6eN3+M6H9kGMMcxNLDU40crggHXyZWojuG6Yeot+jaE=",
+      "Terjeki.Scheduler.Infrastucure.wasm": "sha256-/8D2AdfrcvjuhT9cDDwYFJhRwbjGPr4hjcDb8QIkdho=",
+      "Terjeki.Scheduler.Web.wasm": "sha256-NCwUp3s2NJFS3oE5jjlMmHudVw8LNqtNBdB6S0WoPhY=",
       "WindowsBase.wasm": "sha256-FlJ2nafNrWiJjHfIM3jHmENrSQE2LuaJULuhcZgE9Qs="
     },
     "satelliteResources": {
