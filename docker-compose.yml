@@ -1,3 +1,11 @@
+captainVersion: 4
+caproverOneClickApp:
+  instructions:
+    start: "Deploying .NET Core API, Blazor WebAssembly and MSSQL via Docker Compose"
+    end:   "Deployment finished successfully!"
+########
+
+# 2) Docker Compose (v3.8)
 version: '3.8'
 
 services:
