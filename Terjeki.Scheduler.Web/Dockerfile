@@ -11,11 +11,11 @@ RUN dotnet restore "./Terjeki.Scheduler.Web/Terjeki.Scheduler.Web.csproj" \
 COPY . .
 WORKDIR "/src/Terjeki.Scheduler.Web"
 RUN dotnet build "./Terjeki.Scheduler.Web.csproj" \
--c Release -o /app/build --no-restore -v minimal
+-c Release -o /app/build  -v minimal
 
 FROM build AS publish
 RUN dotnet publish "./Terjeki.Scheduler.Web.csproj" \
--c Release -o /app/publish --no-restore -v minimal \ /p:UseAppHost=false
+-c Release -o /app/publish -v minimal \ /p:UseAppHost=false
 
 FROM  base AS final
 WORKDIR /usr/share/nginx/html
